@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Stellar Symphony</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+    <style>
+        .constellations .constellation canvas {
+            width: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid constellations">
+        <!-- <canvas id="myChart"></canvas> -->
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-colorschemes"></script> -->
+
+    <script>
+        const getColor = (i) => {
+            const Tableau20 = ["#4E79A7", "#A0CBE8", "#F28E2B", "#FFBE7D", "#59A14F", "#8CD17D", "#B6992D", "#F1CE63", "#499894", "#86BCB6", "#E15759", "#FF9D9A", "#79706E", "#BAB0AC", "#D37295", "#FABFD2", "#B07AA1", "#D4A6C8", "#9D7660", "#D7B5A6"]
+            return Tableau20[i % 20]
+        }
+        console.log('Chart', getColor(0), getColor(19), getColor(20))
+        // Chart.defaults.global.defaultFontFamily = "Helvetica Neue";
+
+        const sort = (list) => {
+            list.sort(function(a, b) {
+                return a - b
+            })
+        }
+        const addConstellationGraphs = (starData) => {
+
+            const dataAbsmagAll = {
+                label: `ALL - absmag - average`,
+                backgroundColor: getColor(19),
+                borderColor: getColor(19),
+                data: starData.ranges.absmag.averages,
+                borderWidth: 1,
+                hidden: true
+            }
+            const dataMagAll = {
+                label: `ALL - mag - average`,
+                backgroundColor: getColor(19),
+                borderColor: getColor(19),
+                data: starData.ranges.mag.averages,
+                borderWidth: 1,
+                hidden: true
+            }
+            const dataRVAll = {
+                label: `ALL - rv - average`,
+                backgroundColor: getColor(19),
+                borderColor: getColor(19),
+                data: starData.ranges.rv.averages,
+                borderWidth: 1,
+                hidden: true
+            }
+            const dataLumAll = {
+                label: `ALL - absmag - average`,
+                backgroundColor: getColor(19),
+                borderColor: getColor(19),
+                data: starData.ranges.lum.averages,
+                borderWidth: 1,
+                hidden: true
+            }
+
+            const absmagConstellationDiffList = [dataAbsmagAll]
+
+            // starData.constellations = starData.constellations.filter(c => c.constellation.includes('S'))
+            for (const [i, constellationData] of starData.constellations.entries()) {
+                console.log(`Processing ${i+1} of ${starData.constellations.length} - ${constellationData.constellationName} - ${constellationData.constellation}`)
+                // console.log('constellationData', constellationData)
+                const div = document.createElement('div')
+                div.classList.add('constellation')
+                div.setAttribute('data-constellation', constellationData.constellation)
+
+                const absmagList = []
+                const magList = []
+                const rvList = []
+                const lumList = []
+
+                for (const star of constellationData.stars) {
+                    if (star.absmag) {
+                        absmagList.push(star.absmag)
+                    }
+                    if (star.mag) {
+                        magList.push(star.mag)
+                    }
+                    if (star.rv) {
+                        rvList.push(star.rv)
+                    }
+                    if (star.lum) {
+                        lumList.push(star.lum)
+                    }
+                }
+                const absmagMainList = []
+                const magMainList = []
+                const rvMainList = []
+                const lumMainList = []
+                for (const star of constellationData.starsMain) {
+                    if (star.absmag) {
+                        absmagMainList.push(star.absmag)
+                    }
+                    if (star.mag) {
+                        magMainList.push(star.mag)
+                    }
+                    if (star.rv) {
+                        rvMainList.push(star.rv)
+                    }
+                    if (star.lum) {
+                        lumMainList.push(star.lum)
+                    }
+                }
+
+                // console.log('list', absmagList, magList)
+                div.innerHTML = `
+                    <div class="row">
+                        <h3>${constellationData.constellationName} - ${constellationData.constellation}</h3>
+
+                        <div class="col-3">
+                            <p>Stars Total: ${constellationData.stars.length}</p>
+                        </div>
+                        <div class="col-3">
+                            <p>Stars Main Total: ${constellationData.starsMain.length}</p>
+                        </div>
+                        <div class="col-3">
+                            <!--<p>Stars Main Total: ${constellationData.starsMain.length}</p>-->
+                        </div>
+                        <div class="col-3">
+                            <!--<p>Stars Main Total: ${constellationData.starsMain.length}</p>-->
+                        </div>
+
+                        <div class="col-3"><canvas class="${constellationData.constellation}-absmag"></canvas></div>
+                        <div class="col-3"><canvas class="${constellationData.constellation}-mag"></canvas></div>
+                        <div class="col-3"><canvas class="${constellationData.constellation}-rv"></canvas></div>
+                        <div class="col-3"><canvas class="${constellationData.constellation}-lum"></canvas></div>
+
+                        <div class="col-3"><canvas class="${constellationData.constellation}-absmag-main"></canvas></div>
+                        <div class="col-3"><canvas class="${constellationData.constellation}-mag-main"></canvas></div>
+                        <div class="col-3"><canvas class="${constellationData.constellation}-rv-main"></canvas></div>
+                        <div class="col-3"><canvas class="${constellationData.constellation}-lum-main"></canvas></div>
+
+                        <div class="col-3"><canvas class="${constellationData.constellation}-absmag-ave"></canvas></div>
+                        <div class="col-3"><canvas class="${constellationData.constellation}-mag-ave"></canvas></div>
+                        <div class="col-3"><canvas class="${constellationData.constellation}-rv-ave"></canvas></div>
+                        <div class="col-3"><canvas class="${constellationData.constellation}-lum-ave"></canvas></div>
+
+                        <div class="col-3"><canvas class="${constellationData.constellation}-absmag-ave-main"></canvas></div>
+                        <div class="col-3"><canvas class="${constellationData.constellation}-mag-ave-main"></canvas></div>
+                        <div class="col-3"><canvas class="${constellationData.constellation}-rv-ave-main"></canvas></div>
+                        <div class="col-3"><canvas class="${constellationData.constellation}-lum-ave-mains"></canvas></div>
+                    </div>
+                `
+                sort(absmagList)
+                sort(magList)
+                sort(rvList)
+                sort(lumList)
+                sort(absmagMainList)
+                sort(magMainList)
+                sort(rvMainList)
+                sort(lumMainList)
+
+                document.querySelector('.constellations').appendChild(div)
+
+                // Sorted all stars
+                new Chart(document.querySelector(`.${constellationData.constellation}-absmag`), {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: `${constellationData.constellation} - absmag`,
+                            backgroundColor: getColor(i),
+                            borderColor: getColor(i),
+                            data: absmagList.map((d, di) => {
+                                return {
+                                    y: d,
+                                    x: di
+                                }
+                            })
+                        }]
+                    }
+                })
+                new Chart(document.querySelector(`.${constellationData.constellation}-mag`), {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: `${constellationData.constellation} - mag`,
+                            backgroundColor: getColor(i),
+                            borderColor: getColor(i),
+                            data: magList.map((d, di) => {
+                                return {
+                                    y: d,
+                                    x: di
+                                }
+                            })
+                        }]
+                    }
+                })
+                new Chart(document.querySelector(`.${constellationData.constellation}-rv`), {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: `${constellationData.constellation} - rv`,
+                            backgroundColor: getColor(i),
+                            borderColor: getColor(i),
+                            data: rvList.map((d, di) => {
+                                return {
+                                    y: d,
+                                    x: di
+                                }
+                            })
+                        }]
+                    }
+                })
+                new Chart(document.querySelector(`.${constellationData.constellation}-lum`), {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: `${constellationData.constellation} - lum`,
+                            backgroundColor: getColor(i),
+                            borderColor: getColor(i),
+                            data: lumList.map((d, di) => {
+                                return {
+                                    y: d,
+                                    x: di
+                                }
+                            })
+                        }]
+                    }
+                })
+
+                // Sorted main stars
+                new Chart(document.querySelector(`.${constellationData.constellation}-absmag-main`), {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: `${constellationData.constellation} - absmag - main`,
+                            backgroundColor: getColor(i),
+                            borderColor: getColor(i),
+                            data: absmagMainList.map((d, di) => {
+                                return {
+                                    y: d,
+                                    x: di
+                                }
+                            })
+                        }]
+                    }
+                })
+                new Chart(document.querySelector(`.${constellationData.constellation}-mag-main`), {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: `${constellationData.constellation} - mag - main`,
+                            backgroundColor: getColor(i),
+                            borderColor: getColor(i),
+                            data: magMainList.map((d, di) => {
+                                return {
+                                    y: d,
+                                    x: di
+                                }
+                            })
+                        }]
+                    }
+                })
+                new Chart(document.querySelector(`.${constellationData.constellation}-rv-main`), {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: `${constellationData.constellation} - rv - main`,
+                            backgroundColor: getColor(i),
+                            borderColor: getColor(i),
+                            data: rvMainList.map((d, di) => {
+                                return {
+                                    y: d,
+                                    x: di
+                                }
+                            })
+                        }]
+                    }
+                })
+                new Chart(document.querySelector(`.${constellationData.constellation}-lum-main`), {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: `${constellationData.constellation} - lum - main`,
+                            backgroundColor: getColor(i),
+                            borderColor: getColor(i),
+                            data: lumMainList.map((d, di) => {
+                                return {
+                                    y: d,
+                                    x: di
+                                }
+                            })
+                        }]
+                    }
+                })
+
+                // AVERAGES - ALL
+                const absmagConstellationDiff = {
+                    label: `${constellationData.constellation} - absmag - diff`,
+                    backgroundColor: getColor(i),
+                    borderColor: getColor(i),
+                    data: constellationData.ranges.absmag.averages.map((v, i) => v - starData.ranges.absmag.averages[i]),
+                    borderWidth: 1
+                }
+                absmagConstellationDiffList.push(absmagConstellationDiff)
+                new Chart(document.querySelector(`.${constellationData.constellation}-absmag-ave`), {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({
+                            length: constellationData.ranges.absmag.averages.length
+                        }, (_, i) => i + 1),
+                        datasets: [{
+                            label: `${constellationData.constellation} - absmag - average`,
+                            backgroundColor: getColor(i),
+                            borderColor: getColor(i),
+                            data: constellationData.ranges.absmag.averages,
+                            borderWidth: 1,
+                            hidden: true
+                        }, absmagConstellationDiff, dataAbsmagAll]
+                    }
+                })
+                new Chart(document.querySelector(`.${constellationData.constellation}-mag-ave`), {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({
+                            length: constellationData.ranges.mag.averages.length
+                        }, (_, i) => i + 1),
+                        datasets: [{
+                            label: `${constellationData.constellation} - mag - average`,
+                            backgroundColor: getColor(i),
+                            borderColor: getColor(i),
+                            data: constellationData.ranges.mag.averages,
+                            borderWidth: 1,
+                            hidden: true
+                        }, {
+                            label: `${constellationData.constellation} - mag - diff`,
+                            backgroundColor: getColor(i),
+                            borderColor: getColor(i),
+                            data: constellationData.ranges.mag.averages.map((v, i) => v - starData.ranges.mag.averages[i]),
+                            borderWidth: 1
+                        }, dataMagAll]
+                    }
+                })
+                new Chart(document.querySelector(`.${constellationData.constellation}-rv-ave`), {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({
+                            length: constellationData.ranges.rv.averages.length
+                        }, (_, i) => i + 1),
+                        datasets: [{
+                            label: `${constellationData.constellation} - rv - average`,
+                            backgroundColor: getColor(i),
+                            borderColor: getColor(i),
+                            data: constellationData.ranges.rv.averages,
+                            borderWidth: 1,
+                            hidden: true
+                        }, {
+                            label: `${constellationData.constellation} - rv - diff`,
+                            backgroundColor: getColor(i),
+                            borderColor: getColor(i),
+                            data: constellationData.ranges.rv.averages.map((v, i) => v - starData.ranges.rv.averages[i]),
+                            borderWidth: 1
+                        }, dataRVAll]
+                    }
+                })
+                new Chart(document.querySelector(`.${constellationData.constellation}-lum-ave`), {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({
+                            length: constellationData.ranges.lum.averages.length
+                        }, (_, i) => i + 1),
+                        datasets: [{
+                            label: `${constellationData.constellation} - lum - average`,
+                            backgroundColor: getColor(i),
+                            borderColor: getColor(i),
+                            data: constellationData.ranges.lum.averages,
+                            borderWidth: 1,
+                            hidden: true
+                        }, {
+                            label: `${constellationData.constellation} - lum - diff`,
+                            backgroundColor: getColor(i),
+                            borderColor: getColor(i),
+                            data: constellationData.ranges.lum.averages.map((v, i) => v - starData.ranges.lum.averages[i]),
+                            borderWidth: 1
+                        }, dataLumAll]
+                    }
+                })
+                // AVERAGES - MAIN
+                // new Chart(document.querySelector(`.${constellationData.constellation}-absmag-ave-main`), {
+                //     type: 'line',
+                //     data: {
+                //         labels: Array.from({
+                //             length: constellationData.rangesMain.absmag.averages.length
+                //         }, (_, i) => i + 1),
+                //         datasets: [{
+                //             label: `${constellationData.constellation} - absmag - average - main`,
+                //             backgroundColor: getColor(i),
+                //             borderColor: getColor(i),
+                //             data: constellationData.rangesMain.absmag.averages,
+                //             borderWidth: 1
+                //         }, dataAbsmagAll]
+                //     }
+                // })
+                new Chart(document.querySelector(`.${constellationData.constellation}-mag-ave-main`), {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({
+                            length: constellationData.rangesMain.mag.averages.length
+                        }, (_, i) => i + 1),
+                        datasets: [{
+                            label: `${constellationData.constellation} - mag - average - main`,
+                            backgroundColor: getColor(i),
+                            borderColor: getColor(i),
+                            data: constellationData.rangesMain.mag.averages,
+                            borderWidth: 1
+                        }, dataMagAll]
+                    }
+                })
+                new Chart(document.querySelector(`.${constellationData.constellation}-rv-ave-main`), {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({
+                            length: constellationData.rangesMain.rv.averages.length
+                        }, (_, i) => i + 1),
+                        datasets: [{
+                            label: `${constellationData.constellation} - rv - average - main`,
+                            backgroundColor: getColor(i),
+                            borderColor: getColor(i),
+                            data: constellationData.rangesMain.rv.averages,
+                            borderWidth: 1
+                        }, dataRVAll]
+                    }
+                })
+                // new Chart(document.querySelector(`.${constellationData.constellation}-lum-ave-main`), {
+                //     type: 'line',
+                //     data: {
+                //         labels: Array.from({
+                //             length: constellationData.rangesMain.lum.averages.length
+                //         }, (_, i) => i + 1),
+                //         datasets: [{
+                //             label: `${constellationData.constellation} - lum - average`,
+                //             backgroundColor: getColor(i),
+                //             borderColor: getColor(i),
+                //             data: constellationData.rangesMain.lum.averages,
+                //             borderWidth: 1
+                //         }, dataLumAll]
+                //     }
+                // })
+            }
+
+            const allDiv = document.createElement('div')
+            allDiv.classList.add('all-constellation')
+
+            allDiv.innerHTML = `<div class="row">
+                <h3>All</h3>
+                <div class="col-12"><canvas class="all-absmag"></canvas></div>
+            </div>`
+            document.querySelector('.constellations').prepend(allDiv)
+
+            new Chart(document.querySelector(`.all-absmag`), {
+                type: 'line',
+                data: {
+                    labels: Array.from({
+                        length: starData.ranges.absmag.averages.length
+                    }, (_, i) => i + 1),
+                    datasets: absmagConstellationDiffList
+                }
+            })
+        }
+
+        const init = async () => {
+            const starData = await (await fetch('/data/star-data.json')).json()
+            console.log('starData', starData)
+            addConstellationGraphs(starData)
+        }
+        init()
+    </script>
+
+</body>
+
+</html>

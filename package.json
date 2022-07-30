@@ -1,0 +1,19 @@
+{
+    "name": "name-in-the-stars",
+    "version": "1.0.0",
+    "description": "",
+    "main": "data-prep.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "csv-parser": "^3.0.0",
+        "fs-extra": "^10.1.0",
+        "lodash": "^4.17.21"
+    },
+    "nodemonConfig": {
+        "ignore": ["_static", "*.json"]
+    }
+}
