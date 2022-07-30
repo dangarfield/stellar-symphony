@@ -45,6 +45,7 @@ const getStarData = async () => {
         // if (data.lum < 1) {
         //   delete data.lum
         // }
+        data.ci = parseFloat(data.ci)
         results.push(data)
       })
       .on('end', () => {
@@ -154,17 +155,25 @@ const getMinMaxAndRanges = (stars, allRanges) => {
       min: _.minBy(stars, 'lum').lum,
       max: _.maxBy(stars, 'lum').lum,
       mean: _.meanBy(stars, 'lum')
+    },
+
+    ci: {
+      min: _.minBy(stars, 'ci').ci,
+      max: _.maxBy(stars, 'ci').ci,
+      mean: _.meanBy(stars, 'ci')
     }
   }
   ranges.absmag.ranges = getRange(ranges.absmag.min, ranges.absmag.max, totalSteps)
   ranges.mag.ranges = getRange(ranges.mag.min, ranges.mag.max, totalSteps)
   ranges.rv.ranges = getRange(ranges.rv.min, ranges.rv.max, totalSteps)
   ranges.lum.ranges = getRange(ranges.lum.min, ranges.lum.max, totalSteps)
+  ranges.ci.ranges = getRange(ranges.ci.min, ranges.ci.max, totalSteps)
 
   ranges.absmag.averages = getAverages(allRanges ? allRanges.absmag.ranges : ranges.absmag.ranges, 'absmag', stars)
   ranges.mag.averages = getAverages(allRanges ? allRanges.mag.ranges : ranges.mag.ranges, 'mag', stars)
   ranges.rv.averages = getAverages(allRanges ? allRanges.rv.ranges : ranges.rv.ranges, 'rv', stars)
   ranges.lum.averages = getAverages(allRanges ? allRanges.lum.ranges : ranges.lum.ranges, 'lum', stars)
+  ranges.ci.averages = getAverages(allRanges ? allRanges.ci.ranges : ranges.ci.ranges, 'ci', stars)
 
   //   console.log('ranges', ranges)
   return ranges
