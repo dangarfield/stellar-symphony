@@ -46,6 +46,17 @@ const getStarData = async () => {
         //   delete data.lum
         // }
         data.ci = parseFloat(data.ci)
+
+        data.ra = parseFloat(data.ra)
+        data.dec = parseFloat(data.dec)
+        /*
+        apparant distance between stars
+        X = R (distance) * cos(ra) * cos(dec)
+        Y = R (distance) * sin(ra) * cos(dec)
+        Z = R (distance) * sin(dec)
+
+        Math.srt( Math.square(X2 - X1) + Math.square(Y2 - Y1)  + Math.square(Y2 - Y1) )
+        */
         results.push(data)
       })
       .on('end', () => {
@@ -73,9 +84,10 @@ const getConstellationShipData = () => {
   //   data = data.split(/\s+/)
   data = data.map(d => {
     const dSplit = d.split(' ')// d.split[/\t+/]
+    const lines = _.chunk(dSplit.slice(3), 2)
     return {
       constellation: dSplit[0],
-      lines: _.chunk(dSplit.slice(3), 2)
+      lines: lines
     }
   })
   //   console.log('data', data, data.length)
