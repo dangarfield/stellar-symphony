@@ -908,7 +908,7 @@
 
         const init = async () => {
             const starData = await (await fetch('/data/star-data.json')).json()
-            starData.constellations = starData.constellations.filter(c => c.constellation.includes('S'))
+            starData.constellations = starData.constellations.filter(c => c.constellation.includes('P'))
 
             console.log('starData', starData)
             addConstellationGraphs(starData)

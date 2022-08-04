@@ -49,14 +49,7 @@ const getStarData = async () => {
 
         data.ra = parseFloat(data.ra)
         data.dec = parseFloat(data.dec)
-        /*
-        apparant distance between stars
-        X = R (distance) * cos(ra) * cos(dec)
-        Y = R (distance) * sin(ra) * cos(dec)
-        Z = R (distance) * sin(dec)
 
-        Math.srt( Math.square(X2 - X1) + Math.square(Y2 - Y1)  + Math.square(Y2 - Y1) )
-        */
         results.push(data)
       })
       .on('end', () => {
@@ -84,10 +77,10 @@ const getConstellationShipData = () => {
   //   data = data.split(/\s+/)
   data = data.map(d => {
     const dSplit = d.split(' ')// d.split[/\t+/]
-    const lines = _.chunk(dSplit.slice(3), 2)
+    const lines = _.chunk(dSplit.slice(3), 2).map(l => { return { starIds: l } })
     return {
       constellation: dSplit[0],
-      lines: lines
+      lines
     }
   })
   //   console.log('data', data, data.length)
@@ -107,7 +100,7 @@ const getConstellationNamesData = () => {
 const groupByConstellation = (rawData) => {
 //   console.log('constellationShip', constellationShip)
   return _.chain(rawData.rawStarData)
-    .filter(r => r.con !== '')
+    // .filter(r => r.con !== '')
     // .filter(r => r.con === 'Sct')
     // .filter(r => r.con.includes('S'))
     .groupBy('con')
@@ -119,7 +112,40 @@ const groupByConstellation = (rawData) => {
       ))
     )
     .map(v => {
-      v.starsMain = _.uniq(_.flatten(v.lines)).map(sid => v.stars.find(s => s.hip === sid)).filter(s => s !== undefined)
+      v.starsMain = _.uniq(_.flatten(v.lines.map(l => l.starIds))).map(sid => v.stars.find(s => s.hip === sid)).filter(s => s !== undefined)
+      v.starsMain.sort((a, b) => b.mag - a.mag)
+
+      const alpha = v.starsMain.find(s => s.bayer === 'Alp')
+      if (alpha === null) {
+        console.log('NO Alpha', v.constellationName)
+      }
+      /*
+        apparant distance between stars
+        X = R (distance) * cos(ra) * cos(dec)
+        Y = R (distance) * sin(ra) * cos(dec)
+        Z = R (distance) * sin(dec)
+
+        Math.srt( Math.square(X2 - X1) + Math.square(Y2 - Y1)  + Math.square(Y2 - Y1) )
+        */
+
+      for (const starMain of v.starsMain) {
+        const R = 100
+        const cosRa = Math.cos(starMain.ra)
+        const sinRa = Math.sin(starMain.ra)
+        const cosDec = Math.cos(starMain.dec)
+        const sinDec = Math.sin(starMain.dec)
+        starMain.ax = R * cosRa * cosDec
+        starMain.ay = R * sinRa * cosDec
+        starMain.az = R * sinDec
+      }
+      // Note: Some lines extend to other constellations, Pegasus to Andromeda for example
+      for (const line of v.lines) {
+        const starA = v.starsMain.find(s => s.hip === line.starIds[0]) || rawData.rawStarData.find(s => s.hip === line.starIds[0])
+        const starB = v.starsMain.find(s => s.hip === line.starIds[1]) || rawData.rawStarData.find(s => s.hip === line.starIds[1])
+        if (starA && starB) {
+          line.distance = Math.sqrt(Math.pow(starB.ax - starA.ax, 2) + Math.pow(starB.ay - starA.ay, 2) + Math.pow(starB.az - starA.az, 2))
+        }
+      }
       return v
     })
     .value()
