@@ -115,10 +115,27 @@ const groupByConstellation = (rawData) => {
       v.starsMain = _.uniq(_.flatten(v.lines.map(l => l.starIds))).map(sid => v.stars.find(s => s.hip === sid)).filter(s => s !== undefined)
       v.starsMain.sort((a, b) => b.mag - a.mag)
 
-      const alpha = v.starsMain.find(s => s.bayer === 'Alp')
-      if (alpha === null) {
-        console.log('NO Alpha', v.constellationName)
+      let alpha = v.starsMain.find(s => s.bayer === 'Alp')
+
+      const R = 100
+      // console.log('--------------------------------------------------------')
+      if (alpha === undefined || alpha === null) {
+        const alphaCandidates = v.starsMain.filter(s => s.bayer !== '')
+        alphaCandidates.sort((a, b) => a.absmag - b.absmag)
+        // console.log('alpha can', alphaCandidates[0])
+        alpha = alphaCandidates[0]
+        // console.log('NO Alpha -', v.constellationName, '-', alpha.bayer)
       }
+      // console.log('alpha', alpha, v.constellationName, v.starsMain.length, v.stars.length)
+      // console.log('alpha.ra', alpha.ra)
+      const alphaCosRa = Math.cos(alpha.ra)
+      const alphaSinRa = Math.sin(alpha.ra)
+      const alphaCosDec = Math.cos(alpha.dec)
+      const alphaSinDec = Math.sin(alpha.dec)
+      alpha.ax = R * alphaCosRa * alphaCosDec
+      alpha.ay = R * alphaSinRa * alphaCosDec
+      alpha.az = R * alphaSinDec
+      alpha.alpha = true
       /*
         apparant distance between stars
         X = R (distance) * cos(ra) * cos(dec)
@@ -129,7 +146,6 @@ const groupByConstellation = (rawData) => {
         */
 
       for (const starMain of v.starsMain) {
-        const R = 100
         const cosRa = Math.cos(starMain.ra)
         const sinRa = Math.sin(starMain.ra)
         const cosDec = Math.cos(starMain.dec)
@@ -137,6 +153,8 @@ const groupByConstellation = (rawData) => {
         starMain.ax = R * cosRa * cosDec
         starMain.ay = R * sinRa * cosDec
         starMain.az = R * sinDec
+
+        starMain.distanceFromAlpha = Math.sqrt(Math.pow(starMain.ax - alpha.ax, 2) + Math.pow(starMain.ay - alpha.ay, 2) + Math.pow(starMain.az - alpha.az, 2))
       }
       // Note: Some lines extend to other constellations, Pegasus to Andromeda for example
       for (const line of v.lines) {
