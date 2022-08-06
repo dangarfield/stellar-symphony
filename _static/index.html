@@ -51,8 +51,8 @@
                     synth.triggerAttackRelease(note, "4n", time)
                 }, scaleNotes, 'up').start(0)
                 Tone.Transport.bpm.value = 120
-                Tone.Transport.start()
-            } else if (toneData.type === 'chord') {
+
+            } else if (toneData.type === 'chord' || toneData.type === 'melody') {
 
                 const synth = new Tone.PolySynth().toDestination();
 
@@ -82,7 +82,20 @@
                         })
                     }
                 }
-                console.log()
+
+                if (toneData.melody) {
+                    for (const melodyNote of toneData.melody) {
+                        notesToPlay.push({
+                            time: melodyNote.timing,
+                            note: melodyNote.note,
+                            duration: melodyNote.duration
+                        })
+                    }
+                }
+                // note: 'C4',
+                // timing: `${Math.floor(noteCount/4)}:${noteCount%4}`,
+                // duration: '8n'
+
 
                 const part = new Tone.Part(((time, value) => {
                         // the value is an object which contains both the note and the velocity
@@ -95,9 +108,8 @@
                 part.loopEnd = "4m";
 
                 Tone.Transport.bpm.value = 80
-                Tone.Transport.start()
             }
-
+            Tone.Transport.start()
 
         }
         const sort = (list) => {
@@ -232,6 +244,35 @@
             // const scaleFound = allScales[0]
             // console.log('scaleFound', scaleFound)
             return allScales[0]
+        }
+        const getMelody = (stars, scale) => {
+            const melodyStars = stars.filter(s => s.bayer !== '')
+            melodyStars.sort((a, b) => a.distanceFromAlpha - b.distanceFromAlpha)
+
+            // 15 notes -> 4 bars, across total 32 half notes
+            // 7 notes -> 2 bars, acrodd total 16 half notes
+            // 3 notes -> 2 bars, across total 16 half notes
+            const totalBars = melodyStars.length >= 7 ? 4 : 2
+            const totalNoteCount = (8 * totalBars) - 1
+            const timeFactor = melodyStars[melodyStars.length - 1].distanceFromAlpha / totalNoteCount
+
+            const scaleNotes = scale.intervals.map(Tonal.Note.transposeFrom('C')).map(v => (v) + '5')
+
+            console.log('scaleNotes', scaleNotes, scale)
+            const melody = melodyStars.map((s, i) => {
+                const noteCount = Math.round(s.distanceFromAlpha / timeFactor)
+                return {
+                    // bayer: s.bayer,
+                    // distanceFromAlpha: s.distanceFromAlpha,
+                    noteCount: noteCount,
+                    note: scaleNotes[i % scaleNotes.length],
+                    timing: `${Math.floor(noteCount/8)}:${Math.floor(noteCount/2)%4}:${noteCount%2===1?2:0}`,
+                    duration: '8n' // Todo lengths
+                }
+            }) // TODO - fill out any notes played at the same time?
+
+            console.log('melody stars', melodyStars, '-', totalBars, totalNoteCount, timeFactor, '-', melody)
+            return melody
         }
         const addConstellationGraphs = (starData) => {
             const dataAbsmagAll = {
@@ -417,6 +458,7 @@
                 chordList.push(chords)
                 // console.log('chords', chords)
 
+                const melody = getMelody(constellationData.starsMain, scale)
 
                 div.innerHTML = `
                     <div class="row">
@@ -434,6 +476,11 @@
                             </p>
                             <p>Chords: ${chords.map(v => toRomanNumeral(v.interval) + (v.decoration?`add${v.decoration}`:'')).join(', ')}
                                 <span class="badge rounded-pill text-bg-secondary tone-clip" data-tone="${encodeURIComponent(JSON.stringify({type:'chord',chords:chords}))}">
+                                    <i class="bi bi-play-circle"></i>
+                                </span>
+                            </p>
+                            <p>Melody: ${melody.map(m => `${m.note}-${m.timing}`)}
+                                <span class="badge rounded-pill text-bg-secondary tone-clip" data-tone="${encodeURIComponent(JSON.stringify({type:'chord',chords:chords, melody:melody}))}">
                                     <i class="bi bi-play-circle"></i>
                                 </span>
                             </p>
@@ -898,9 +945,9 @@
 
             for (const button of document.querySelectorAll('.tone-clip')) {
                 button.addEventListener('click', function() {
-                    console.log('this', this)
+                    // console.log('this', this)
                     const toneData = JSON.parse(decodeURIComponent(this.getAttribute('data-tone')))
-                    console.log('toneData', toneData)
+                    // console.log('toneData', toneData)
                     playToneClip(toneData)
                 })
             }
@@ -908,13 +955,13 @@
 
         const init = async () => {
             const starData = await (await fetch('/data/star-data.json')).json()
-            starData.constellations = starData.constellations.filter(c => c.constellation.includes('P'))
+            starData.constellations = starData.constellations.filter(c => c.constellation.includes('S'))
 
             console.log('starData', starData)
             addConstellationGraphs(starData)
 
             document.body.addEventListener('keypress', function(e) {
-                console.log('e', e)
+                // console.log('e', e)
                 if (e.code === 'Space') {
                     stopToneClips()
                 }

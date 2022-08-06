@@ -117,7 +117,7 @@ const groupByConstellation = (rawData) => {
 
       let alpha = v.starsMain.find(s => s.bayer === 'Alp')
 
-      const R = 100
+      const R = 1
       // console.log('--------------------------------------------------------')
       if (alpha === undefined || alpha === null) {
         const alphaCandidates = v.starsMain.filter(s => s.bayer !== '')
@@ -128,6 +128,7 @@ const groupByConstellation = (rawData) => {
       }
       // console.log('alpha', alpha, v.constellationName, v.starsMain.length, v.stars.length)
       // console.log('alpha.ra', alpha.ra)
+
       const alphaCosRa = Math.cos(alpha.ra)
       const alphaSinRa = Math.sin(alpha.ra)
       const alphaCosDec = Math.cos(alpha.dec)
@@ -135,6 +136,14 @@ const groupByConstellation = (rawData) => {
       alpha.ax = R * alphaCosRa * alphaCosDec
       alpha.ay = R * alphaSinRa * alphaCosDec
       alpha.az = R * alphaSinDec
+
+      const phi = Math.PI / 2 - alpha.dec
+      const theta = alpha.ra
+      const sinPhiRadius = Math.sin(phi) * R
+      alpha.ax2 = sinPhiRadius * Math.sin(theta)
+      alpha.ay2 = Math.cos(phi) * R
+      alpha.az2 = sinPhiRadius * Math.cos(theta)
+
       alpha.alpha = true
       /*
         apparant distance between stars
@@ -154,7 +163,15 @@ const groupByConstellation = (rawData) => {
         starMain.ay = R * sinRa * cosDec
         starMain.az = R * sinDec
 
+        const phi = Math.PI / 2 - starMain.dec
+        const theta = starMain.ra
+        const sinPhiRadius = Math.sin(phi) * R
+        starMain.ax2 = sinPhiRadius * Math.sin(theta)
+        starMain.ay2 = Math.cos(phi) * R
+        starMain.az2 = sinPhiRadius * Math.cos(theta)
+
         starMain.distanceFromAlpha = Math.sqrt(Math.pow(starMain.ax - alpha.ax, 2) + Math.pow(starMain.ay - alpha.ay, 2) + Math.pow(starMain.az - alpha.az, 2))
+        starMain.distanceFromAlpha2 = Math.sqrt(Math.pow(starMain.ax2 - alpha.ax2, 2) + Math.pow(starMain.ay2 - alpha.ay2, 2) + Math.pow(starMain.az2 - alpha.az2, 2))
       }
       // Note: Some lines extend to other constellations, Pegasus to Andromeda for example
       for (const line of v.lines) {
