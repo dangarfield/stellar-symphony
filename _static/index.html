@@ -264,6 +264,7 @@
         const getMelody = (stars, scale) => {
             const melodyStars = stars//.filter(s => s.bayer !== '')
             melodyStars.sort((a, b) => a.distanceFromAlpha - b.distanceFromAlpha)
+            // melodyStars.sort((a, b) => a.distanceFromCentre - b.distanceFromCentre) // Could also use distanceFromCentre
 
             // 15 notes -> 4 bars, across total 32 half notes
             // 7 notes -> 2 bars, acrodd total 16 half notes
@@ -271,12 +272,14 @@
             const totalBars = melodyStars.length >= 7 ? 4 : 2
             const totalNoteCount = (8 * totalBars) - 1
             const timeFactor = melodyStars[melodyStars.length - 1].distanceFromAlpha / totalNoteCount
+            // const timeFactor = melodyStars[melodyStars.length - 1].distanceFromCentre / totalNoteCount
 
             const scaleNotes = scale.intervals.map(Tonal.Note.transposeFrom('C')).map(v => (v) + '5')
 
             console.log('scaleNotes', scaleNotes, scale)
             const melody = melodyStars.map((s, i) => {
                 const noteCount = Math.round(s.distanceFromAlpha / timeFactor)
+                // const noteCount = Math.round(s.distanceFromCentre / timeFactor)
                 return {
                     // bayer: s.bayer,
                     // distanceFromAlpha: s.distanceFromAlpha,
@@ -978,8 +981,8 @@
             scene.background = new THREE.Color(0x000000);
 
             var camera = new THREE.PerspectiveCamera(
-                75, // Field of View
-                600 / 600, // aspect ratio
+                35, // Field of View
+                1200 / 600, // aspect ratio
                 0.001, // near clipping plane
                 1000 // far clipping plane
             );
@@ -988,13 +991,13 @@
                 antialias: true // smooth edges
             });
 
-            renderer.setSize(600, 600);
+            renderer.setSize(1200, 600);
             document.querySelector('.star-map').appendChild(renderer.domElement);
 
             const controls = new OrbitControls(camera, renderer.domElement);
             // controls.rotateSpeed *= -1; // This isn't working, should ideally be opposite up and down, scroll in / out, not pan
             controls.minDistance = -1
-            controls.maxDistance = 1
+            controls.maxDistance = 2
             // console.log('controls', controls)
             // controls.addEventListener( 'change', function(change) {
                 // camera.lookAt(new THREE.Vector3(0,0,0).lerp(camera.position, 2))
@@ -1005,28 +1008,39 @@
             // scene.add(cube);
 
             // POINTS
+            const sprite = new THREE.TextureLoader().load( 'disc.png' );
+
             const bufGeom = new THREE.BufferGeometry()
             const points = new THREE.Points(bufGeom, new THREE.PointsMaterial({
-                size: 0.01,
-                color: 0x00FF00,
-                // vertexColors: THREE.VertexColors
+                size: 0.03,
+                // color: 0x00FF00,
+                vertexColors: true,//THREE.VertexColors
+                transparent: true,
+                sizeAttenuation: true,
+                map: sprite
             }))
             const pointsArray = []
             const colorsArray = []
             let targetCameraPos
             for (const constellation of starData.constellations) {//.filter(c => c.constellationName === 'Sagitta')) {
+
+                const mainStarHips = constellation.starsMain.map(s => s.hip)
+                for (const star of constellation.stars.filter(s => !mainStarHips.includes(s.hip))) {
+                    pointsArray.push(star.ax, star.ay, star.az)
+                    colorsArray.push(1,1,1,0.3)
+                }
                 for (const star of constellation.starsMain) {
                     pointsArray.push(star.ax, star.ay, star.az)
-                    colorsArray.push(0,1,0)
+                    colorsArray.push(0,1,0,1)
                 }
                 pointsArray.push(constellation.centre.x, constellation.centre.y, constellation.centre.z)
-                colorsArray.push(1,0,0)
+                colorsArray.push(1,0,0,1)
             }
             const vertices = new Float32Array(pointsArray)
             bufGeom.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
             const colors = new Float32Array(colorsArray)
-            bufGeom.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-            // TODO - get colors working
+            bufGeom.setAttribute('color', new THREE.BufferAttribute(colors, 4));
+
             scene.add(points)
 
             // LINES
@@ -1037,13 +1051,15 @@
             for (const constellation of starData.constellations) {
                 for (const lines of constellation.lines) {
                     const points = []
-                    for (const point of lines.points) {
-                        points.push( new THREE.Vector3( point.x,point.y,point.z ) )
+                    if(lines.points) {
+                        for (const point of lines.points) {
+                            points.push( new THREE.Vector3( point.x,point.y,point.z ) )
+                        }
+                        const lineGeom = new THREE.BufferGeometry().setFromPoints( points );
+                        const line = new THREE.Line( lineGeom, lineMaterial );
+                        scene.add( line );
                     }
-                    const lineGeom = new THREE.BufferGeometry().setFromPoints( points );
 
-                    const line = new THREE.Line( lineGeom, lineMaterial );
-                    scene.add( line );
 
                 }
 
@@ -1079,7 +1095,7 @@
         }
         const init = async () => {
             const starData = await (await fetch('/data/star-data.json')).json()
-            starData.constellations = starData.constellations.filter(c => c.constellation.includes('T'))
+            // starData.constellations = starData.constellations.filter(c => c.constellation.includes('S'))
 
             console.log('starData', starData)
             addConstellationGraphs(starData)

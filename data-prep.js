@@ -52,6 +52,10 @@ const getStarData = async () => {
         data.dec = parseFloat(data.dec)
         data.decrad = parseFloat(data.decrad)
 
+        const {x, y, z} = getXYZFromRaDec(1, data.decrad, data.rarad)
+        data.ax = x
+        data.ay = y
+        data.az = z
         results.push(data)
       })
       .on('end', () => {
@@ -117,6 +121,12 @@ const groupByConstellation = (rawData) => {
       v.starsMain = _.uniq(_.flatten(v.lines.map(l => l.starIds))).map(sid => v.stars.find(s => s.hip === sid)).filter(s => s !== undefined)
       v.starsMain.sort((a, b) => b.mag - a.mag)
 
+      v.centre = {
+        x: _.meanBy(v.starsMain, 'ax'),
+        y: _.meanBy(v.starsMain, 'ay'),
+        z: _.meanBy(v.starsMain, 'az')
+      }
+
       let alpha = v.starsMain.find(s => s.bayer === 'Alp')
 
       const R = 1
@@ -131,20 +141,21 @@ const groupByConstellation = (rawData) => {
       // console.log('alpha', alpha, v.constellationName, v.starsMain.length, v.stars.length)
       // console.log('alpha.ra', alpha.ra)
 
-      const {x, y, z} = getXYZFromRaDec(R, alpha.decrad, alpha.rarad)
-      alpha.ax = x
-      alpha.ay = y
-      alpha.az = z
+      // const {x, y, z} = getXYZFromRaDec(R, alpha.decrad, alpha.rarad)
+      // alpha.ax = x
+      // alpha.ay = y
+      // alpha.az = z
 
       alpha.alpha = true
 
       for (const starMain of v.starsMain) {
-        const {x, y, z} = getXYZFromRaDec(R, starMain.decrad, starMain.rarad)
-        starMain.ax = x
-        starMain.ay = y
-        starMain.az = z
+        // const {x, y, z} = getXYZFromRaDec(R, starMain.decrad, starMain.rarad)
+        // starMain.ax = x
+        // starMain.ay = y
+        // starMain.az = z
 
         starMain.distanceFromAlpha = Math.sqrt(Math.pow(starMain.ax - alpha.ax, 2) + Math.pow(starMain.ay - alpha.ay, 2) + Math.pow(starMain.az - alpha.az, 2))
+        starMain.distanceFromCentre = Math.sqrt(Math.pow(starMain.ax - v.centre.x, 2) + Math.pow(starMain.ay - v.centre.y, 2) + Math.pow(starMain.az - v.centre.z, 2))
       }
       // Note: Some lines extend to other constellations, Pegasus to Andromeda for example
       for (const line of v.lines) {
@@ -154,12 +165,6 @@ const groupByConstellation = (rawData) => {
           line.distance = Math.sqrt(Math.pow(starB.ax - starA.ax, 2) + Math.pow(starB.ay - starA.ay, 2) + Math.pow(starB.az - starA.az, 2))
           line.points = [{x: starA.ax, y: starA.ay, z: starA.az}, {x: starB.ax, y: starB.ay, z: starB.az}]
         }
-      }
-
-      v.centre = {
-        x: _.meanBy(v.starsMain, 'ax'),
-        y: _.meanBy(v.starsMain, 'ay'),
-        z: _.meanBy(v.starsMain, 'az')
       }
 
       return v
