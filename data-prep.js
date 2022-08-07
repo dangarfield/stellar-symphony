@@ -48,7 +48,9 @@ const getStarData = async () => {
         data.ci = parseFloat(data.ci)
 
         data.ra = parseFloat(data.ra)
+        data.rarad = parseFloat(data.rarad)
         data.dec = parseFloat(data.dec)
+        data.decrad = parseFloat(data.decrad)
 
         results.push(data)
       })
@@ -129,20 +131,12 @@ const groupByConstellation = (rawData) => {
       // console.log('alpha', alpha, v.constellationName, v.starsMain.length, v.stars.length)
       // console.log('alpha.ra', alpha.ra)
 
-      const alphaCosRa = Math.cos(alpha.ra)
-      const alphaSinRa = Math.sin(alpha.ra)
-      const alphaCosDec = Math.cos(alpha.dec)
-      const alphaSinDec = Math.sin(alpha.dec)
-      alpha.ax = R * alphaCosRa * alphaCosDec
-      alpha.ay = R * alphaSinRa * alphaCosDec
-      alpha.az = R * alphaSinDec
-
-      const phi = Math.PI / 2 - alpha.dec
-      const theta = alpha.ra
+      const phi = Math.PI / 2 - alpha.decrad
+      const theta = alpha.rarad
       const sinPhiRadius = Math.sin(phi) * R
-      alpha.ax2 = sinPhiRadius * Math.sin(theta)
-      alpha.ay2 = Math.cos(phi) * R
-      alpha.az2 = sinPhiRadius * Math.cos(theta)
+      alpha.ax = sinPhiRadius * Math.sin(theta)
+      alpha.ay = Math.cos(phi) * R
+      alpha.az = sinPhiRadius * Math.cos(theta)
 
       alpha.alpha = true
       /*
@@ -155,23 +149,14 @@ const groupByConstellation = (rawData) => {
         */
 
       for (const starMain of v.starsMain) {
-        const cosRa = Math.cos(starMain.ra)
-        const sinRa = Math.sin(starMain.ra)
-        const cosDec = Math.cos(starMain.dec)
-        const sinDec = Math.sin(starMain.dec)
-        starMain.ax = R * cosRa * cosDec
-        starMain.ay = R * sinRa * cosDec
-        starMain.az = R * sinDec
-
-        const phi = Math.PI / 2 - starMain.dec
-        const theta = starMain.ra
+        const phi = Math.PI / 2 - starMain.decrad
+        const theta = starMain.rarad
         const sinPhiRadius = Math.sin(phi) * R
-        starMain.ax2 = sinPhiRadius * Math.sin(theta)
-        starMain.ay2 = Math.cos(phi) * R
-        starMain.az2 = sinPhiRadius * Math.cos(theta)
+        starMain.ax = sinPhiRadius * Math.sin(theta)
+        starMain.ay = Math.cos(phi) * R
+        starMain.az = sinPhiRadius * Math.cos(theta)
 
         starMain.distanceFromAlpha = Math.sqrt(Math.pow(starMain.ax - alpha.ax, 2) + Math.pow(starMain.ay - alpha.ay, 2) + Math.pow(starMain.az - alpha.az, 2))
-        starMain.distanceFromAlpha2 = Math.sqrt(Math.pow(starMain.ax2 - alpha.ax2, 2) + Math.pow(starMain.ay2 - alpha.ay2, 2) + Math.pow(starMain.az2 - alpha.az2, 2))
       }
       // Note: Some lines extend to other constellations, Pegasus to Andromeda for example
       for (const line of v.lines) {
