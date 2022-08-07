@@ -131,30 +131,18 @@ const groupByConstellation = (rawData) => {
       // console.log('alpha', alpha, v.constellationName, v.starsMain.length, v.stars.length)
       // console.log('alpha.ra', alpha.ra)
 
-      const phi = Math.PI / 2 - alpha.decrad
-      const theta = alpha.rarad
-      const sinPhiRadius = Math.sin(phi) * R
-      alpha.ax = sinPhiRadius * Math.sin(theta)
-      alpha.ay = Math.cos(phi) * R
-      alpha.az = sinPhiRadius * Math.cos(theta)
+      const {x, y, z} = getXYZFromRaDec(R, alpha.decrad, alpha.rarad)
+      alpha.ax = x
+      alpha.ay = y
+      alpha.az = z
 
       alpha.alpha = true
-      /*
-        apparant distance between stars
-        X = R (distance) * cos(ra) * cos(dec)
-        Y = R (distance) * sin(ra) * cos(dec)
-        Z = R (distance) * sin(dec)
-
-        Math.srt( Math.square(X2 - X1) + Math.square(Y2 - Y1)  + Math.square(Y2 - Y1) )
-        */
 
       for (const starMain of v.starsMain) {
-        const phi = Math.PI / 2 - starMain.decrad
-        const theta = starMain.rarad
-        const sinPhiRadius = Math.sin(phi) * R
-        starMain.ax = sinPhiRadius * Math.sin(theta)
-        starMain.ay = Math.cos(phi) * R
-        starMain.az = sinPhiRadius * Math.cos(theta)
+        const {x, y, z} = getXYZFromRaDec(R, starMain.decrad, starMain.rarad)
+        starMain.ax = x
+        starMain.ay = y
+        starMain.az = z
 
         starMain.distanceFromAlpha = Math.sqrt(Math.pow(starMain.ax - alpha.ax, 2) + Math.pow(starMain.ay - alpha.ay, 2) + Math.pow(starMain.az - alpha.az, 2))
       }
@@ -164,11 +152,29 @@ const groupByConstellation = (rawData) => {
         const starB = v.starsMain.find(s => s.hip === line.starIds[1]) || rawData.rawStarData.find(s => s.hip === line.starIds[1])
         if (starA && starB) {
           line.distance = Math.sqrt(Math.pow(starB.ax - starA.ax, 2) + Math.pow(starB.ay - starA.ay, 2) + Math.pow(starB.az - starA.az, 2))
+          line.points = [{x: starA.ax, y: starA.ay, z: starA.az}, {x: starB.ax, y: starB.ay, z: starB.az}]
         }
       }
+
+      v.centre = {
+        x: _.meanBy(v.starsMain, 'ax'),
+        y: _.meanBy(v.starsMain, 'ay'),
+        z: _.meanBy(v.starsMain, 'az')
+      }
+
       return v
     })
     .value()
+}
+const getXYZFromRaDec = (R, dec, ra) => {
+  const phi = Math.PI / 2 - dec
+  const theta = ra
+  const sinPhiRadius = Math.sin(phi) * R
+  return {
+    x: sinPhiRadius * Math.sin(theta),
+    y: Math.cos(phi) * R,
+    z: sinPhiRadius * Math.cos(theta)
+  }
 }
 const getRange = (min, max, totalSteps) => {
   let range = _.range(min, max, (max - min) / (totalSteps))
