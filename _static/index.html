@@ -15,6 +15,18 @@
         .tone-clip:hover {
             cursor: pointer;
         }
+
+        .star-map {
+            position: relative;
+        }
+
+        .label {
+            color: #FFF;
+            font-family: sans-serif;
+            padding: 2px;
+            background: rgba(0, 0, 0, .6);
+            font-family: 12px;
+        }
     </style>
 </head>
 
@@ -46,6 +58,10 @@
         import * as THREE from 'https://unpkg.com/three@0.143.0/build/three.module.js';
         import { OrbitControls} from 'https://unpkg.com/three@0.143.0/examples/jsm/controls/OrbitControls.js';
         import { PointerLockControls } from 'https://unpkg.com/three@0.143.0/examples/jsm/controls/PointerLockControls.js';
+        import { Line2 } from 'https://unpkg.com/three@0.143.0/examples/jsm/lines/Line2.js';
+        import { LineMaterial } from 'https://unpkg.com/three@0.143.0/examples/jsm/lines/LineMaterial.js';
+        import { LineGeometry } from 'https://unpkg.com/three@0.143.0/examples/jsm/lines/LineGeometry.js';
+		import { CSS2DRenderer, CSS2DObject } from 'https://unpkg.com/three@0.143.0/examples/jsm/renderers/CSS2DRenderer.js';
 
         const getColor = (i) => {
             const Tableau20 = ["#4E79A7", "#A0CBE8", "#F28E2B", "#FFBE7D", "#59A14F", "#8CD17D", "#B6992D", "#F1CE63",
@@ -316,7 +332,7 @@
                 // const note = scaleNotes[Math.floor((s.angleFromCentre%180)/(180/7))]
                 const note = scaleNotes[Math.floor((s.distanceFromCentre/maxDistance) * (scaleNotes.length-1))]
 
-                console.log('star', s.bayer, s.proper, '-', s.angleFromCentre, noteCount, '-', scaleNotes, s.distanceFromCentre, s.distanceFromCentre/maxDistance, (s.distanceFromCentre/maxDistance) * (scaleNotes.length-1), note)
+                // console.log('star', s.bayer, s.proper, '-', s.angleFromCentre, noteCount, '-', scaleNotes, s.distanceFromCentre, s.distanceFromCentre/maxDistance, (s.distanceFromCentre/maxDistance) * (scaleNotes.length-1), note)
                 return {
                     noteCount: noteCount,
                     note: note,//scaleNotes[i % scaleNotes.length],
@@ -1016,7 +1032,36 @@
             addStarMap(starData)
         }
 
+        function starVertexShader() {
+            return `
+                attribute float size;
+                attribute vec3 customColor;
+                varying vec3 vColor;
+
+                void main() {
+                    vColor = customColor;
+                    vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+                    gl_PointSize = size * ( 300.0 / -mvPosition.z );
+                    gl_Position = projectionMatrix * mvPosition;
+                }
+            `
+        }
+
+        function starFragmentShader() {
+            return `
+                uniform vec3 color;
+                uniform sampler2D pointTexture;
+                varying vec3 vColor;
+                void main() {
+                    gl_FragColor = vec4( color * vColor, 1.0 );
+                    gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord );
+                }
+            `
+        }
+
+
         const addStarMap = async (starData) => {
+
             const updateFovFromDistance = () => {
                 camera.fov = 25 + (controls.getDistance()*30)
                 camera.updateProjectionMatrix()
@@ -1035,19 +1080,25 @@
                 alpha: true, // transparent background
                 antialias: true // smooth edges
             });
-
             renderer.setSize(1200, 600);
             document.querySelector('.star-map').appendChild(renderer.domElement);
+            const labelRenderer = new CSS2DRenderer();
+            labelRenderer.setSize( 1200, 600 );
+            labelRenderer.domElement.style.position = 'absolute';
+            labelRenderer.domElement.style.top = '0px';
+            labelRenderer.domElement.style.pointerEvents = 'none'
+            document.querySelector('.star-map').appendChild( labelRenderer.domElement )
 
             const controls = new OrbitControls(camera, renderer.domElement);
             // controls.rotateSpeed *= -1; // This isn't working, should ideally be opposite up and down, scroll in / out, not pan
             controls.minDistance = 0
             controls.maxDistance = 1
+            controls.zoomSpeed = 2
             // console.log('controls', controls)
             controls.addEventListener( 'change', function(change) {
                 // camera.lookAt(new THREE.Vector3(0,0,0).lerp(camera.position, 2))
                 updateFovFromDistance()
-                console.log('control change', controls.getDistance(), camera.fov)
+                // console.log('control change', controls.getDistance(), camera.fov)
             } );
 
             // var cube = new THREE.Mesh(new THREE.BoxGeometry(0.001, 0.001, 0.001), new THREE.MeshNormalMaterial())
@@ -1057,67 +1108,90 @@
             const sprite = new THREE.TextureLoader().load( 'disc.png' );
 
             const bufGeom = new THREE.BufferGeometry()
-            const points = new THREE.Points(bufGeom, new THREE.PointsMaterial({
-                size: 0.03,
-                // color: 0x00FF00,
-                vertexColors: true,//THREE.VertexColors
-                transparent: true,
-                sizeAttenuation: true,
-                map: sprite
+            const points = new THREE.Points(bufGeom, new THREE.ShaderMaterial({
+            uniforms: {
+            color: { value: new THREE.Color( 0xffffff ) },
+            pointTexture: { value: new THREE.TextureLoader().load( 'disc.png' ) }
+            },
+            vertexShader: starVertexShader(),
+            fragmentShader: starFragmentShader(),
+
+            blending: THREE.AdditiveBlending,
+            depthTest: false,
+            transparent: true
             }))
             const pointsArray = []
             const colorsArray = []
+            const sizesArray = []
             let targetCameraPos
             for (const constellation of starData.constellations) {//.filter(c => c.constellationName === 'Sagitta')) {
 
                 const mainStarHips = constellation.starsMain.map(s => s.hip)
                 for (const star of constellation.stars.filter(s => !mainStarHips.includes(s.hip))) {
                     pointsArray.push(star.ax, star.ay, star.az)
-                    colorsArray.push(1,1,1,0.3)
+                    const s = ((star.mag * 26) / 255 + 0.18) / 75
+                    // const s = 0.0125
+                    sizesArray.push(s)
+                    colorsArray.push(1,1,1,1)
                 }
                 for (const star of constellation.starsMain) {
                     pointsArray.push(star.ax, star.ay, star.az)
-                    colorsArray.push(0,1,0,1)
+                    // const s = ((star.mag * 26) / 255 + 0.18) / 75
+                    const s = 0.03
+                    sizesArray.push(s)
+                    colorsArray.push(0.82,0.89,1,1)
                 }
                 pointsArray.push(constellation.centre.x, constellation.centre.y, constellation.centre.z)
+                sizesArray.push(0.03)
                 colorsArray.push(1,0,0,1)
             }
-            const vertices = new Float32Array(pointsArray)
-            bufGeom.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-            const colors = new Float32Array(colorsArray)
-            bufGeom.setAttribute('color', new THREE.BufferAttribute(colors, 4));
+            // console.log('sizeArray', sizesArray)
+            bufGeom.setAttribute('position', new THREE.Float32BufferAttribute(pointsArray, 3));
+            bufGeom.setAttribute('customColor', new THREE.Float32BufferAttribute(colorsArray, 4));
+            bufGeom.setAttribute('size', new THREE.Float32BufferAttribute(sizesArray, 1));
 
             scene.add(points)
 
             // LINES
-            const lineMaterial = new THREE.LineBasicMaterial({
-                color: 0x0000ff
-            });
-
+            const lineMaterial = new LineMaterial({
+                color: 0x1363DF,
+                linewidth: 0.003
+            })
             for (const constellation of starData.constellations) {
                 for (const lines of constellation.lines) {
-                    const points = []
                     if(lines.points) {
+                        const points = []
                         for (const point of lines.points) {
-                            points.push( new THREE.Vector3( point.x,point.y,point.z ) )
+                            // points.push( new THREE.Vector3( point.x,point.y,point.z ) )
+                            points.push(point.x,point.y,point.z)
                         }
-                        const lineGeom = new THREE.BufferGeometry().setFromPoints( points );
-                        const line = new THREE.Line( lineGeom, lineMaterial );
+                        // const lineGeom = new THREE.BufferGeometry().setFromPoints( points );
+                        const lineGeom = new LineGeometry()
+                        lineGeom.setPositions( points )
+                        const line = new Line2( lineGeom, lineMaterial );
+                        line.computeLineDistances();
+                        line.scale.set( 1, 1, 1 );
                         scene.add( line );
                     }
-
-
                 }
+
+                const conDev = document.createElement( 'div' );
+                conDev.className = 'label';
+                conDev.textContent = constellation.constellationName;
+                // conDev.style.marginTop = '-1em';
+                const conLabel = new CSS2DObject( conDev );
+                conLabel.position.set( constellation.centre.x, constellation.centre.y, constellation.centre.z );
+                scene.add( conLabel );
 
             }
 
 
 
             // SPHERE
-            const sphere = new THREE.Mesh( new THREE.SphereGeometry( 1, 32, 16 ), new THREE.MeshPhongMaterial( { color: 0xffff00, side: THREE.DoubleSide, wireframe: true } ) )
+            const sphere = new THREE.Mesh( new THREE.SphereGeometry( 1, 24, 13 ), new THREE.MeshPhongMaterial( { color: 0x12394C, side: THREE.DoubleSide, wireframe: true } ) )
             sphere.doubleSided = true;
             scene.add( sphere )
-            scene.add( new THREE.AmbientLight( 0x444444 ) )
+            scene.add( new THREE.AmbientLight( 0xFFFFFF ) )
 
 
             // TRIANGLES
@@ -1149,9 +1223,10 @@
             // controls.update()
 
             var render = function() {
-                requestAnimationFrame(render);
+                requestAnimationFrame(render)
                 // controls.update()
-                renderer.render(scene, camera);
+                renderer.render(scene, camera)
+                labelRenderer.render( scene, camera )
                 // console.log('render')
                 // rotate cube a little each frame
                 // cube.rotation.x += 0.01;
@@ -1162,7 +1237,7 @@
         }
         const init = async () => {
             const starData = await (await fetch('/data/star-data.json')).json()
-            starData.constellations = starData.constellations.filter(c => c.constellation.includes('P'))
+            // starData.constellations = starData.constellations.filter(c => c.constellation.includes('P'))
 
             console.log('starData', starData)
             addConstellationGraphs(starData)
