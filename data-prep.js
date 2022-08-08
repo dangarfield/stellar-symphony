@@ -1,6 +1,7 @@
 const csv = require('csv-parser')
 const fs = require('fs-extra')
 const _ = require('lodash')
+const THREE = require('three')
 
 const saveDataStep = (fileName, obj) => {
   fs.writeJsonSync(`data-steps/${fileName}.json`, obj)
@@ -103,6 +104,20 @@ const getConstellationNamesData = () => {
   //   console.log('data', data, data.length)
   return data
 }
+const getAngleFromPoint = (originTriangleNormal, originPlane, originX, originY, originZ, destinationX, destinationY, destinationZ) => {
+  if (originX === destinationX && originY === destinationY && originZ === destinationZ) {
+    return 0
+  }
+  const starVec3 = new THREE.Vector3(destinationX, destinationY, destinationZ)
+  const starCentreTriangle = new THREE.Triangle(new THREE.Vector3(0, 0, 0), new THREE.Vector3(originX, originY, originZ), starVec3)
+  const starCentreTriangleNormal = starCentreTriangle.getNormal(new THREE.Vector3())
+  const starCentreDist = originPlane.distanceToPoint(starVec3) > 0 // TODO - Not sure how to tell if star deg is clockwise or anticlockwise, use this temporarily
+  // const angleDeg = THREE.MathUtils.radToDeg(centreTriangleNormal.angleTo(starTriangleNormal))
+  const starCentreDot = originTriangleNormal.dot(starCentreTriangleNormal)
+  const starCentreAngleDeg = THREE.MathUtils.radToDeg(Math.acos(starCentreDot))
+  const starCentreFinalAngle = starCentreDist ? starCentreAngleDeg : 360 - starCentreAngleDeg
+  return starCentreFinalAngle
+}
 const groupByConstellation = (rawData) => {
 //   console.log('constellationShip', constellationShip)
   return _.chain(rawData.rawStarData)
@@ -148,6 +163,14 @@ const groupByConstellation = (rawData) => {
 
       alpha.alpha = true
 
+      const centreTriangle = new THREE.Triangle(new THREE.Vector3(0, 0, 0), new THREE.Vector3(v.centre.x, v.centre.y, v.centre.z), new THREE.Vector3(0, 1, 0))
+      const centreTriangleNormal = centreTriangle.getNormal(new THREE.Vector3())
+      const centrePlane = centreTriangle.getPlane(new THREE.Plane())
+
+      const alphaTriangle = new THREE.Triangle(new THREE.Vector3(0, 0, 0), new THREE.Vector3(v.centre.x, v.centre.y, v.centre.z), new THREE.Vector3(alpha.ax, alpha.ay, alpha.az))
+      const alphaTriangleNormal = alphaTriangle.getNormal(new THREE.Vector3())
+      const alphaPlane = alphaTriangle.getPlane(new THREE.Plane())
+
       for (const starMain of v.starsMain) {
         // const {x, y, z} = getXYZFromRaDec(R, starMain.decrad, starMain.rarad)
         // starMain.ax = x
@@ -156,6 +179,9 @@ const groupByConstellation = (rawData) => {
 
         starMain.distanceFromAlpha = Math.sqrt(Math.pow(starMain.ax - alpha.ax, 2) + Math.pow(starMain.ay - alpha.ay, 2) + Math.pow(starMain.az - alpha.az, 2))
         starMain.distanceFromCentre = Math.sqrt(Math.pow(starMain.ax - v.centre.x, 2) + Math.pow(starMain.ay - v.centre.y, 2) + Math.pow(starMain.az - v.centre.z, 2))
+
+        starMain.angleFromCentre = getAngleFromPoint(centreTriangleNormal, centrePlane, v.centre.x, v.centre.y, v.centre.z, starMain.ax, starMain.ay, starMain.az)
+        starMain.angleFromAlpha = getAngleFromPoint(alphaTriangleNormal, alphaPlane, alpha.ax, alpha.ay, alpha.az, starMain.ax, starMain.ay, starMain.az)
       }
       // Note: Some lines extend to other constellations, Pegasus to Andromeda for example
       for (const line of v.lines) {

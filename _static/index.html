@@ -11,6 +11,10 @@
         .constellations .constellation canvas {
             width: 200px;
         }
+
+        .tone-clip:hover {
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -276,21 +280,51 @@
 
             const scaleNotes = scale.intervals.map(Tonal.Note.transposeFrom('C')).map(v => (v) + '5')
 
-            console.log('scaleNotes', scaleNotes, scale)
+            // console.log('scaleNotes', scaleNotes, scale)
             const melody = melodyStars.map((s, i) => {
                 const noteCount = Math.round(s.distanceFromAlpha / timeFactor)
-                // const noteCount = Math.round(s.distanceFromCentre / timeFactor)
+                const note = scaleNotes[Math.floor((s.angleFromCentre%180)/(180/7))]
                 return {
-                    // bayer: s.bayer,
-                    // distanceFromAlpha: s.distanceFromAlpha,
                     noteCount: noteCount,
-                    note: scaleNotes[i % scaleNotes.length],
+                    note: note,//scaleNotes[i % scaleNotes.length],
                     timing: `${Math.floor(noteCount/8)}:${Math.floor(noteCount/2)%4}:${noteCount%2===1?2:0}`,
                     duration: '8n' // Todo lengths
                 }
             }) // TODO - fill out any notes played at the same time?
 
-            console.log('melody stars', melodyStars, '-', totalBars, totalNoteCount, timeFactor, '-', melody)
+            // console.log('melody stars', melodyStars, '-', totalBars, totalNoteCount, timeFactor, '-', melody)
+            return melody
+        }
+        const getMelody2 = (stars, scale) => {
+            const melodyStars = stars//.filter(s => s.bayer !== '')
+            melodyStars.sort((a, b) => a.angleFromCentre - b.angleFromCentre)
+
+            const totalBars = melodyStars.length >= 7 ? 4 : 2
+            const totalNoteCount = (8 * totalBars) - 1
+            const timeFactor = 360 / totalNoteCount
+
+            console.log('melody2 timefactor', totalNoteCount, timeFactor)
+
+            const scaleNotes = scale.intervals.map(Tonal.Note.transposeFrom('C')).map(v => (v) + '5')
+            scaleNotes.push('C5')
+            const maxDistance = _.maxBy(melodyStars, 'distanceFromCentre').distanceFromCentre
+
+
+
+            const melody = melodyStars.map((s, i) => {
+                const noteCount = Math.round(s.angleFromCentre/timeFactor)
+                // const note = scaleNotes[Math.floor((s.angleFromCentre%180)/(180/7))]
+                const note = scaleNotes[Math.floor((s.distanceFromCentre/maxDistance) * (scaleNotes.length-1))]
+
+                console.log('star', s.bayer, s.proper, '-', s.angleFromCentre, noteCount, '-', scaleNotes, s.distanceFromCentre, s.distanceFromCentre/maxDistance, (s.distanceFromCentre/maxDistance) * (scaleNotes.length-1), note)
+                return {
+                    noteCount: noteCount,
+                    note: note,//scaleNotes[i % scaleNotes.length],
+                    timing: `${Math.floor(noteCount/8)}:${Math.floor(noteCount/2)%4}:${noteCount%2===1?2:0}`,
+                    duration: '8n' // Todo lengths
+                }
+            })
+
             return melody
         }
         const addConstellationGraphs = (starData) => {
@@ -478,6 +512,7 @@
                 // console.log('chords', chords)
 
                 const melody = getMelody(constellationData.starsMain, scale)
+                const melody2 = getMelody2(constellationData.starsMain, scale)
 
                 div.innerHTML = `
                     <div class="row">
@@ -500,6 +535,12 @@
                             </p>
                             <p>Melody: ${melody.map(m => `${m.note}-${m.timing}`)}
                                 <span class="badge rounded-pill text-bg-secondary tone-clip" data-tone="${encodeURIComponent(JSON.stringify({type:'chord',chords:chords, melody:melody}))}">
+                                    <i class="bi bi-play-circle"></i>
+                                </span>
+                            </p>
+
+                            <p>Melody2: ${melody2.map(m => `${m.note}-${m.timing}`)}
+                                <span class="badge rounded-pill text-bg-secondary tone-clip" data-tone="${encodeURIComponent(JSON.stringify({type:'chord',chords:chords, melody:melody2}))}">
                                     <i class="bi bi-play-circle"></i>
                                 </span>
                             </p>
@@ -1074,6 +1115,26 @@
             scene.add( new THREE.AmbientLight( 0x444444 ) )
 
 
+            // TRIANGLES
+            // for (const constellation of starData.constellations.filter(c => c.constellationName === 'Ursa Major')) {
+            //     const alpha = constellation.starsMain.find(s => s.alpha)
+            //     const origin = {x: constellation.centre.x, y: constellation.centre.y, z: constellation.centre.z}
+            //     // const origin = {x: alpha.ax, y: alpha.ay, z: alpha.az}
+            //     const triGeom = new THREE.BufferGeometry()
+            //     const triMesh = new THREE.Mesh(triGeom, new THREE.MeshBasicMaterial( {side: THREE.DoubleSide, transparent:false, color: 0xFFFFFF} ))
+            //     const triPos = new Float32Array([0,0,0, origin.x,origin.y,origin.z, 0,1,0])
+            //     triGeom.setAttribute('position', new THREE.BufferAttribute(triPos,3))
+            //     scene.add(triMesh)
+            //     for (const star of constellation.starsMain) {
+            //         console.log('Angle to ', star.bayer, star.proper, '-', star.angleFromCentre, star.angleFromAlpha )
+            //         const triGeom = new THREE.BufferGeometry()
+            //         const triMesh = new THREE.Mesh(triGeom, new THREE.MeshBasicMaterial( {side: THREE.DoubleSide, transparent:false, color: 0xFF00FF} ))
+            //         const triPos = new Float32Array([0,0,0, origin.x,origin.y,origin.z, star.ax, star.ay,star.az])
+            //         triGeom.setAttribute('position', new THREE.BufferAttribute(triPos,3))
+            //         scene.add(triMesh)
+            //     }
+            // }
+
 
             camera.lookAt(0,0,0)
             camera.position.z = 0.5; // move camera back so we can see the cube
@@ -1095,7 +1156,7 @@
         }
         const init = async () => {
             const starData = await (await fetch('/data/star-data.json')).json()
-            // starData.constellations = starData.constellations.filter(c => c.constellation.includes('S'))
+            starData.constellations = starData.constellations.filter(c => c.constellation.includes('P'))
 
             console.log('starData', starData)
             addConstellationGraphs(starData)
