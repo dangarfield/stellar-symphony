@@ -1017,12 +1017,16 @@
         }
 
         const addStarMap = async (starData) => {
+            const updateFovFromDistance = () => {
+                camera.fov = 25 + (controls.getDistance()*30)
+                camera.updateProjectionMatrix()
+            }
             console.log('addStarMap', starData)
             var scene = new THREE.Scene();
             scene.background = new THREE.Color(0x000000);
 
             var camera = new THREE.PerspectiveCamera(
-                35, // Field of View
+                25, // Field of View
                 1200 / 600, // aspect ratio
                 0.001, // near clipping plane
                 1000 // far clipping plane
@@ -1037,13 +1041,14 @@
 
             const controls = new OrbitControls(camera, renderer.domElement);
             // controls.rotateSpeed *= -1; // This isn't working, should ideally be opposite up and down, scroll in / out, not pan
-            controls.minDistance = -1
-            controls.maxDistance = 2
+            controls.minDistance = 0
+            controls.maxDistance = 1
             // console.log('controls', controls)
-            // controls.addEventListener( 'change', function(change) {
+            controls.addEventListener( 'change', function(change) {
                 // camera.lookAt(new THREE.Vector3(0,0,0).lerp(camera.position, 2))
-                // console.log('control change', camera)
-            // } );
+                updateFovFromDistance()
+                console.log('control change', controls.getDistance(), camera.fov)
+            } );
 
             // var cube = new THREE.Mesh(new THREE.BoxGeometry(0.001, 0.001, 0.001), new THREE.MeshNormalMaterial())
             // scene.add(cube);
@@ -1138,6 +1143,7 @@
 
             camera.lookAt(0,0,0)
             camera.position.z = 0.5; // move camera back so we can see the cube
+            updateFovFromDistance()
             // camera.lookAt(new THREE.Vector3(0,0,0).lerp(camera.position, 2))
 
             // controls.update()
