@@ -41,6 +41,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@tonaljs/tonal/browser/tonal.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.40/Tone.min.js"></script>
+    <script src="https://unpkg.com/@tonejs/midi"></script>
+
     <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/build/three.min.js" type="module"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/examples/jsm/controls/OrbitControls.js" type="module"></script> -->
@@ -76,6 +78,101 @@
             Tone.Transport.stop();
             Tone.Transport.cancel(0);
         }
+        const noteToMidi = (lengthBarSec, lengthBeatSec, lengthSubDSec, chordNotesFlat) => {
+            return chordNotesFlat.map(n => {
+                let bars = 0
+                let beats = 0
+                let subdivisions = 0
+                const timeSplit = n.time.split(':')
+                if(timeSplit.length>0) bars = parseInt(timeSplit[0])
+                if(timeSplit.length>1) beats = parseInt(timeSplit[1])
+                if(timeSplit.length>2) subdivisions = parseInt(timeSplit[2])
+                const durationSplit = n.duration.split('')
+                const durationCount = parseInt(durationSplit[0])
+                let durationOneLength = lengthBeatSec
+                switch (durationSplit[1]) {
+                    case 'n':
+                        durationOneLength = lengthBeatSec
+                        break;
+                }
+                const duration = durationCount * durationOneLength
+
+                let timeSeconds = (bars * lengthBarSec) + (beats * lengthBeatSec) + (subdivisions * lengthSubDSec)
+
+                const midiNote = {
+                    // bars,
+                    // beats,
+                    // subdivisions,
+                    midi: Tonal.Note.midi(n.note),
+                    time: timeSeconds,
+                    // ticks: secondsToTicks(timeSeconds),
+                    // name: n.note,
+                    // pitch: n.note.slice(0, -1),
+                    // octave: parseInt(n.note.slice(-1)),
+                    velocity: 1,
+                    duration: duration
+                }
+                console.log('converting note', n, midiNote)
+                return midiNote
+            })
+        }
+        const convertNotesToMidi = (timeSig, bpm, chordNotes, melodyNotes) => {
+
+            // Assumed 4/4
+            const beatsInMeasure = timeSig[0]
+            const beatsLength = timeSig[1]
+            const lengthBeatSec = Math.pow(bpm/60,-1)
+            const lengthSubDSec = lengthBeatSec / beatsLength
+            const lengthBarSec = lengthBeatSec * beatsInMeasure
+
+            const midi = new Midi()
+            midi.header.name = 'Stella Symphony'
+            midi.header.setTempo(bpm)
+            midi.header.timeSignatures.push({ticks:0,timeSignature:beatsInMeasure,measures:beatsLength})
+
+
+
+            console.log('bars/beat/subd', lengthBarSec, lengthBeatSec, lengthSubDSec)
+            // Chords
+            const chordsTrack = midi.addTrack()
+            chordsTrack.name = 'Chords'
+            chordsTrack.channel = 1
+            // console.log('chordNotes', chordNotes)
+            const chordNotesFlat = chordNotes.flatMap((x) => Array.isArray(x.note) ? x.note.flatMap((d) => ({ time: x.time, duration:x.duration, note:d })) : x);
+            const chordMidiNotes = noteToMidi(lengthBarSec, lengthBeatSec, lengthSubDSec, chordNotesFlat)
+            console.log('chordMidiNotes', chordMidiNotes)
+            for (const note of chordMidiNotes) {
+                chordsTrack.addNote(note)
+            }
+            // Chords
+            const melodyTrack = midi.addTrack()
+            melodyTrack.name = 'Melody'
+            melodyTrack.channel = 2
+            // console.log('melodyNotes', melodyNotes)
+            const melodyNotesFlat = melodyNotes.flatMap((x) => Array.isArray(x.note) ? x.note.flatMap((d) => ({ time: x.time, duration:x.duration, note:d })) : x);
+            const melodyMidiNotes = noteToMidi(lengthBarSec, lengthBeatSec, lengthSubDSec, melodyNotesFlat)
+            console.log('melodyMidiNotes', melodyMidiNotes)
+            for (const note of melodyMidiNotes) {
+                melodyTrack.addNote(note)
+            }
+            console.log('midi', midi)
+            console.log('midi.toArray()', midi.toArray())
+            // new Blob([new Buffer(midi.toArray())]);
+
+            let link = document.createElement('a');
+            link.download = 'test.mid';
+
+            let blob = new Blob([midi.toArray()], {type: 'audio/midi'})
+
+            link.href = URL.createObjectURL(blob);
+
+            link.click();
+
+            URL.revokeObjectURL(link.href);
+
+
+
+        }
         const playToneClip = (toneData) => {
             // console.log('playToneClip', toneData)
             stopToneClips()
@@ -92,12 +189,15 @@
 
                 const synth = new Tone.PolySynth().toDestination();
 
-                const notesToPlay = []
+                const bpm = 80
+                const timeSig = [4,4]
+                const chordNotes = []
+                const melodyNotes = []
                 for (let i = 0; i < toneData.chords.length; i++) {
                     const chord = toneData.chords[i]
                     const notesInChord = chord.notes.slice(0, 3).map(n => Tonal.Note.transpose(n, '-8P'))
                     let decorationNote = chord.notes.length > 3 ? Tonal.Note.transpose(Tonal.Note.transpose(chord.notes[3], '-8P'), '-8P') : false
-                    notesToPlay.push({
+                    chordNotes.push({
                         time: `${i}:0`,
                         note: notesInChord,
                         duration: '2n'
@@ -107,10 +207,10 @@
                         duration: '2n'
                     })
                     if (decorationNote) {
-                        notesToPlay.push({
+                        chordNotes.push({
                             time: `${i}:1`,
                             note: decorationNote,
-                            duration: '4n'
+                            duration: '2n'
                         }, {
                             time: `${i}:3`,
                             note: decorationNote,
@@ -121,13 +221,17 @@
 
                 if (toneData.melody) {
                     for (const melodyNote of toneData.melody) {
-                        notesToPlay.push({
+                        melodyNotes.push({
                             time: melodyNote.timing,
                             note: melodyNote.note,
                             duration: melodyNote.duration
                         })
                     }
                 }
+
+                convertNotesToMidi(timeSig, bpm, chordNotes, melodyNotes)
+                const notesToPlay = chordNotes.concat(melodyNotes)
+
                 // note: 'C4',
                 // timing: `${Math.floor(noteCount/4)}:${noteCount%4}`,
                 // duration: '8n'
@@ -143,7 +247,7 @@
                 part.loop = true;
                 part.loopEnd = "4m";
 
-                Tone.Transport.bpm.value = 80
+                Tone.Transport.bpm.value = bpm
             }
             Tone.Transport.start()
 
@@ -281,6 +385,22 @@
             // console.log('scaleFound', scaleFound)
             return allScales[0]
         }
+
+
+        // Potential melodies (da - distance from alpha)
+        // # - timing - notes
+        // 1 - da - aa
+        // 2 - da - ac
+        // 3 - dc - aa
+        // 4 - dc - ac
+        // 5 - aa - da
+        // 6 - aa - dc
+        // 7 - ac - da
+        // 8 - ac - dc
+
+
+        // Melody 1 Timing = distance from alpha
+        // Melody 1 Notes =  angle from centre
         const getMelody = (stars, scale) => {
             const melodyStars = stars//.filter(s => s.bayer !== '')
             melodyStars.sort((a, b) => a.distanceFromAlpha - b.distanceFromAlpha)
@@ -311,6 +431,8 @@
             // console.log('melody stars', melodyStars, '-', totalBars, totalNoteCount, timeFactor, '-', melody)
             return melody
         }
+        // Melody 2 Timing = angle from centre
+        // Melody 2 Notes = distance from centre
         const getMelody2 = (stars, scale) => {
             const melodyStars = stars//.filter(s => s.bayer !== '')
             melodyStars.sort((a, b) => a.angleFromCentre - b.angleFromCentre)
@@ -1249,9 +1371,10 @@
                     sizesArray.push(s)
 
                     if (star.alpha) {
-                        colorsArray.push(1,0,1,1)
+                        colorsArray.push(1,0,0,1)
                     } else {
-                        colorsArray.push(0.82,0.89,1,1)
+                        // colorsArray.push(0.82,0.89,1,1)
+                        colorsArray.push(0,1,1,1)
                     }
 
                 }
@@ -1311,7 +1434,7 @@
 
 
             // TRIANGLES
-            // for (const constellation of starData.constellations.filter(c => c.constellationName === 'Ursa Major')) {
+            // for (const constellation of starData.constellations) {//.filter(c => c.constellationName === 'Ursa Major')) {
             //     const alpha = constellation.starsMain.find(s => s.alpha)
             //     const origin = {x: constellation.centre.x, y: constellation.centre.y, z: constellation.centre.z}
             //     // const origin = {x: alpha.ax, y: alpha.ay, z: alpha.az}
@@ -1374,21 +1497,21 @@
                 renderer.render(scene, camera)
                 labelRenderer.render( scene, camera )
             };
-
+            updateSelectedConstellation(starData, starData.constellations[0].constellation, true)
             render();
 
 
         }
         const init = async () => {
             const starData = await (await fetch('/data/star-data.json')).json()
-            starData.constellations = starData.constellations.filter(c => c.constellation.includes('P'))
+            starData.constellations = starData.constellations.filter(c => c.constellation.includes('Peg'))
 
             console.log('starData', starData)
             addConstellationGraphs(starData)
             addStarMap(starData)
             document.body.addEventListener('keydown', function(e) {
-                console.log('e', e.code, e)
-                if (e.code === 'Space' || e.code === 'Del') {
+                // console.log('e', e.code, e)
+                if (e.code === 'Space' || e.code === 'Backspace' || e.code === 'Delete') {
                     stopToneClips()
                 }
             })
