@@ -2,6 +2,8 @@ const csv = require('csv-parser')
 const fs = require('fs-extra')
 const _ = require('lodash')
 const THREE = require('three')
+const path = require('path')
+const fetch = require('node-fetch')
 
 const saveDataStep = (fileName, obj) => {
   fs.writeJsonSync(`data-steps/${fileName}.json`, obj)
@@ -11,7 +13,39 @@ const loadDataStep = (fileName) => {
     return fs.readJsonSync(`data-steps/${fileName}.json`)
   }
 }
+const downloadDataFile = async (url, path) => {
+  const res = await fetch(url)
+  const fileStream = fs.createWriteStream(path)
+  await new Promise((resolve, reject) => {
+    res.body.pipe(fileStream)
+    res.body.on('error', reject)
+    fileStream.on('finish', resolve)
+  })
+}
+const downloadDataFiles = async () => {
+  const dataDirName = 'data'
+  fs.ensureDirSync(dataDirName)
 
+  const urls = [
+    'https://raw.githubusercontent.com/Stellarium/stellarium/master/skycultures/western/asterism_lines.fab',
+    'https://raw.githubusercontent.com/Stellarium/stellarium/master/skycultures/western/asterism_names.eng.fab',
+    'https://raw.githubusercontent.com/Stellarium/stellarium/master/skycultures/western/constellation_names.eng.fab',
+    'https://raw.githubusercontent.com/Stellarium/stellarium/master/skycultures/western/constellationship.fab',
+    'https://raw.githubusercontent.com/Stellarium/stellarium/master/skycultures/western/star_names.fab',
+    'https://raw.githubusercontent.com/astronexus/HYG-Database/master/hygdata_v3.csv'
+  ]
+  for (const url of urls) {
+    const fileName = url.split('/').slice(-1)[0]
+    const filePath = path.join(dataDirName, fileName)
+    if (!fs.existsSync(filePath)) {
+      console.log('dl', url, filePath, 'downloading')
+      await downloadDataFile(url, filePath)
+      console.log('dl', url, filePath, 'complete')
+    } else {
+      // console.log('dl', url, filePath, 'already downloaded')
+    }
+  }
+}
 const getRawData = async () => {
   const rawStarData = await getStarData()
   const constellationShip = getConstellationShipData()
@@ -99,9 +133,13 @@ const getConstellationNamesData = () => {
   //   data = data.split(/\s+/)
   data = data.map(d => {
     const dSplit = d.split('\t')// d.split[/\t+/]
+    // console.log('dSplit', dSplit)
+    if (dSplit.length < 2) {
+      return {}
+    }
     return {constellation: dSplit[0], constellationName: dSplit[1].replaceAll('"', '')}
-  })
-  //   console.log('data', data, data.length)
+  }).filter(d => d.constellation)
+  // console.log('data', data, data.length)
   return data
 }
 const getAngleFromPoint = (originTriangleNormal, originPlane, originX, originY, originZ, destinationX, destinationY, destinationZ) => {
@@ -296,6 +334,7 @@ const getConstellationAverages = (groupedByConstellation) => {
   }
 }
 const init = async () => {
+  await downloadDataFiles()
   const rawData = await getRawData()
   const ranges = getMinMaxAndRanges(rawData.rawStarData)
   //   console.log('rawData', rawStarData, constellationShip)

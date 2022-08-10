@@ -387,7 +387,7 @@
         }
 
 
-        // Potential melodies (da - distance from alpha)
+        // Potential melodies (da - distance from alpha, dc - distance from centre, aa - angle from alpha, ac - angle from centre)
         // # - timing - notes
         // 1 - da - aa
         // 2 - da - ac
@@ -401,9 +401,10 @@
 
         // Melody 1 Timing = distance from alpha
         // Melody 1 Notes =  angle from centre
-        const getMelody = (stars, scale) => {
+
+        const getMelodyTimingByDistance = (stars, scale, distanceAttribute, angleAttribute) => {
             const melodyStars = stars//.filter(s => s.bayer !== '')
-            melodyStars.sort((a, b) => a.distanceFromAlpha - b.distanceFromAlpha)
+            melodyStars.sort((a, b) => a[distanceAttribute] - b[distanceAttribute])
             // melodyStars.sort((a, b) => a.distanceFromCentre - b.distanceFromCentre) // Could also use distanceFromCentre
 
             // 15 notes -> 4 bars, across total 32 half notes
@@ -411,15 +412,15 @@
             // 3 notes -> 2 bars, across total 16 half notes
             const totalBars = melodyStars.length >= 7 ? 4 : 2
             const totalNoteCount = (8 * totalBars) - 1
-            const timeFactor = melodyStars[melodyStars.length - 1].distanceFromAlpha / totalNoteCount
+            const timeFactor = melodyStars[melodyStars.length - 1][distanceAttribute] / totalNoteCount
             // const timeFactor = melodyStars[melodyStars.length - 1].distanceFromCentre / totalNoteCount
 
             const scaleNotes = scale.intervals.map(Tonal.Note.transposeFrom('C')).map(v => (v) + '5')
 
             // console.log('scaleNotes', scaleNotes, scale)
             const melody = melodyStars.map((s, i) => {
-                const noteCount = Math.round(s.distanceFromAlpha / timeFactor)
-                const note = scaleNotes[Math.floor((s.angleFromCentre%180)/(180/7))]
+                const noteCount = Math.round(s[distanceAttribute] / timeFactor)
+                const note = scaleNotes[Math.floor((s[angleAttribute]%180)/(180/7))]
                 return {
                     noteCount: noteCount,
                     note: note,//scaleNotes[i % scaleNotes.length],
@@ -433,9 +434,9 @@
         }
         // Melody 2 Timing = angle from centre
         // Melody 2 Notes = distance from centre
-        const getMelody2 = (stars, scale) => {
+        const getMelodyTimingByAngle = (stars, scale, distanceAttribute, angleAttribute) => {
             const melodyStars = stars//.filter(s => s.bayer !== '')
-            melodyStars.sort((a, b) => a.angleFromCentre - b.angleFromCentre)
+            melodyStars.sort((a, b) => a[angleAttribute] - b[angleAttribute])
 
             const totalBars = melodyStars.length >= 7 ? 4 : 2
             const totalNoteCount = (8 * totalBars) - 1
@@ -445,16 +446,16 @@
 
             const scaleNotes = scale.intervals.map(Tonal.Note.transposeFrom('C')).map(v => (v) + '5')
             scaleNotes.push('C5')
-            const maxDistance = _.maxBy(melodyStars, 'distanceFromCentre').distanceFromCentre
+            const maxDistance = _.maxBy(melodyStars, distanceAttribute)[distanceAttribute]
 
 
 
             const melody = melodyStars.map((s, i) => {
-                const noteCount = Math.round(s.angleFromCentre/timeFactor)
-                // const note = scaleNotes[Math.floor((s.angleFromCentre%180)/(180/7))]
-                const note = scaleNotes[Math.floor((s.distanceFromCentre/maxDistance) * (scaleNotes.length-1))]
+                const noteCount = Math.round(s[angleAttribute]/timeFactor)
+                // const note = scaleNotes[Math.floor((s[angleAttribute]%180)/(180/7))]
+                const note = scaleNotes[Math.floor((s[distanceAttribute]/maxDistance) * (scaleNotes.length-1))]
 
-                // console.log('star', s.bayer, s.proper, '-', s.angleFromCentre, noteCount, '-', scaleNotes, s.distanceFromCentre, s.distanceFromCentre/maxDistance, (s.distanceFromCentre/maxDistance) * (scaleNotes.length-1), note)
+                // console.log('star', s.bayer, s.proper, '-', s[angleAttribute], noteCount, '-', scaleNotes, s[distanceAttribute], s[distanceAttribute]/maxDistance, (s[distanceAttribute]/maxDistance) * (scaleNotes.length-1), note)
                 return {
                     noteCount: noteCount,
                     note: note,//scaleNotes[i % scaleNotes.length],
@@ -723,11 +724,11 @@
                 chordList.push(chords)
                 // console.log('chords', chords)
 
-                const melody = getMelody(constellationData.starsMain, scale)
+                const melody = getMelodyTimingByDistance(constellationData.starsMain, scale, 'distanceFromAlpha', 'angleFromCentre')
                 constellationData.melody = melody
                 constellationData.melodyText = melody.map(m => `${m.note}-${m.timing}`).join(', ')
 
-                const melody2 = getMelody2(constellationData.starsMain, scale)
+                const melody2 = getMelodyTimingByAngle(constellationData.starsMain, scale, 'distanceFromCentre', 'angleFromCentre')
                 constellationData.melody2 = melody2
                 constellationData.melody2Text = melody2.map(m => `${m.note}-${m.timing}`).join(', ')
 

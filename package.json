@@ -12,6 +12,7 @@
         "csv-parser": "^3.0.0",
         "fs-extra": "^10.1.0",
         "lodash": "^4.17.21",
+        "node-fetch": "^2.6.1",
         "three": "^0.143.0"
     },
     "nodemonConfig": {
