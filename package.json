@@ -6,13 +6,16 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
+    "type": "module",
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@tonaljs/tonal": "^4.6.5",
+        "@tonejs/midi": "^2.0.28",
         "csv-parser": "^3.0.0",
         "fs-extra": "^10.1.0",
         "lodash": "^4.17.21",
-        "node-fetch": "^2.6.1",
+        "node-fetch": "^3.2.10",
         "three": "^0.143.0"
     },
     "nodemonConfig": {

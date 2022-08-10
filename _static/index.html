@@ -71,108 +71,14 @@
             ]
             return Tableau20[i % 20]
         }
-        console.log('Chart', getColor(0), getColor(19), getColor(20))
+        // console.log('Chart', getColor(0), getColor(19), getColor(20))
         // Chart.defaults.global.defaultFontFamily = "Helvetica Neue";
 
         const stopToneClips = () => {
             Tone.Transport.stop();
             Tone.Transport.cancel(0);
         }
-        const noteToMidi = (lengthBarSec, lengthBeatSec, lengthSubDSec, chordNotesFlat) => {
-            return chordNotesFlat.map(n => {
-                let bars = 0
-                let beats = 0
-                let subdivisions = 0
-                const timeSplit = n.time.split(':')
-                if(timeSplit.length>0) bars = parseInt(timeSplit[0])
-                if(timeSplit.length>1) beats = parseInt(timeSplit[1])
-                if(timeSplit.length>2) subdivisions = parseInt(timeSplit[2])
-                const durationSplit = n.duration.split('')
-                const durationCount = parseInt(durationSplit[0])
-                let durationOneLength = lengthBeatSec
-                switch (durationSplit[1]) {
-                    case 'n':
-                        durationOneLength = lengthBeatSec
-                        break;
-                }
-                const duration = durationCount * durationOneLength
 
-                let timeSeconds = (bars * lengthBarSec) + (beats * lengthBeatSec) + (subdivisions * lengthSubDSec)
-
-                const midiNote = {
-                    // bars,
-                    // beats,
-                    // subdivisions,
-                    midi: Tonal.Note.midi(n.note),
-                    time: timeSeconds,
-                    // ticks: secondsToTicks(timeSeconds),
-                    // name: n.note,
-                    // pitch: n.note.slice(0, -1),
-                    // octave: parseInt(n.note.slice(-1)),
-                    velocity: 1,
-                    duration: duration
-                }
-                console.log('converting note', n, midiNote)
-                return midiNote
-            })
-        }
-        const convertNotesToMidi = (timeSig, bpm, chordNotes, melodyNotes) => {
-
-            // Assumed 4/4
-            const beatsInMeasure = timeSig[0]
-            const beatsLength = timeSig[1]
-            const lengthBeatSec = Math.pow(bpm/60,-1)
-            const lengthSubDSec = lengthBeatSec / beatsLength
-            const lengthBarSec = lengthBeatSec * beatsInMeasure
-
-            const midi = new Midi()
-            midi.header.name = 'Stella Symphony'
-            midi.header.setTempo(bpm)
-            midi.header.timeSignatures.push({ticks:0,timeSignature:beatsInMeasure,measures:beatsLength})
-
-
-
-            console.log('bars/beat/subd', lengthBarSec, lengthBeatSec, lengthSubDSec)
-            // Chords
-            const chordsTrack = midi.addTrack()
-            chordsTrack.name = 'Chords'
-            chordsTrack.channel = 1
-            // console.log('chordNotes', chordNotes)
-            const chordNotesFlat = chordNotes.flatMap((x) => Array.isArray(x.note) ? x.note.flatMap((d) => ({ time: x.time, duration:x.duration, note:d })) : x);
-            const chordMidiNotes = noteToMidi(lengthBarSec, lengthBeatSec, lengthSubDSec, chordNotesFlat)
-            console.log('chordMidiNotes', chordMidiNotes)
-            for (const note of chordMidiNotes) {
-                chordsTrack.addNote(note)
-            }
-            // Chords
-            const melodyTrack = midi.addTrack()
-            melodyTrack.name = 'Melody'
-            melodyTrack.channel = 2
-            // console.log('melodyNotes', melodyNotes)
-            const melodyNotesFlat = melodyNotes.flatMap((x) => Array.isArray(x.note) ? x.note.flatMap((d) => ({ time: x.time, duration:x.duration, note:d })) : x);
-            const melodyMidiNotes = noteToMidi(lengthBarSec, lengthBeatSec, lengthSubDSec, melodyNotesFlat)
-            console.log('melodyMidiNotes', melodyMidiNotes)
-            for (const note of melodyMidiNotes) {
-                melodyTrack.addNote(note)
-            }
-            console.log('midi', midi)
-            console.log('midi.toArray()', midi.toArray())
-            // new Blob([new Buffer(midi.toArray())]);
-
-            let link = document.createElement('a');
-            link.download = 'test.mid';
-
-            let blob = new Blob([midi.toArray()], {type: 'audio/midi'})
-
-            link.href = URL.createObjectURL(blob);
-
-            link.click();
-
-            URL.revokeObjectURL(link.href);
-
-
-
-        }
         const playToneClip = (toneData) => {
             // console.log('playToneClip', toneData)
             stopToneClips()
@@ -189,53 +95,7 @@
 
                 const synth = new Tone.PolySynth().toDestination();
 
-                const bpm = 80
-                const timeSig = [4,4]
-                const chordNotes = []
-                const melodyNotes = []
-                for (let i = 0; i < toneData.chords.length; i++) {
-                    const chord = toneData.chords[i]
-                    const notesInChord = chord.notes.slice(0, 3).map(n => Tonal.Note.transpose(n, '-8P'))
-                    let decorationNote = chord.notes.length > 3 ? Tonal.Note.transpose(Tonal.Note.transpose(chord.notes[3], '-8P'), '-8P') : false
-                    chordNotes.push({
-                        time: `${i}:0`,
-                        note: notesInChord,
-                        duration: '2n'
-                    }, {
-                        time: `${i}:2`,
-                        note: notesInChord,
-                        duration: '2n'
-                    })
-                    if (decorationNote) {
-                        chordNotes.push({
-                            time: `${i}:1`,
-                            note: decorationNote,
-                            duration: '2n'
-                        }, {
-                            time: `${i}:3`,
-                            note: decorationNote,
-                            duration: '4n'
-                        })
-                    }
-                }
-
-                if (toneData.melody) {
-                    for (const melodyNote of toneData.melody) {
-                        melodyNotes.push({
-                            time: melodyNote.timing,
-                            note: melodyNote.note,
-                            duration: melodyNote.duration
-                        })
-                    }
-                }
-
-                convertNotesToMidi(timeSig, bpm, chordNotes, melodyNotes)
-                const notesToPlay = chordNotes.concat(melodyNotes)
-
-                // note: 'C4',
-                // timing: `${Math.floor(noteCount/4)}:${noteCount%4}`,
-                // duration: '8n'
-
+                const notesToPlay = toneData.melody ? toneData.chords.concat(toneData.melody) : toneData.chords
 
                 const part = new Tone.Part(((time, value) => {
                         // the value is an object which contains both the note and the velocity
@@ -247,145 +107,53 @@
                 part.loop = true;
                 part.loopEnd = "4m";
 
-                Tone.Transport.bpm.value = bpm
+                Tone.Transport.bpm.value = toneData.bpm
+            } else if (toneData.type === 'song') {
+                const synth = new Tone.PolySynth().toDestination();
+                // console.log('song', toneData)
+                let notesToPlay = []
+                for (const track of toneData.song) {
+                    // console.log('track', track.notes)
+                    notesToPlay = notesToPlay.concat(track.notes)
+                }
+                // toneData.melody ? toneData.chords.concat(toneData.melody) : toneData.chords
+
+                // console.log('song', toneData, notesToPlay)
+                const part = new Tone.Part(((time, value) => {
+                    // the value is an object which contains both the note and the velocity
+                    synth.triggerAttackRelease(value.note, value.duration, time)
+                    }),
+                    notesToPlay
+                ).start(0)
+
+                // part.loop = true;
+                // part.loopEnd = "16m";
+
+                Tone.Transport.bpm.value = toneData.bpm
             }
             Tone.Transport.start()
 
         }
-        const sort = (list) => {
-            list.sort(function(a, b) {
-                return a - b
-            })
-        }
 
-        const chromaDifference = (a, b) => {
-            const as = a.split('')
-            const bs = b.split('')
-            let diff = 0
-            for (let i = 0; i < as.length; i++) {
-                if (as[i] !== bs[i]) {
-                    diff++
-                }
-            }
-            return diff
-        }
-        const adjustBucketValue = (value, max, total) => {
-            return Math.min(Math.abs(Math.round((value / max) * total)), total)
-        }
+
         const toRomanNumeral = (i) => {
             if (i === 1) {
-                return 'I'
+            return 'I'
             } else if (i === 2) {
-                return 'II'
+            return 'II'
             } else if (i === 3) {
-                return 'III'
+            return 'III'
             } else if (i === 4) {
-                return 'IV'
+            return 'IV'
             } else if (i === 5) {
-                return 'V'
+            return 'V'
             } else if (i === 6) {
-                return 'VI'
+            return 'VI'
             } else if (i === 7) {
-                return 'VII'
+            return 'VII'
             }
             return i
         }
-        const getTriad = (scale, interval, decoration) => {
-            const scaleChromaArray = scale.chroma.split('')
-            const tripleOctave = [...scaleChromaArray].concat(scaleChromaArray, scaleChromaArray).map((v, i) => ({
-                v: v,
-                i: i
-            }))
-            const tripleOctaveFiltered = tripleOctave.filter(v => v.v === '1')
-            // console.log('tripleOctave', tripleOctave, tripleOctaveFiltered)
-
-            const intervalNotes = [interval + 1 - 1, interval + 3 - 1, interval + 5 - 1]
-
-            const notesForChord = intervalNotes.map(v => tripleOctaveFiltered[v - 1])
-            // console.log('notesForChord', intervalNotes, notesForChord, scale.chroma)
-            if (decoration && decoration > 0) {
-                notesForChord.push(tripleOctaveFiltered[interval + decoration - 1 - 1])
-            }
-            return notesForChord.map(v => v.i)
-        }
-        const getNotesForChordSemitones = (chord) => {
-            return chord.map(v => Tonal.Note.transpose('C4', Tonal.Interval.fromSemitones(v)))
-        }
-        const getChords = (bucketValues, bucketPositions, max, scale) => {
-            const maxIntervals = 7
-            const chords = []
-            for (const bucketPosition of bucketPositions) {
-                const value = bucketValues[bucketPosition]
-                const interval = 1 + adjustBucketValue(value, max, maxIntervals - 1)
-                // console.log('chords value', bucketPosition, value, interval)
-                let decorationValue = parseInt(value.toFixed(5).replace(/\D/g, ''))
-                let decoration = false
-                if (decorationValue % 6 === 0) {
-                    decoration = 13
-                } else if (decorationValue % 4 === 0) {
-                    decoration = 11
-                } else if (decorationValue % 2 === 0) {
-                    decoration = 9
-                }
-                // console.log('decorationValue', decorationValue, decorationValue % 2 === 0, decorationValue % 4 === 0, decorationValue % 6 === 0, '->', decoration)
-                const chord = getTriad(scale, interval, decoration)
-                const chordObj = {
-                    interval,
-                    chord,
-                    notes: getNotesForChordSemitones(chord)
-                }
-                if (decoration) {
-                    chordObj.decoration = decoration
-                }
-
-                // console.log('chord', chordObj)
-                chords.push(chordObj)
-            }
-            return chords
-        }
-        const getScale = (bucketValues) => {
-            let scale = [...bucketValues]
-            scale.sort((a, b) => Math.abs(b) - Math.abs(a))
-            scale = scale.slice(0, 6).map(v => v > 0)
-            // Use chroma. for the 6 pairs, set 2 or b2 etc for all, then use chroma to find a found scale, removing one note as required until a match
-
-            const chromaString = new Array(12).fill(0)
-            chromaString[0] = 1
-
-            for (let i = 0; i < scale.length; i++) {
-                const noteValue = scale[i]
-                if (i === 0 || i === 1) {
-                    chromaString[(i + 1) * 2 - (noteValue ? 0 : 1)] = 1
-                } else if (i === 4 || i === 5) {
-                    chromaString[((i + 1) * 2) - 1 - (noteValue ? 0 : 1)] = 1
-                } else if (i === 2 || i === 3) {
-                    chromaString[i + 4 - (noteValue ? 0 : 1)] = 1
-                }
-            }
-            const chroma = chromaString.join('')
-            const allScales = Tonal.ScaleType.all().filter(s => s.intervals.length === 7)
-            for (const potentialScale of allScales) {
-                const distance = chromaDifference(chroma, potentialScale.chroma)
-                potentialScale.distance = distance
-            }
-            // allScales.sort((a, b) => a.distance - b.distance)
-
-            allScales.sort((a, b) => {
-                function findFirstDiffPos(a, b) {
-                    if (a.length < b.length)[a, b] = [b, a]
-                    return [...a].findIndex((chr, i) => chr !== b[i])
-                }
-                return a.distance - b.distance || findFirstDiffPos(b.chroma.split(''), chroma) - findFirstDiffPos(a.chroma.split(''), chroma)
-            })
-
-
-            // console.log('allScales', chroma, allScales, allScales.map(s => `${chroma} : ${s.chroma} - ${s.distance} - ${s.name}`))
-
-            // const scaleFound = allScales[0]
-            // console.log('scaleFound', scaleFound)
-            return allScales[0]
-        }
-
 
         // Potential melodies (da - distance from alpha, dc - distance from centre, aa - angle from alpha, ac - angle from centre)
         // # - timing - notes
@@ -402,92 +170,36 @@
         // Melody 1 Timing = distance from alpha
         // Melody 1 Notes =  angle from centre
 
-        const getMelodyTimingByDistance = (stars, scale, distanceAttribute, angleAttribute) => {
-            const melodyStars = stars//.filter(s => s.bayer !== '')
-            melodyStars.sort((a, b) => a[distanceAttribute] - b[distanceAttribute])
-            // melodyStars.sort((a, b) => a.distanceFromCentre - b.distanceFromCentre) // Could also use distanceFromCentre
 
-            // 15 notes -> 4 bars, across total 32 half notes
-            // 7 notes -> 2 bars, acrodd total 16 half notes
-            // 3 notes -> 2 bars, across total 16 half notes
-            const totalBars = melodyStars.length >= 7 ? 4 : 2
-            const totalNoteCount = (8 * totalBars) - 1
-            const timeFactor = melodyStars[melodyStars.length - 1][distanceAttribute] / totalNoteCount
-            // const timeFactor = melodyStars[melodyStars.length - 1].distanceFromCentre / totalNoteCount
-
-            const scaleNotes = scale.intervals.map(Tonal.Note.transposeFrom('C')).map(v => (v) + '5')
-
-            // console.log('scaleNotes', scaleNotes, scale)
-            const melody = melodyStars.map((s, i) => {
-                const noteCount = Math.round(s[distanceAttribute] / timeFactor)
-                const note = scaleNotes[Math.floor((s[angleAttribute]%180)/(180/7))]
-                return {
-                    noteCount: noteCount,
-                    note: note,//scaleNotes[i % scaleNotes.length],
-                    timing: `${Math.floor(noteCount/8)}:${Math.floor(noteCount/2)%4}:${noteCount%2===1?2:0}`,
-                    duration: '8n' // Todo lengths
-                }
-            }) // TODO - fill out any notes played at the same time?
-
-            // console.log('melody stars', melodyStars, '-', totalBars, totalNoteCount, timeFactor, '-', melody)
-            return melody
-        }
-        // Melody 2 Timing = angle from centre
-        // Melody 2 Notes = distance from centre
-        const getMelodyTimingByAngle = (stars, scale, distanceAttribute, angleAttribute) => {
-            const melodyStars = stars//.filter(s => s.bayer !== '')
-            melodyStars.sort((a, b) => a[angleAttribute] - b[angleAttribute])
-
-            const totalBars = melodyStars.length >= 7 ? 4 : 2
-            const totalNoteCount = (8 * totalBars) - 1
-            const timeFactor = 360 / totalNoteCount
-
-            // console.log('melody2 timefactor', totalNoteCount, timeFactor)
-
-            const scaleNotes = scale.intervals.map(Tonal.Note.transposeFrom('C')).map(v => (v) + '5')
-            scaleNotes.push('C5')
-            const maxDistance = _.maxBy(melodyStars, distanceAttribute)[distanceAttribute]
-
-
-
-            const melody = melodyStars.map((s, i) => {
-                const noteCount = Math.round(s[angleAttribute]/timeFactor)
-                // const note = scaleNotes[Math.floor((s[angleAttribute]%180)/(180/7))]
-                const note = scaleNotes[Math.floor((s[distanceAttribute]/maxDistance) * (scaleNotes.length-1))]
-
-                // console.log('star', s.bayer, s.proper, '-', s[angleAttribute], noteCount, '-', scaleNotes, s[distanceAttribute], s[distanceAttribute]/maxDistance, (s[distanceAttribute]/maxDistance) * (scaleNotes.length-1), note)
-                return {
-                    noteCount: noteCount,
-                    note: note,//scaleNotes[i % scaleNotes.length],
-                    timing: `${Math.floor(noteCount/8)}:${Math.floor(noteCount/2)%4}:${noteCount%2===1?2:0}`,
-                    duration: '8n' // Todo lengths
-                }
-            })
-
-            return melody
-        }
         const getToneDataFromElementAndPlay = (starData, ele) => {
             const type = ele.getAttribute('data-type')
             const constellationId = ele.getAttribute('data-constellation')
             const constellation = starData.constellations.find(c => c.constellation === constellationId)
 
-            let toneData = {}
+            let toneData = {bpm: constellation.music.bpm, timeSig: constellation.music.timeSig}
             switch (type) {
-            case 'scale':
-            toneData = {type:'scale',scale:constellation.scale}
-            break;
-            case 'chords':
-            toneData = {type:'chords',chords:constellation.chords}
-            break;
-            case 'melody':
-            toneData = {type:'chords',chords:constellation.chords, melody:constellation.melody}
-            break;
-            case 'melody2':
-            toneData = {type:'chords',chords:constellation.chords, melody:constellation.melody2}
-            break;
-
-            default:
-            break;
+                case 'scale':
+                    toneData.type = 'scale'
+                    toneData.scale = constellation.music.scale
+                    break;
+                case 'chords':
+                    toneData.type = 'chords'
+                    toneData.chords = constellation.music.chords.toneNotes
+                    break;
+                case 'melody':
+                    toneData.type = 'chords'
+                    toneData.chords = constellation.music.chords.toneNotes
+                    toneData.melody = constellation.music.melody
+                    break;
+                case 'melody2':
+                    toneData.type = 'chords'
+                    toneData.chords = constellation.music.chords.toneNotes
+                    toneData.melody = constellation.music.melody2
+                    break;
+                case 'song':
+                    toneData.type = 'song'
+                    toneData.song = constellation.music.songNotes
+                    break;
             }
             console.log('.tone-clip click', type, constellationId, constellation, toneData)
             playToneClip(toneData)
@@ -502,24 +214,27 @@
                     starData.focusMapOnConstellation(constellation)
                 }
                 const selectedConstellationHtml = `
-                <h5 class="mt-3">${constellation.constellationName} - ${constellation.constellation}</h5>
-                <p>Scale: ${constellation.scaleText}<br />
+                <h5 class="mt-3">${constellation.constellationName} - ${constellation.constellation}
+                    <span class="badge rounded-pill text-bg-secondary tone-clip" data-constellation="${constellation.constellation}" data-type="song">
+                                                                    <i class="bi bi-play-circle"></i>
+                                                                </span></h5>
+                <p>Scale: ${constellation.music.scaleText}<br />
                     <span class="badge rounded-pill text-bg-secondary tone-clip" data-constellation="${constellation.constellation}" data-type="scale">
                                                                     <i class="bi bi-play-circle"></i>
                                                                 </span>
                 </p>
-                <p>Chords: ${constellation.chordsText}<br />
+                <p>Chords: ${constellation.music.chords.text}<br />
                     <span class="badge rounded-pill text-bg-secondary tone-clip" data-constellation="${constellation.constellation}" data-type="chords">
                                                                     <i class="bi bi-play-circle"></i>
                                                                 </span>
                 </p>
-                <p>Melody: ${constellation.melodyText}<br />
+                <p>Melody: ${constellation.music.melodyText}<br />
                     <span class="badge rounded-pill text-bg-secondary tone-clip" data-constellation="${constellation.constellation}" data-type="melody">
                                                                     <i class="bi bi-play-circle"></i>
                                                                 </span>
                 </p>
 
-                <p>Melody2: ${constellation.melody2Text}<br />
+                <p>Melody2: ${constellation.music.melody2Text}<br />
                     <span class="badge rounded-pill text-bg-secondary tone-clip" data-constellation="${constellation.constellation}" data-type="melody2">
                                                                     <i class="bi bi-play-circle"></i>
                                                                 </span>
@@ -532,7 +247,7 @@
                     getToneDataFromElementAndPlay(starData, this)
                 })
                 }
-                console.log('updated selected constellation', constellationId)
+                // console.log('updated selected constellation', constellationId)
 
             }
         }
@@ -579,9 +294,6 @@
             }
 
 
-            const scaleList = []
-            const chordList = []
-
 
 
             for (const [i, constellationData] of starData.constellations.entries()) {
@@ -590,81 +302,6 @@
                 const div = document.createElement('div')
                 div.classList.add('constellation')
                 div.setAttribute('data-constellation', constellationData.constellation)
-
-                // const absmagList = []
-                // const magList = []
-                // const rvList = []
-                // const lumList = []
-                // const ciList = []
-                // const hrList = []
-
-
-                // for (const star of constellationData.stars) {
-                //     if (star.absmag) {
-                //         absmagList.push(star.absmag)
-                //     }
-                //     if (star.mag) {
-                //         magList.push(star.mag)
-                //     }
-                //     if (star.rv) {
-                //         rvList.push(star.rv)
-                //     }
-                //     if (star.lum) {
-                //         lumList.push(star.lum)
-                //     }
-                //     if (star.ci) {
-                //         ciList.push(star.ci)
-                //     }
-                //     if (star.absmag && star.ci) {
-                //         hrList.push({
-                //             x: star.ci,
-                //             y: star.absmag
-                //         })
-                //     }
-                // }
-                // const absmagMainList = []
-                // const magMainList = []
-                // const rvMainList = []
-                // const lumMainList = []
-                // const ciMainList = []
-                // const hrMainList = []
-                // for (const star of constellationData.starsMain) {
-                //     if (star.hip === '69673') {
-                //         console.log('Acturus', star)
-                //     }
-                //     if (star.absmag) {
-                //         absmagMainList.push(star.absmag)
-                //     }
-                //     if (star.mag) {
-                //         magMainList.push(star.mag)
-                //     }
-                //     if (star.rv) {
-                //         rvMainList.push(star.rv)
-                //     }
-                //     if (star.lum) {
-                //         lumMainList.push(star.lum)
-                //     }
-                //     if (star.ci) {
-                //         ciMainList.push(star.ci)
-                //     }
-                // }
-                // sort(absmagList)
-                // sort(magList)
-                // sort(rvList)
-                // sort(lumList)
-                // sort(ciList)
-                // sort(absmagMainList)
-                // sort(magMainList)
-                // sort(rvMainList)
-                // sort(lumMainList)
-                // sort(ciMainList)
-
-                // const hrDataset = {
-                //     label: `${constellationData.constellation} - hr`,
-                //     backgroundColor: getColor(i),
-                //     borderColor: getColor(i),
-                //     data: constellationData.diffs.hrList
-                // }
 
                 // console.log('list', absmagList, magList)
                 const absmagConstellationDiff = {
@@ -708,25 +345,13 @@
                 }
                 // ciConstellationDiffList.push(ciConstellationDiff)
 
-                const scale = getScale(constellationData.ranges.mag.diffs)
-                scaleList.push(scale)
-                constellationData.scale = scale
-                constellationData.scaleText = `${scale.name} - ${scale.chroma}`
-                console.log('scale', scale)
+                const scale = Tonal.ScaleType.get(constellationData.music.scale.chroma)
+                constellationData.music.scaleText = `${scale.name} - ${scale.chroma}`
 
-                const chords = getChords(constellationData.ranges.absmag.diffs, [13, 14, 15, 16], 0.075, scale)
-                constellationData.chords = chords
-                constellationData.chordsText = chords.map(v => toRomanNumeral(v.interval) + (v.decoration?`add${v.decoration}`:'')).join(', ')
-                chordList.push(chords)
-                console.log('chords', chords)
+                constellationData.music.chords.text = constellationData.music.chords.structure.map(v => toRomanNumeral(v.interval) + (v.decoration?`add${v.decoration}`:'')).join(', ')
 
-                const melody = getMelodyTimingByDistance(constellationData.starsMain, scale, 'distanceFromAlpha', 'angleFromCentre')
-                constellationData.melody = melody
-                constellationData.melodyText = melody.map(m => `${m.note}-${m.timing}`).join(', ')
-
-                const melody2 = getMelodyTimingByAngle(constellationData.starsMain, scale, 'distanceFromCentre', 'angleFromCentre')
-                constellationData.melody2 = melody2
-                constellationData.melody2Text = melody2.map(m => `${m.note}-${m.timing}`).join(', ')
+                constellationData.music.melodyText = constellationData.music.melody.map(m => `${m.note}-${m.time}`).join(', ')
+                constellationData.music.melody2Text = constellationData.music.melody2.map(m => `${m.note}-${m.time}`).join(', ')
 
                 div.innerHTML = `
                     <div class="row">
@@ -737,23 +362,23 @@
                             <p>Stars Main Total: ${constellationData.starsMain.length}</p>
                         </div>
                         <div class="col-3">
-                            <p>Scale: ${constellationData.scaleText}
+                            <p>Scale: ${constellationData.music.scaleText}
                                 <span class="badge rounded-pill text-bg-secondary tone-clip" data-constellation="${constellationData.constellation}" data-type="scale">
                                     <i class="bi bi-play-circle"></i>
                                 </span>
                             </p>
-                            <p>Chords: ${constellationData.chordsText}
+                            <p>Chords: ${constellationData.music.chords.text}
                                 <span class="badge rounded-pill text-bg-secondary tone-clip" data-constellation="${constellationData.constellation}" data-type="chords">
                                     <i class="bi bi-play-circle"></i>
                                 </span>
                             </p>
-                            <p>Melody: ${constellationData.melodyText}
+                            <p>Melody: ${constellationData.music.melodyText}
                                 <span class="badge rounded-pill text-bg-secondary tone-clip" data-constellation="${constellationData.constellation}" data-type="melody">
                                     <i class="bi bi-play-circle"></i>
                                 </span>
                             </p>
 
-                            <p>Melody2: ${constellationData.melody2Text}
+                            <p>Melody2: ${constellationData.music.melody2Text}
                                 <span class="badge rounded-pill text-bg-secondary tone-clip" data-constellation="${constellationData.constellation}" data-type="melody2">
                                     <i class="bi bi-play-circle"></i>
                                 </span>
@@ -1129,6 +754,7 @@
                 })
             }
 
+            console.log('Drawing ALL graphs')
             const allDiv = document.createElement('div')
             allDiv.classList.add('all-constellation')
 
@@ -1260,18 +886,6 @@
             //     }
             // })
 
-            function sumArrays(arrayList) {
-                const total = new Array(arrayList[0].length).fill(0)
-                for (const array of arrayList) {
-                    for (let i = 0; i < array.length; i++) {
-                        total[i] += array[i]
-                    }
-                }
-                return total
-            }
-
-            // console.log('scaleList', scaleList, _.countBy(scaleList, 'name'), sumArrays((scaleList.map(s => s.chroma.split('').map(v => parseInt(v))))))
-
 
             for (const button of document.querySelectorAll('.tone-clip')) {
                 button.addEventListener('click', function() {
@@ -1331,7 +945,7 @@
 
             starData.focusMapOnConstellation = focusMapOnConstellation
 
-            console.log('addStarMap', starData)
+            // console.log('addStarMap', starData)
             var scene = new THREE.Scene();
             scene.background = new THREE.Color(0x000000);
 
@@ -1539,19 +1153,23 @@
 
 
         }
-        const init = async () => {
-            const starData = await (await fetch('/data/star-data.json')).json()
-            // starData.constellations = starData.constellations.filter(c => c.constellation.includes('Pe'))
-
-            console.log('starData', starData)
-            addConstellationGraphs(starData)
-            addStarMap(starData)
+        const globalBindings = () => {
             document.body.addEventListener('keydown', function(e) {
                 // console.log('e', e.code, e)
                 if (e.code === 'Space' || e.code === 'Backspace' || e.code === 'Delete') {
                     stopToneClips()
                 }
             })
+        }
+        const init = async () => {
+            console.log('Fetching data')
+            const starData = await (await fetch('/data/star-data.json')).json()
+            // starData.constellations = starData.constellations.filter(c => c.constellation.includes('Peg'))
+            console.log('Drawing Graphs', 'starData', starData)
+            addConstellationGraphs(starData)
+            console.log('Drawing Map')
+            addStarMap(starData)
+            globalBindings()
             console.log('Ready')
         }
         init()

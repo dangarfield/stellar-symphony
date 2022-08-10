@@ -1,18 +1,19 @@
-const csv = require('csv-parser')
-const fs = require('fs-extra')
-const _ = require('lodash')
-const THREE = require('three')
-const path = require('path')
-const fetch = require('node-fetch')
+import csv from 'csv-parser'
+import fs from 'fs-extra'
+import _ from 'lodash'
+import * as THREE from 'three'
+import * as path from 'path'
+import fetch from 'node-fetch'
+import { getScale, getChords, getMelodyWithTimingByDistance, getMelodyWithTimingByAngle, chordsToToneNotes, generateSong } from './music-generator.js'
 
-const saveDataStep = (fileName, obj) => {
-  fs.writeJsonSync(`data-steps/${fileName}.json`, obj)
-}
-const loadDataStep = (fileName) => {
-  if (fs.existsSync(`data-steps/${fileName}.json`)) {
-    return fs.readJsonSync(`data-steps/${fileName}.json`)
-  }
-}
+// const saveDataStep = (fileName, obj) => {
+//   fs.writeJsonSync(`data-steps/${fileName}.json`, obj)
+// }
+// const loadDataStep = (fileName) => {
+//   if (fs.existsSync(`data-steps/${fileName}.json`)) {
+//     return fs.readJsonSync(`data-steps/${fileName}.json`)
+//   }
+// }
 const downloadDataFile = async (url, path) => {
   const res = await fetch(url)
   const fileStream = fs.createWriteStream(path)
@@ -443,6 +444,47 @@ const calculateAndAddAveragesToConstellations = (starData) => {
     rvConstellationDiffListData.push({constellation: constellationData.constellation, data: constellationData.ranges.rv.diffs})
     lumConstellationDiffListData.push({constellation: constellationData.constellation, data: constellationData.ranges.lum.diffs})
     ciConstellationDiffListData.push({constellation: constellationData.constellation, data: constellationData.ranges.ci.diffs})
+
+    // General Music Config
+    const bpm = 80
+    const timeSig = [4, 4]
+
+    // Scale
+    const scale = getScale(constellationData.ranges.mag.diffs)
+    constellationData.music = {
+      bpm,
+      timeSig
+    }
+    constellationData.music.scale = {
+      name: scale.name,
+      chroma: scale.chroma
+    }
+    scaleList.push(constellationData.music.scale)
+
+    // Chords
+    const chords = getChords(constellationData.ranges.absmag.diffs, [13, 14, 15, 16], 0.075, scale)
+    // constellationData.chords = chords
+    // constellationData.chordsText = chords.map(v => toRomanNumeral(v.interval) + (v.decoration ? `add${v.decoration}` : '')).join(', ')
+    constellationData.music.chords = {
+      structure: chords,
+      toneNotes: chordsToToneNotes(chords, 0)
+    }
+    chordList.push(chords)
+    // console.log('chords', chords)
+
+    const melody = getMelodyWithTimingByDistance(constellationData.starsMain, scale, 'distanceFromAlpha', 'angleFromCentre')
+    constellationData.music.melody = melody
+    // constellationData.music.melodyText = melody.map(m => `${m.note}-${m.timing}`).join(', ')
+
+    const melody2 = getMelodyWithTimingByAngle(constellationData.starsMain, scale, 'distanceFromCentre', 'angleFromCentre')
+    constellationData.music.melody2 = melody2
+    // constellationData.music.melody2Text = melody2.map(m => `${m.note}-${m.timing}`).join(', ')
+
+    // if (constellationData.constellation.startsWith('P')) {
+    const songNotes = generateSong(constellationData)
+    constellationData.music.songNotes = songNotes
+    // console.log('music', constellationData.music)
+    // }
   }
   starData.hrAllListData = hrAllListData
   starData.ranges.absmag.constellationDiffListData = absmagConstellationDiffListData
@@ -450,6 +492,17 @@ const calculateAndAddAveragesToConstellations = (starData) => {
   starData.ranges.rv.constellationDiffListData = rvConstellationDiffListData
   starData.ranges.lum.constellationDiffListData = lumConstellationDiffListData
   starData.ranges.ci.constellationDiffListData = ciConstellationDiffListData
+
+  // const sumArrays = (arrayList) => {
+  //   const total = new Array(arrayList[0].length).fill(0)
+  //   for (const array of arrayList) {
+  //     for (let i = 0; i < array.length; i++) {
+  //       total[i] += array[i]
+  //     }
+  //   }
+  //   return total
+  // }
+  // console.log('scaleList', scaleList, _.countBy(scaleList, 'name'), sumArrays((scaleList.map(s => s.chroma.split('').map(v => parseInt(v))))))
 }
 const init = async () => {
   await downloadDataFiles()
@@ -461,8 +514,9 @@ const init = async () => {
   setMinMaxAndRangesForConstellations(groupedByConstellation, ranges)
   const starData = {constellations: groupedByConstellation, ranges, averages}
   calculateAndAddAveragesToConstellations(starData)
-  console.log('rawStarData', groupedByConstellation.map(d => d.constellation), Object.keys(groupedByConstellation[0]))
+  // console.log('rawStarData', groupedByConstellation.map(d => d.constellation), Object.keys(groupedByConstellation[0]))
   fs.writeJsonSync(`_static/data/star-data.json`, starData)
+  console.log('FINISHED')
 }
 
 init()
