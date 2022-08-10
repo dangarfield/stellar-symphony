@@ -333,6 +333,124 @@ const getConstellationAverages = (groupedByConstellation) => {
     }
   }
 }
+const calculateAndAddAveragesToConstellations = (starData) => {
+  const absmagConstellationDiffListData = [{constellation: 'ALL', data: starData.ranges.absmag.averages}]
+  const magConstellationDiffListData = [{constellation: 'ALL', data: starData.ranges.mag.averages}]
+  const rvConstellationDiffListData = [{constellation: 'ALL', data: starData.ranges.rv.averages}]
+  const lumConstellationDiffListData = [{constellation: 'ALL', data: starData.ranges.lum.averages}]
+  const ciConstellationDiffListData = [{constellation: 'ALL', data: starData.ranges.ci.averages}]
+  const hrAllListData = []
+
+  const scaleList = []
+  const chordList = []
+
+  for (const [i, constellationData] of starData.constellations.entries()) {
+    console.log(`Processing ${i + 1} of ${starData.constellations.length} - ${constellationData.constellationName} - ${constellationData.constellation}`)
+    const absmagList = []
+    const magList = []
+    const rvList = []
+    const lumList = []
+    const ciList = []
+    const hrList = []
+
+    for (const star of constellationData.stars) {
+      if (star.absmag) {
+        absmagList.push(star.absmag)
+      }
+      if (star.mag) {
+        magList.push(star.mag)
+      }
+      if (star.rv) {
+        rvList.push(star.rv)
+      }
+      if (star.lum) {
+        lumList.push(star.lum)
+      }
+      if (star.ci) {
+        ciList.push(star.ci)
+      }
+      if (star.absmag && star.ci) {
+        hrList.push({
+          x: star.ci,
+          y: star.absmag
+        })
+      }
+    }
+    const absmagMainList = []
+    const magMainList = []
+    const rvMainList = []
+    const lumMainList = []
+    const ciMainList = []
+    // const hrMainList = []
+    for (const star of constellationData.starsMain) {
+      // if (star.hip === '69673') {
+      //   console.log('Acturus', star)
+      // }
+      if (star.absmag) {
+        absmagMainList.push(star.absmag)
+      }
+      if (star.mag) {
+        magMainList.push(star.mag)
+      }
+      if (star.rv) {
+        rvMainList.push(star.rv)
+      }
+      if (star.lum) {
+        lumMainList.push(star.lum)
+      }
+      if (star.ci) {
+        ciMainList.push(star.ci)
+      }
+    }
+    const sort = (list) => {
+      list.sort(function (a, b) {
+        return a - b
+      })
+    }
+
+    sort(absmagList)
+    sort(magList)
+    sort(rvList)
+    sort(lumList)
+    sort(ciList)
+    sort(absmagMainList)
+    sort(magMainList)
+    sort(rvMainList)
+    sort(lumMainList)
+    sort(ciMainList)
+    constellationData.diffs = {}
+    constellationData.diffs.absmagList = absmagList
+    constellationData.diffs.magList = magList
+    constellationData.diffs.rvList = rvList
+    constellationData.diffs.lumList = lumList
+    constellationData.diffs.ciList = ciList
+    constellationData.diffs.hrList = hrList
+    constellationData.diffs.absmagMainList = absmagMainList
+    constellationData.diffs.magMainList = magMainList
+    constellationData.diffs.rvMainList = rvMainList
+    constellationData.diffs.lumMainList = lumMainList
+    constellationData.diffs.ciMainList = ciMainList
+
+    constellationData.ranges.absmag.diffs = constellationData.ranges.absmag.averages.map((v, i) => v - starData.ranges.absmag.averages[i])
+    constellationData.ranges.mag.diffs = constellationData.ranges.mag.averages.map((v, i) => v - starData.ranges.mag.averages[i])
+    constellationData.ranges.rv.diffs = constellationData.ranges.rv.averages.map((v, i) => v - starData.ranges.rv.averages[i])
+    constellationData.ranges.lum.diffs = constellationData.ranges.lum.averages.map((v, i) => v - starData.ranges.lum.averages[i])
+    constellationData.ranges.ci.diffs = constellationData.ranges.ci.averages.map((v, i) => v - starData.ranges.ci.averages[i])
+
+    hrAllListData.push({constellation: constellationData.constellation, data: constellationData.diffs.hrList})
+    absmagConstellationDiffListData.push({constellation: constellationData.constellation, data: constellationData.ranges.absmag.diffs})
+    magConstellationDiffListData.push({constellation: constellationData.constellation, data: constellationData.ranges.mag.diffs})
+    rvConstellationDiffListData.push({constellation: constellationData.constellation, data: constellationData.ranges.rv.diffs})
+    lumConstellationDiffListData.push({constellation: constellationData.constellation, data: constellationData.ranges.lum.diffs})
+    ciConstellationDiffListData.push({constellation: constellationData.constellation, data: constellationData.ranges.ci.diffs})
+  }
+  starData.hrAllListData = hrAllListData
+  starData.ranges.absmag.constellationDiffListData = absmagConstellationDiffListData
+  starData.ranges.mag.constellationDiffListData = magConstellationDiffListData
+  starData.ranges.rv.constellationDiffListData = rvConstellationDiffListData
+  starData.ranges.lum.constellationDiffListData = lumConstellationDiffListData
+  starData.ranges.ci.constellationDiffListData = ciConstellationDiffListData
+}
 const init = async () => {
   await downloadDataFiles()
   const rawData = await getRawData()
@@ -341,8 +459,10 @@ const init = async () => {
   const groupedByConstellation = groupByConstellation(rawData)
   const averages = getConstellationAverages(groupedByConstellation)
   setMinMaxAndRangesForConstellations(groupedByConstellation, ranges)
+  const starData = {constellations: groupedByConstellation, ranges, averages}
+  calculateAndAddAveragesToConstellations(starData)
   console.log('rawStarData', groupedByConstellation.map(d => d.constellation), Object.keys(groupedByConstellation[0]))
-  fs.writeJsonSync(`_static/data/star-data.json`, {constellations: groupedByConstellation, ranges, averages})
+  fs.writeJsonSync(`_static/data/star-data.json`, starData)
 }
 
 init()
