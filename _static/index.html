@@ -31,6 +31,13 @@
 </head>
 
 <body>
+    <div class="container-fluid loading">
+        <div class="row">
+            <div class="col">
+                <h3 class="loading-text">Loading...</h3>
+            </div>
+        </div>
+    </div>
     <div class="container-fluid constellations">
         <!-- <canvas id="myChart"></canvas> -->
     </div>
@@ -65,6 +72,14 @@
         import { LineGeometry } from 'https://unpkg.com/three@0.143.0/examples/jsm/lines/LineGeometry.js';
 		import { CSS2DRenderer, CSS2DObject } from 'https://unpkg.com/three@0.143.0/examples/jsm/renderers/CSS2DRenderer.js';
 
+        const loadingTextEle = document.querySelector('.loading-text')
+        const setLoadingText = (text) => {
+            console.log('setLoadingText', text)
+            document.querySelector('.loading-text').innerHTML = text
+        }
+        const removeLoadingText = () => {
+            document.querySelector('.loading').style.display = "none"
+        }
         const getColor = (i) => {
             const Tableau20 = ["#4E79A7", "#A0CBE8", "#F28E2B", "#FFBE7D", "#59A14F", "#8CD17D", "#B6992D", "#F1CE63",
                 "#499894", "#86BCB6", "#E15759", "#FF9D9A", "#79706E", "#BAB0AC", "#D37295", "#FABFD2", "#B07AA1", "#D4A6C8", "#9D7660", "#D7B5A6"
@@ -298,6 +313,7 @@
 
             for (const [i, constellationData] of starData.constellations.entries()) {
                 console.log(`Processing ${i+1} of ${starData.constellations.length} - ${constellationData.constellationName} - ${constellationData.constellation}`)
+                setLoadingText(`Drawing graphs for ${constellationData.constellationName} (${i+1} of ${starData.constellations.length})`)
                 // console.log('constellationData', constellationData)
                 const div = document.createElement('div')
                 div.classList.add('constellation')
@@ -1163,14 +1179,18 @@
         }
         const init = async () => {
             console.log('Fetching data')
+            setLoadingText('Fetching data...')
             const starData = await (await fetch('/data/star-data.json')).json()
-            // starData.constellations = starData.constellations.filter(c => c.constellation.includes('Peg'))
+            starData.constellations = starData.constellations.filter(c => c.constellation.includes('S'))
             console.log('Drawing Graphs', 'starData', starData)
+            // setLoadingText('Drawing graphs...')
             addConstellationGraphs(starData)
             console.log('Drawing Map')
+            setLoadingText('Drawing star map...')
             addStarMap(starData)
             globalBindings()
             console.log('Ready')
+            removeLoadingText()
         }
         init()
     </script>
