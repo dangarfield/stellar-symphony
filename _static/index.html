@@ -49,7 +49,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.40/Tone.min.js"></script>
     <script src="https://unpkg.com/@tonejs/midi"></script>
-
     <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/build/three.min.js" type="module"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.143.0/examples/jsm/controls/OrbitControls.js" type="module"></script> -->
@@ -70,7 +69,7 @@
         import { Line2 } from 'https://unpkg.com/three@0.143.0/examples/jsm/lines/Line2.js';
         import { LineMaterial } from 'https://unpkg.com/three@0.143.0/examples/jsm/lines/LineMaterial.js';
         import { LineGeometry } from 'https://unpkg.com/three@0.143.0/examples/jsm/lines/LineGeometry.js';
-		import { CSS2DRenderer, CSS2DObject } from 'https://unpkg.com/three@0.143.0/examples/jsm/renderers/CSS2DRenderer.js';
+        import { CSS2DRenderer, CSS2DObject } from 'https://unpkg.com/three@0.143.0/examples/jsm/renderers/CSS2DRenderer.js';
 
         const loadingTextEle = document.querySelector('.loading-text')
         const setLoadingText = (text) => {
@@ -89,6 +88,45 @@
         // console.log('Chart', getColor(0), getColor(19), getColor(20))
         // Chart.defaults.global.defaultFontFamily = "Helvetica Neue";
 
+        const piano = new Tone.Sampler({
+            urls: {
+                A0: "A0.mp3",
+                C1: "C1.mp3",
+                "D#1": "Ds1.mp3",
+                "F#1": "Fs1.mp3",
+                A1: "A1.mp3",
+                C2: "C2.mp3",
+                "D#2": "Ds2.mp3",
+                "F#2": "Fs2.mp3",
+                A2: "A2.mp3",
+                C3: "C3.mp3",
+                "D#3": "Ds3.mp3",
+                "F#3": "Fs3.mp3",
+                A3: "A3.mp3",
+                C4: "C4.mp3",
+                "D#4": "Ds4.mp3",
+                "F#4": "Fs4.mp3",
+                A4: "A4.mp3",
+                C5: "C5.mp3",
+                "D#5": "Ds5.mp3",
+                "F#5": "Fs5.mp3",
+                A5: "A5.mp3",
+                C6: "C6.mp3",
+                "D#6": "Ds6.mp3",
+                "F#6": "Fs6.mp3",
+                A6: "A6.mp3",
+                C7: "C7.mp3",
+                "D#7": "Ds7.mp3",
+                "F#7": "Fs7.mp3",
+                A7: "A7.mp3",
+                C8: "C8.mp3"
+            },
+            release: 1,
+            baseUrl: "https://tonejs.github.io/audio/salamander/"
+        }).toDestination()
+        Tone.loaded().then(() => {
+            console.log('Piano samples loaded')
+        })
         const stopToneClips = () => {
             Tone.Transport.stop();
             Tone.Transport.cancel(0);
@@ -98,52 +136,34 @@
             // console.log('playToneClip', toneData)
             stopToneClips()
             if (toneData.type === 'scale') {
+
                 const scaleNotes = Tonal.Scale.get(toneData.scale.chroma).intervals.map(Tonal.Note.transposeFrom('C')).map(v => (v) + '4')
                 scaleNotes.push('C5')
-                const synth = new Tone.Synth().toDestination()
                 var pattern = new Tone.Pattern(function(time, note) {
-                    synth.triggerAttackRelease(note, "4n", time)
+                    piano.triggerAttackRelease(note, "4n", time)
                 }, scaleNotes, 'up').start(0)
                 Tone.Transport.bpm.value = 120
 
             } else if (toneData.type === 'chords' || toneData.type === 'melody') {
 
-                const synth = new Tone.PolySynth().toDestination();
-
                 const notesToPlay = toneData.melody ? toneData.chords.concat(toneData.melody) : toneData.chords
-
                 const part = new Tone.Part(((time, value) => {
-                        // the value is an object which contains both the note and the velocity
-                        synth.triggerAttackRelease(value.note, value.duration, time)
-                    }),
-                    notesToPlay
-                ).start(0)
+                        piano.triggerAttackRelease(value.note, value.duration, time)
+                }), notesToPlay).start(0)
 
                 part.loop = true;
                 part.loopEnd = "4m";
 
                 Tone.Transport.bpm.value = toneData.bpm
             } else if (toneData.type === 'song') {
-                const synth = new Tone.PolySynth().toDestination();
-                // console.log('song', toneData)
+
                 let notesToPlay = []
                 for (const track of toneData.song) {
-                    // console.log('track', track.notes)
                     notesToPlay = notesToPlay.concat(track.notes)
                 }
-                // toneData.melody ? toneData.chords.concat(toneData.melody) : toneData.chords
-
-                // console.log('song', toneData, notesToPlay)
                 const part = new Tone.Part(((time, value) => {
-                    // the value is an object which contains both the note and the velocity
-                    synth.triggerAttackRelease(value.note, value.duration, time)
-                    }),
-                    notesToPlay
-                ).start(0)
-
-                // part.loop = true;
-                // part.loopEnd = "16m";
-
+                    piano.triggerAttackRelease(value.note, value.duration, time)
+                }),notesToPlay).start(0)
                 Tone.Transport.bpm.value = toneData.bpm
             }
             Tone.Transport.start()
@@ -1181,7 +1201,7 @@
             console.log('Fetching data')
             setLoadingText('Fetching data...')
             const starData = await (await fetch('/data/star-data.json')).json()
-            starData.constellations = starData.constellations.filter(c => c.constellation.includes('S'))
+            starData.constellations = starData.constellations.filter(c => c.constellation.includes('Aqr'))
             console.log('Drawing Graphs', 'starData', starData)
             // setLoadingText('Drawing graphs...')
             addConstellationGraphs(starData)
