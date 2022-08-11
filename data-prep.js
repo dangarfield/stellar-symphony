@@ -480,7 +480,7 @@ const calculateAndAddAveragesToConstellations = (starData) => {
     constellationData.music.melody2 = melody2
     // constellationData.music.melody2Text = melody2.map(m => `${m.note}-${m.timing}`).join(', ')
 
-    // if (constellationData.constellation.startsWith('P')) {
+    // if (constellationData.constellation.startsWith('UMi')) {
     const songNotes = generateSong(constellationData)
     constellationData.music.songNotes = songNotes
     // console.log('music', constellationData.music)

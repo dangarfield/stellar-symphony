@@ -193,85 +193,6 @@ export const getMelodyWithTimingByAngle = (stars, scale, distanceAttribute, angl
 
   return melody
 }
-export const chordsToToneNotes = (chords, barOffset) => {
-  const chordNotes = []
-  for (let i = 0; i < chords.length; i++) {
-    const chord = chords[i]
-    const notesInChord = chord.notes.slice(0, 3).map(n => Note.transpose(n, '-8P'))
-    let decorationNote = chord.notes.length > 3 ? Note.transpose(Note.transpose(chord.notes[3], '-8P'), '-8P') : false
-    chordNotes.push({
-      time: `${i + barOffset}:0`,
-      note: notesInChord,
-      duration: '2n'
-    }, {
-      time: `${i + barOffset}:2`,
-      note: notesInChord,
-      duration: '2n'
-    })
-    if (decorationNote) {
-      chordNotes.push({
-        time: `${i + barOffset}:1`,
-        note: decorationNote,
-        duration: '2n'
-      }, {
-        time: `${i + barOffset}:3`,
-        note: decorationNote,
-        duration: '4n'
-      })
-    }
-  }
-  return chordNotes
-}
-
-const melodyToToneNotes = (melody, barOffset) => {
-  return melody.map(m => {
-    const timeSplit = m.time.split(':')
-    timeSplit[0] = parseInt(timeSplit[0]) + barOffset
-    return {
-      note: m.note,
-      time: timeSplit.join(':'),
-      duration: m.duration
-    }
-  })
-}
-const chordsToRootBassToneNotes = (chords, barOffset) => {
-  const chordNotes = []
-  for (let i = 0; i < chords.length; i++) {
-    const chord = chords[i]
-    // console.log('chord', chord)
-    const rootNote = Note.transpose(chord.notes[0], '-8P')
-    // let decorationNote = chord.notes.length > 3 ? Note.transpose(Note.transpose(chord.notes[3], '-8P'), '-8P') : false
-    chordNotes.push({
-      time: `${i + barOffset}:0`,
-      note: rootNote,
-      duration: '1n'
-    })
-  }
-  return chordNotes
-}
-const scaleAndChordToHighNotes = (chords, scaleChroma, barOffset) => {
-  const scaleNotes = ScaleType.get(scaleChroma).intervals.map(Note.transposeFrom('C')).map(v => (v) + '5')
-  // console.log('triad', scaleNotes[2], scaleNotes[1], scaleNotes[4], scaleNotes[2])
-  const highNotes = [{
-    time: `${0 + barOffset}:0`,
-    note: scaleNotes[2],
-    duration: '1n'
-  }, {
-    time: `${1 + barOffset}:0`,
-    note: scaleNotes[1],
-    duration: '2m'
-  }, {
-    time: `${2 + barOffset}:0`,
-    note: scaleNotes[4],
-    duration: '1n'
-  }, {
-    time: `${3 + barOffset}:0`,
-    note: [scaleNotes[2], scaleNotes[0]],
-    duration: '1n'
-  }]
-
-  return highNotes
-}
 
 const noteToMidi = (lengthBarSec, lengthBeatSec, lengthSubDSec, chordNotesFlat) => {
   return chordNotesFlat.map(n => {
@@ -298,6 +219,9 @@ const noteToMidi = (lengthBarSec, lengthBeatSec, lengthSubDSec, chordNotesFlat) 
         break
       case '8n':
         duration = 0.5 * lengthBeatSec
+        break
+      case '16n':
+        duration = 0.25 * lengthBeatSec
         break
       case '1m':
         duration = 1 * lengthBarSec
@@ -366,32 +290,285 @@ const convertNotesToMidi = (bpm, timeSig, name, tracks) => { // chordNotes, melo
   // console.log('midi.toArray()', midi.toArray())
   return midi.toArray()
 }
+export const chordsToToneNotes = (chords, barOffset, variant) => {
+  const chordNotes = []
+  for (let i = 0; i < chords.length; i++) {
+    const chord = chords[i]
+    const notesInChord = chord.notes.slice(0, 3).map(n => Note.transpose(n, '-8P'))
+    let decorationNote = chord.notes.length > 3 ? Note.transpose(Note.transpose(chord.notes[3], '-8P'), '-8P') : false
+    if (variant === 2 && i === 3) {
+      chordNotes.push({
+        time: `${i + barOffset}:0`,
+        note: notesInChord,
+        duration: '4n'
+      })
+    } else if (variant === 3 && i === 3) {
+      chordNotes.push({
+        time: `${i + barOffset}:0`,
+        note: notesInChord,
+        duration: '2n'
+      }, {
+        time: `${i + barOffset}:2`,
+        note: notesInChord,
+        duration: '4n'
+      })
+      if (decorationNote) {
+        chordNotes.push({
+          time: `${i + barOffset}:1`,
+          note: decorationNote,
+          duration: '2n'
+        })
+      }
+    } else {
+      chordNotes.push({
+        time: `${i + barOffset}:0`,
+        note: notesInChord,
+        duration: '2n'
+      }, {
+        time: `${i + barOffset}:2`,
+        note: notesInChord,
+        duration: '2n'
+      })
+      if (decorationNote) {
+        chordNotes.push({
+          time: `${i + barOffset}:1`,
+          note: decorationNote,
+          duration: '2n'
+        }, {
+          time: `${i + barOffset}:3`,
+          note: decorationNote,
+          duration: '4n'
+        })
+      }
+    }
+  }
+  return chordNotes
+}
+export const chordsDroneToToneNotes = (chords, barOffset, variant) => {
+  const chordNotes = []
+  for (let i = 0; i < chords.length; i++) {
+    const chord = chords[i]
+    const notesInChord = chord.notes.slice(0, 3).map(n => Note.transpose(n, '-8P'))
+    // let decorationNote = chord.notes.length > 3 ? Note.transpose(Note.transpose(chord.notes[3], '-8P'), '-8P') : false
+    if (variant === 2 && i === 3) {
+      chordNotes.push({
+        time: `${i + barOffset}:0`,
+        note: notesInChord,
+        duration: '4n'
+      })
+    } else if (variant === 3 && i === 3) {
+      chordNotes.push({
+        time: `${i + barOffset}:0`,
+        note: notesInChord,
+        duration: '2n'
+      })
+    } else {
+      chordNotes.push({
+        time: `${i + barOffset}:0`,
+        note: notesInChord,
+        duration: '1m'
+      })
+    }
+  }
+  return chordNotes
+}
+
+const melodyToToneNotes = (melody, barOffset, variant) => {
+  // melody = melody.filter() // Filter every thing that starts with a '3:' except if it is 3:0 or 3:0:0
+  if (variant === 2) {
+    melody = melody.filter(m => !m.time.startsWith('3:') || m.time === '3:0' || m.time === '3:0:0')
+  }
+  if (variant === 3) {
+    melody = melody.filter(m => !['3:2:2', '3:3:0', '3:3:2', '3:4:0', '3:4:2', '3:3', '3:4'].includes(m.time))
+  }
+  return melody.map(m => {
+    const timeSplit = m.time.split(':')
+    timeSplit[0] = parseInt(timeSplit[0]) + barOffset
+    return {
+      note: m.note,
+      time: timeSplit.join(':'),
+      duration: m.duration
+    }
+  })
+}
+const chordsToRootBassToneNotes = (chords, barOffset, variant) => {
+  const chordNotes = []
+  for (let i = 0; i < chords.length; i++) {
+    const chord = chords[i]
+    // console.log('chord', chord)
+    const rootNote = Note.transpose(chord.notes[0], '-8P')
+    // let decorationNote = chord.notes.length > 3 ? Note.transpose(Note.transpose(chord.notes[3], '-8P'), '-8P') : false
+    chordNotes.push({
+      time: `${i + barOffset}:0`,
+      note: rootNote,
+      duration: i === 3 && variant === 2 ? '4n' : i === 3 && variant === 3 ? '2n' : '1n'
+    })
+  }
+  return chordNotes
+}
+const scaleAndChordToHighNotes = (chords, scaleChroma, barOffset, variant) => {
+  const scaleNotes = ScaleType.get(scaleChroma).intervals.map(Note.transposeFrom('C')).map(v => (v) + '5')
+  // console.log('triad', scaleNotes[2], scaleNotes[1], scaleNotes[4], scaleNotes[2])
+  const highNotes = [{
+    time: `${0 + barOffset}:0`,
+    note: scaleNotes[2],
+    duration: '1n'
+  }, {
+    time: `${1 + barOffset}:0`,
+    note: scaleNotes[1],
+    duration: '2m'
+  }, {
+    time: `${2 + barOffset}:0`,
+    note: scaleNotes[4],
+    duration: '1n'
+  }, {
+    time: `${3 + barOffset}:0`,
+    note: [scaleNotes[2], scaleNotes[0]],
+    duration: variant === 2 ? '4n' : variant === 3 ? '2n' : '1n'
+  }]
+
+  return highNotes
+}
+
+const scaleToPickingNotes = (scaleChroma, barOffset, variant) => {
+  const scaleNotes = ScaleType.get(scaleChroma).intervals.map(Note.transposeFrom('C')).map(v => (v) + '3')
+  scaleNotes.push('C4')
+  scaleNotes.push(scaleNotes[5 - 1].replace('3', '2'))
+  // console.log('triad', scaleNotes[2], scaleNotes[1], scaleNotes[4], scaleNotes[2])
+  const pattern = [
+    // 1, 4, 5, 8, 3, 4, 2, 9,
+    // 1, 4, 5, 4, 3, 4, 5, 7,
+    // 1, 4, 5, 8, 3, 4, 2, 9,
+    // 1, 4, 5, 4, 3, 4, 5, 7
+    // 1, 2, 3, 5, 2, 3, 1, 8,
+    // 1, 2, 3, 2, 5, 3, 2, 3,
+    // 1, 2, 3, 5, 2, 3, 1, 8,
+    // 1, 2, 3, 2, 5, 3, 2, 3
+    1, 3, 5, 8, 6, 4, 5, 3,
+    1, 3, 5, 8, 6, 4, 5, 3,
+    1, 3, 5, 8, 6, 4, 5, 3,
+    1, 3, 5, 8, 6, 4, 5, 3
+  ]
+  const pickingNotes = []
+  for (let i = 0; i < pattern.length; i++) {
+    const interval = pattern[i] - 1
+    pickingNotes.push({
+      time: `${barOffset}:${Math.floor(i / 2)}:${i % 2 === 1 ? 2 : 0}`,
+      note: scaleNotes[interval],
+      duration: '8n'
+    })
+    if (variant === 2 && i === 24) {
+      break
+    }
+    if (variant === 3 && i === 28) {
+      break
+    }
+  }
+  // console.log('pickingNotes', pickingNotes, scaleNotes)
+  return pickingNotes
+}
+
+const scaleToFastArpeggioNotes = (chords, scaleChroma, barOffset, variant) => {
+  const intervals = ScaleType.get(scaleChroma).intervals
+  let scaleNotes = intervals.map(Note.transposeFrom('C')).map(v => (v) + '3')
+  scaleNotes = scaleNotes.concat(intervals.map(Note.transposeFrom('C')).map(v => (v) + '4'))
+  // scaleNotes.push('C4')
+  // scaleNotes.push(scaleNotes[7 - 1].replace('3', '2'))
+  // console.log('triad', scaleNotes[2], scaleNotes[1], scaleNotes[4], scaleNotes[2])
+  const i1 = chords[0].interval - 1
+  const i2 = chords[1].interval - 1
+  const i3 = chords[2].interval - 1
+  const i4 = chords[3].interval - 1
+  const pattern = [
+    i1 + 8, i1 + 5, i1 + 3, i1 + 1,
+    i1 + 8, i1 + 5, i1 + 3, i1 + 1,
+    i1 + 8, i1 + 5, i1 + 3, i1 + 1,
+    i1 + 8, i1 + 5, i1 + 3, i1 + 1,
+    i2 + 8, i2 + 5, i2 + 3, i2 + 1,
+    i2 + 8, i2 + 5, i2 + 3, i2 + 1,
+    i2 + 8, i2 + 5, i2 + 3, i2 + 1,
+    i2 + 8, i2 + 5, i2 + 3, i2 + 1,
+    i3 + 8, i3 + 5, i3 + 3, i3 + 1,
+    i3 + 8, i3 + 5, i3 + 3, i3 + 1,
+    i3 + 8, i3 + 5, i3 + 3, i3 + 1,
+    i3 + 8, i3 + 5, i3 + 3, i3 + 1,
+    i4 + 8, i4 + 5, i4 + 3, i4 + 1,
+    i4 + 8, i4 + 5, i4 + 3, i4 + 1,
+    i4 + 8, i4 + 5, i4 + 3, i4 + 1,
+    i4 + 8, i4 + 5, i4 + 3, i4 + 1
+  ]
+  const pickingNotes = []
+  for (let i = 0; i < pattern.length; i++) {
+    const interval = pattern[i] - 1
+    pickingNotes.push({
+      time: `${barOffset}:${Math.floor(i / 4)}:${i % 4}`,
+      note: scaleNotes[interval],
+      duration: '16n'
+    })
+    if (variant === 2 && i === 48) {
+      break
+    }
+    if (variant === 3 && i === 56) {
+      break
+    }
+  }
+  // console.log('pickingNotes', pickingNotes, scaleNotes)
+  return pickingNotes
+}
+const scaleToLowDroneNotes = (scaleChroma, barOffset, variant) => {
+  const scaleNotes = ScaleType.get(scaleChroma).intervals.map(Note.transposeFrom('C')).map(v => (v) + '2')
+  // console.log('triad', scaleNotes[2], scaleNotes[1], scaleNotes[4], scaleNotes[2])
+  const notes = [{
+    time: `${0 + barOffset}:0`,
+    note: scaleNotes[0],
+    duration: '2m'
+  }, {
+    time: `${2 + barOffset}:0`,
+    note: scaleNotes[0],
+    duration: variant === 2 || variant === 3 ? '1m' : '2m'
+  }]
+
+  return notes
+}
 export const generateSong = (constellationData) => {
   const bpm = constellationData.music.bpm
   const timeSig = constellationData.music.timeSig
 
   const tracks = [
-    {structure: '1111', type: 'Chords'},
-    {structure: '0011', type: 'Melody 1'},
-    {structure: '1100', type: 'Melody 2'},
-    {structure: '1111', type: 'Root Bass'},
-    {structure: '1111', type: 'High Notes'}
+    {structure: '0000011111113', type: 'Chords'},
+    {structure: '0111300000000', type: 'Chords Drone'},
+    {structure: '0011300110013', type: 'Melody 1'},
+    {structure: '0000011001100', type: 'Melody 2'},
+    {structure: '0000311111113', type: 'Root Bass'},
+    {structure: '0001311111113', type: 'High Notes'},
+    {structure: '0000000001113', type: 'Picking'}, // A general picking thing can sound pretty bad, scrap it for now
+    {structure: '0000000111113', type: 'Fast Arpeggio'},
+    {structure: '1111300000000', type: 'Low Drone'}
   ]
   for (const track of tracks) {
     track.notes = []
     const isActiveList = track.structure.split('')
     for (let i = 0; i < isActiveList.length; i++) {
-      if (isActiveList[i] === '1') {
+      const variant = parseInt(isActiveList[i])
+      if (variant !== 0) {
         if (track.type === 'Chords') {
-          track.notes = track.notes.concat(chordsToToneNotes(constellationData.music.chords.structure, i * timeSig[1]))
+          track.notes = track.notes.concat(chordsToToneNotes(constellationData.music.chords.structure, i * timeSig[1], variant))
+        } if (track.type === 'Chords Drone') {
+          track.notes = track.notes.concat(chordsDroneToToneNotes(constellationData.music.chords.structure, i * timeSig[1], variant))
         } else if (track.type === 'Melody 1') {
-          track.notes = track.notes.concat(melodyToToneNotes(constellationData.music.melody, i * timeSig[1]))
+          track.notes = track.notes.concat(melodyToToneNotes(constellationData.music.melody, i * timeSig[1], variant))
         } else if (track.type === 'Melody 2') {
-          track.notes = track.notes.concat(melodyToToneNotes(constellationData.music.melody2, i * timeSig[1]))
+          track.notes = track.notes.concat(melodyToToneNotes(constellationData.music.melody2, i * timeSig[1], variant))
         } else if (track.type === 'Root Bass') {
-          track.notes = track.notes.concat(chordsToRootBassToneNotes(constellationData.music.chords.structure, i * timeSig[1]))
+          track.notes = track.notes.concat(chordsToRootBassToneNotes(constellationData.music.chords.structure, i * timeSig[1], variant))
         } else if (track.type === 'High Notes') {
-          track.notes = track.notes.concat(scaleAndChordToHighNotes(constellationData.music.chords.structure, constellationData.music.scale.chroma, i * timeSig[1]))
+          track.notes = track.notes.concat(scaleAndChordToHighNotes(constellationData.music.chords.structure, constellationData.music.scale.chroma, i * timeSig[1], variant))
+        } else if (track.type === 'Picking') {
+          track.notes = track.notes.concat(scaleToPickingNotes(constellationData.music.scale.chroma, i * timeSig[1], variant))
+        } else if (track.type === 'Fast Arpeggio') {
+          track.notes = track.notes.concat(scaleToFastArpeggioNotes(constellationData.music.chords.structure, constellationData.music.scale.chroma, i * timeSig[1], variant))
+        } else if (track.type === 'Low Drone') {
+          track.notes = track.notes.concat(scaleToLowDroneNotes(constellationData.music.scale.chroma, i * timeSig[1], variant))
         }
       }
     }
