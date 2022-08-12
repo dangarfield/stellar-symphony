@@ -5,7 +5,7 @@
     "main": "data-prep.js",
     "scripts": {
         "start": "node data-prep.js",
-        "static": "server ./_static",
+        "dev": "rollup -cw",
         "deploy": "netlify deploy --prod"
     },
     "type": "module",
@@ -14,11 +14,14 @@
     "dependencies": {
         "@tonaljs/tonal": "^4.6.5",
         "@tonejs/midi": "^2.0.28",
+        "chart.js": "^3.9.1",
         "csv-parser": "^3.0.0",
         "fs-extra": "^10.1.0",
         "lodash": "^4.17.21",
         "node-fetch": "^3.2.10",
-        "three": "^0.143.0"
+        "three": "^0.143.0",
+        "tonal": "^2.2.2",
+        "tone": "^14.7.77"
     },
     "nodemonConfig": {
         "ignore": [
@@ -27,5 +30,11 @@
             "midi",
             "data/*"
         ]
+    },
+    "devDependencies": {
+        "@rollup/plugin-json": "^4.1.0",
+        "@rollup/plugin-node-resolve": "^13.3.0",
+        "rollup-plugin-livereload": "^2.0.5",
+        "rollup-plugin-serve": "^2.0.1"
     }
 }
