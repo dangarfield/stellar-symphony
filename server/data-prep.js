@@ -6,14 +6,6 @@ import * as path from 'path'
 import fetch from 'node-fetch'
 import { getScale, getChords, getMelodyWithTimingByDistance, getMelodyWithTimingByAngle, chordsToToneNotes, generateSong } from './music-generator.js'
 
-// const saveDataStep = (fileName, obj) => {
-//   fs.writeJsonSync(`data-steps/${fileName}.json`, obj)
-// }
-// const loadDataStep = (fileName) => {
-//   if (fs.existsSync(`data-steps/${fileName}.json`)) {
-//     return fs.readJsonSync(`data-steps/${fileName}.json`)
-//   }
-// }
 const downloadDataFile = async (url, path) => {
   const res = await fetch(url)
   const fileStream = fs.createWriteStream(path)
@@ -24,7 +16,7 @@ const downloadDataFile = async (url, path) => {
   })
 }
 const downloadDataFiles = async () => {
-  const dataDirName = 'data'
+  const dataDirName = path.join('data')
   fs.ensureDirSync(dataDirName)
 
   const urls = [

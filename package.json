@@ -4,9 +4,11 @@
     "description": "",
     "main": "data-prep.js",
     "scripts": {
-        "start": "node data-prep.js",
+        "start": "node server/data-prep.js",
+        "data": "nodemon server/data-prep.js",
         "dev": "rollup -cw",
-        "deploy": "netlify deploy --prod"
+        "build": "rollup -c",
+        "deploy": "rollup -c && netlify deploy --prod"
     },
     "type": "module",
     "author": "",
