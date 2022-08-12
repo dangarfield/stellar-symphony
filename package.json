@@ -1,10 +1,12 @@
 {
-    "name": "name-in-the-stars",
-    "version": "1.0.0",
+    "name": "steller-symphony",
+    "version": "0.1.0",
     "description": "",
     "main": "data-prep.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "start": "node data-prep.js",
+        "static": "server ./_static",
+        "deploy": "netlify deploy --prod"
     },
     "type": "module",
     "author": "",
@@ -21,7 +23,9 @@
     "nodemonConfig": {
         "ignore": [
             "_static",
-            "*.json"
+            "*.json",
+            "midi",
+            "data/*"
         ]
     }
 }

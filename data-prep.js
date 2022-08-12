@@ -183,7 +183,6 @@ const groupByConstellation = (rawData) => {
 
       let alpha = v.starsMain.find(s => s.bayer === 'Alp')
 
-      const R = 1
       // console.log('--------------------------------------------------------')
       if (alpha === undefined || alpha === null) {
         const alphaCandidates = v.starsMain.filter(s => s.bayer !== '')
@@ -234,6 +233,7 @@ const groupByConstellation = (rawData) => {
 
       return v
     })
+    .sort((a, b) => a.constellationName.localeCompare(b.constellationName))
     .value()
 }
 const getXYZFromRaDec = (R, dec, ra) => {
@@ -483,6 +483,10 @@ const calculateAndAddAveragesToConstellations = (starData) => {
     // if (constellationData.constellation.startsWith('UMi')) {
     const songNotes = generateSong(constellationData)
     constellationData.music.songNotes = songNotes
+
+    if (fs.existsSync(path.join('_static', 'audio', `${constellationData.constellationName}.mp3`))) {
+      constellationData.music.songPath = `audio/${constellationData.constellationName}.mp3`
+    }
     // console.log('music', constellationData.music)
     // }
   }
@@ -504,6 +508,19 @@ const calculateAndAddAveragesToConstellations = (starData) => {
   // }
   // console.log('scaleList', scaleList, _.countBy(scaleList, 'name'), sumArrays((scaleList.map(s => s.chroma.split('').map(v => parseInt(v))))))
 }
+const reduceStarDataSize = (starData) => {
+  const allowedKeys = ['absmag', 'mag', 'hip', 'ax', 'ay', 'az', 'alpha']
+  for (const constellation of starData.constellations) {
+    for (const star of constellation.stars) {
+      delete star['id']
+      for (const [key] of Object.entries(star)) {
+        if (!allowedKeys.includes(key)) {
+          delete star[key]
+        }
+      }
+    }
+  }
+}
 const init = async () => {
   await downloadDataFiles()
   const rawData = await getRawData()
@@ -514,6 +531,7 @@ const init = async () => {
   setMinMaxAndRangesForConstellations(groupedByConstellation, ranges)
   const starData = {constellations: groupedByConstellation, ranges, averages}
   calculateAndAddAveragesToConstellations(starData)
+  reduceStarDataSize(starData)
   // console.log('rawStarData', groupedByConstellation.map(d => d.constellation), Object.keys(groupedByConstellation[0]))
   fs.writeJsonSync(`_static/data/star-data.json`, starData)
   console.log('FINISHED')

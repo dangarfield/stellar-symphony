@@ -1,3 +1,7 @@
+This is all a big TODO
+
+Deployed to https://steller-symphony.netlify.app
+
 Notes:
 
 Song structure - Use mag-diff All - Generally high crescendo - Could create the general volume / intensity of the soundscape
