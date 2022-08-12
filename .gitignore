@@ -3,6 +3,6 @@ data
 midi
 threejs-star-map
 node_modules
-# .DS_Store
+.DS_Store
 audio
 .netlify
