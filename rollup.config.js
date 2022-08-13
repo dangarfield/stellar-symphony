@@ -15,6 +15,6 @@ export default {
     nodeResolve(),
     json(),
     !production && serve({open: true, contentBase: '_static', port: 3000}),
-    !production && livereload()
+    !production && livereload({watch: '_static'})
   ]
 }
