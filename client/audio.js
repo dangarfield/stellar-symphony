@@ -82,8 +82,7 @@ const playToneClip = (toneData) => {
     Transport.bpm.value = 120
   } else if (toneData.type === 'chords' || toneData.type === 'melody') {
     const visualMelody = setupMelodyExplanation(toneData.constellation)
-    // const notesToPlay = toneData.melody ? toneData.chords.concat(toneData.melody) : toneData.chords
-    const notesToPlay = toneData.melody
+    const notesToPlay = toneData.melody ? toneData.chords.concat(toneData.melody) : toneData.chords
     const totalBars = notesToPlay.find(n => n.totalBars).totalBars
     const timeForAnimation = 1000 * Math.pow(toneData.bpm / 60, -1) * 4 * totalBars
     const part = new Part((time, value) => {
