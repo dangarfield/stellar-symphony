@@ -1,6 +1,6 @@
 This is all a big TODO
 
-Deployed to https://steller-symphony.netlify.app
+Deployed to https://stellar-symphony.netlify.app
 
 Notes:
 

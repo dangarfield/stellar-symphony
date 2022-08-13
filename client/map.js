@@ -1,12 +1,14 @@
 import {Vector3, Scene, Color, PerspectiveCamera, WebGLRenderer, TextureLoader,
   BufferGeometry, Points, ShaderMaterial, AdditiveBlending, Float32BufferAttribute,
-  Mesh, SphereGeometry, MeshPhongMaterial, DoubleSide, AmbientLight, Raycaster, Vector2} from 'three'
+  Mesh, SphereGeometry, MeshPhongMaterial, DoubleSide, AmbientLight, Raycaster, Vector2, Line3, MathUtils, Group,
+  EllipseCurve, LineBasicMaterial, LineLoop, BoxHelper} from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Line2 } from 'three/examples/jsm/lines/Line2.js'
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js'
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js'
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js'
 import {updateSelectedConstellation} from './graphing.js'
+import {Tween, update as tweenUpdate} from '@tweenjs/tween.js'
 
 const starVertexShader = () => {
   return `
@@ -48,10 +50,131 @@ const centrePoints = []
 let starData
 let sphere
 
+const maxBy = (collection, attribute) => {
+  let largestItem
+  let largestValue = 0
+  for (const item of collection) {
+    if (item[attribute] > largestValue) {
+      largestItem = item
+      largestValue = item[attribute]
+    }
+  }
+  return largestItem
+}
+const getTargetPointForExplanation = (distaceTarget, furthestStarFromTarget) => {
+  const camLine = new Line3(camera.pos, distaceTarget)
+  console.log('furthestStar', furthestStarFromTarget)
+  const furthestVec = new Vector3(furthestStarFromTarget.ax, furthestStarFromTarget.ay, furthestStarFromTarget.az)
+  const targetPoint = new Vector3()
+  camLine.closestPointToPoint(furthestVec, true, targetPoint)
+  console.log('targetPoint', targetPoint)
+
+  return targetPoint
+}
+const createTimingExplanationLine = (targetPoint, distance) => {
+  const lineMaterial = new LineMaterial({
+    color: 0xFF00FF,
+    linewidth: 0.003
+  })
+
+  const linePoints = [0, 0, 0, 0, distance, 0]
+  const lineGeom = new LineGeometry()
+  lineGeom.setPositions(linePoints)
+  const line = new Line2(lineGeom, lineMaterial)
+  line.computeLineDistances()
+  line.scale.set(1, 1, 1)
+
+  line.position.x = targetPoint.x
+  line.position.y = targetPoint.y
+  line.position.z = targetPoint.z
+  line.lookAt(camera.position)
+  line.visible = false
+  return line
+}
+const createTimingExplanationCircle = (targetPoint) => {
+  const geo = createCircleGeo(0)
+
+  const mat = new LineBasicMaterial({ color: 0xFF00FF })
+  const circle = new LineLoop(geo, mat)
+
+  circle.position.x = targetPoint.x
+  circle.position.y = targetPoint.y
+  circle.position.z = targetPoint.z
+  circle.lookAt(camera.position)
+  circle.visible = false
+  return circle
+}
+const createCircleGeo = (radius) => {
+  const curve = new EllipseCurve(
+    0.0, 0.0, // Center x, y
+    radius, radius, // x radius, y radius
+    0.0, 2.0 * Math.PI // Start angle, stop angle
+  )
+  const pts = curve.getSpacedPoints(256)
+  const geo = new BufferGeometry().setFromPoints(pts)
+  return geo
+}
+export const setupMelodyExplanation = (constellation) => {
+  console.log('setupMelodyExplanation', constellation)
+  const alphaStar = constellation.starsMain.find(s => s.alpha)
+  const alphaVec = new Vector3(alphaStar.ax, alphaStar.ay, alphaStar.az)
+  const furthestStarFromAlpha = maxBy(constellation.starsMain, 'distanceFromAlpha')
+  const targetPointAlpha = getTargetPointForExplanation(alphaVec, furthestStarFromAlpha)
+
+  const centreVec = new Vector3(constellation.centre.x, constellation.centre.y, constellation.centre.z)
+  const furthestStarFromCentre = maxBy(constellation.starsMain, 'distanceFromCentre')
+  const targetPointCentre = getTargetPointForExplanation(centreVec, furthestStarFromCentre)
+
+  // Create Timing Line
+  const timingLine = createTimingExplanationLine(targetPointCentre, furthestStarFromCentre.distanceFromCentre)
+  scene.add(timingLine)
+
+  // Create Timing Circle
+  const timingCircle = createTimingExplanationCircle(targetPointAlpha)
+  scene.add(timingCircle)
+
+  // lineGroup.setRotationFromAxisAngle(alphaVec, 0)
+
+  const explanationObject = {
+    timingCircle,
+    timingLine
+  }
+
+  explanationObject.animateCircle = (time) => {
+    explanationObject.timingCircle.visible = true
+    const angleTweenConfig = {radius: 0}
+    new Tween(angleTweenConfig)
+      .to({radius: furthestStarFromAlpha.distanceFromAlpha}, time - 10)
+      .onUpdate(() => {
+        explanationObject.timingCircle.geometry = createCircleGeo(angleTweenConfig.radius)
+      })
+      .onComplete(() => {
+        explanationObject.timingCircle.visible = false
+      })
+      .start()
+  }
+  explanationObject.animateLine = (time) => {
+    explanationObject.timingLine.visible = true
+    const angleTweenConfig = {angle: 0}
+    new Tween(angleTweenConfig)
+      .to({angle: 360}, time - 10)
+      .onUpdate(() => {
+        explanationObject.timingLine.setRotationFromAxisAngle(centreVec, MathUtils.degToRad(angleTweenConfig.angle))
+      })
+      .onComplete(() => {
+        explanationObject.timingLine.visible = false
+      })
+      .start()
+  }
+
+  return explanationObject
+}
+
 const updateFovFromDistance = () => {
   camera.fov = 25 + (controls.getDistance() * 30)
   camera.updateProjectionMatrix()
 }
+
 export const focusMapOnConstellation = (constellation) => {
   controls.enabled = false
   const newCamPos = new Vector3(constellation.centre.x, constellation.centre.y, constellation.centre.z).lerp(new Vector3(0, 0, 0), 1.2)
@@ -61,7 +184,7 @@ export const focusMapOnConstellation = (constellation) => {
   camera.lookAt(controls.target)
 
   controls.enabled = true
-
+  setupMelodyExplanation(constellation)
   updateFovFromDistance()
 }
 
@@ -219,6 +342,7 @@ const loadTriangles = () => {
 const render = () => {
   window.requestAnimationFrame(render)
   // controls.update()
+  tweenUpdate()
   raycaster.setFromCamera(pointer, camera)
   const intersects = raycaster.intersectObjects([sphere])
   if (intersects.length > 0) {

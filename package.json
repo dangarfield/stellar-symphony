@@ -16,6 +16,7 @@
     "dependencies": {
         "@tonaljs/tonal": "^4.6.5",
         "@tonejs/midi": "^2.0.28",
+        "@tweenjs/tween.js": "^18.6.4",
         "chart.js": "^3.9.1",
         "csv-parser": "^3.0.0",
         "fs-extra": "^10.1.0",

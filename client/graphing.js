@@ -317,8 +317,8 @@ export const addConstellationGraphs = (starData) => {
 
     constellationData.music.chords.text = constellationData.music.chords.structure.map(v => toRomanNumeral(v.interval) + (v.decoration ? `add${v.decoration}` : '')).join(', ')
 
-    constellationData.music.melodyText = constellationData.music.melody.map(m => `${m.note}-${m.time}`).join(', ')
-    constellationData.music.melody2Text = constellationData.music.melody2.map(m => `${m.note}-${m.time}`).join(', ')
+    constellationData.music.melodyText = constellationData.music.melody.filter(m => !m.ignore).map(m => `${m.note}-${m.time}`).join(', ')
+    constellationData.music.melody2Text = constellationData.music.melody2.filter(m => !m.ignore).map(m => `${m.note}-${m.time}`).join(', ')
 
     div.innerHTML = generateConstellationGraphHtml(constellationData, starData.showCharts)
 

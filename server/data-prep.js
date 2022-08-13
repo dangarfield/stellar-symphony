@@ -501,7 +501,7 @@ const calculateAndAddAveragesToConstellations = (starData) => {
   // console.log('scaleList', scaleList, _.countBy(scaleList, 'name'), sumArrays((scaleList.map(s => s.chroma.split('').map(v => parseInt(v))))))
 }
 const reduceStarDataSize = (starData) => {
-  const allowedKeys = ['absmag', 'mag', 'hip', 'ax', 'ay', 'az', 'alpha']
+  const allowedKeys = ['absmag', 'mag', 'hip', 'ax', 'ay', 'az', 'alpha', 'distanceFromAlpha', 'distanceFromCentre', 'angleFromCentre', 'angleFromAlpha']
   for (const constellation of starData.constellations) {
     for (const star of constellation.stars) {
       delete star['id']

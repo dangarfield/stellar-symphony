@@ -154,10 +154,12 @@ export const getMelodyWithTimingByDistance = (stars, scale, distanceAttribute, a
       noteCount: noteCount,
       note: note, // scaleNotes[i % scaleNotes.length],
       time: `${Math.floor(noteCount / 8)}:${Math.floor(noteCount / 2) % 4}:${noteCount % 2 === 1 ? 2 : 0}`,
-      duration: '4n' // Todo lengths
+      duration: '4n', // Todo lengths
+      starHip: s.hip
     }
   }) // TODO - fill out any notes played at the same time?
-
+  melody[0].melodyTimingByDistance = true
+  melody[0].totalBars = totalBars
   // console.log('melody stars', melodyStars, '-', totalBars, totalNoteCount, timeFactor, '-', melody)
   return melody
 }
@@ -187,10 +189,20 @@ export const getMelodyWithTimingByAngle = (stars, scale, distanceAttribute, angl
       noteCount: noteCount,
       note: note, // scaleNotes[i % scaleNotes.length],
       time: `${Math.floor(noteCount / 8)}:${Math.floor(noteCount / 2) % 4}:${noteCount % 2 === 1 ? 2 : 0}`,
-      duration: '4n' // Todo lengths
+      duration: '4n', // Todo lengths
+      starHip: s.hip
     }
   })
-
+  const hiddenFirstNote = {
+    noteCount: 0,
+    note: 'C0',
+    time: '0:0:0',
+    duration: '4n',
+    ignore: true,
+    melodyTimingByAngle: true,
+    totalBars: totalBars
+  }
+  melody.unshift(hiddenFirstNote)
   return melody
 }
 
@@ -279,7 +291,7 @@ const convertNotesToMidi = (bpm, timeSig, name, tracks) => { // chordNotes, melo
     midiTrack.name = track.type
     midiTrack.channel = 1
     // console.log('chordNotes', chordNotes)
-    const chordNotesFlat = track.notes.flatMap((x) => Array.isArray(x.note) ? x.note.flatMap((d) => ({ time: x.time, duration: x.duration, note: d })) : x)
+    const chordNotesFlat = track.notes.filter(n => !n.ignore).flatMap((x) => Array.isArray(x.note) ? x.note.flatMap((d) => ({ time: x.time, duration: x.duration, note: d })) : x)
     const chordMidiNotes = noteToMidi(lengthBarSec, lengthBeatSec, lengthSubDSec, chordNotesFlat)
     // console.log('chordMidiNotes', chordMidiNotes)
     for (const note of chordMidiNotes) {
@@ -384,11 +396,10 @@ const melodyToToneNotes = (melody, barOffset, variant) => {
   return melody.map(m => {
     const timeSplit = m.time.split(':')
     timeSplit[0] = parseInt(timeSplit[0]) + barOffset
-    return {
-      note: m.note,
-      time: timeSplit.join(':'),
-      duration: m.duration
-    }
+
+    const mClone = Object.assign({}, m)
+    mClone.time = timeSplit.join(':')
+    return mClone
   })
 }
 const chordsToRootBassToneNotes = (chords, barOffset, variant) => {
