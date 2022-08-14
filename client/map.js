@@ -1,7 +1,7 @@
 import {Vector3, Scene, Color, PerspectiveCamera, WebGLRenderer, TextureLoader,
   BufferGeometry, Points, ShaderMaterial, AdditiveBlending, Float32BufferAttribute,
   Mesh, SphereGeometry, MeshPhongMaterial, DoubleSide, AmbientLight, Raycaster, Vector2, Line3, MathUtils, Group,
-  EllipseCurve, LineBasicMaterial, LineLoop, BoxHelper} from 'three'
+  EllipseCurve, LineBasicMaterial, LineLoop} from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Line2 } from 'three/examples/jsm/lines/Line2.js'
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js'
@@ -114,6 +114,37 @@ const createCircleGeo = (radius) => {
   const geo = new BufferGeometry().setFromPoints(pts)
   return geo
 }
+const createStars = (starsMain) => {
+  const bufGeom = new BufferGeometry()
+  const points = new Points(bufGeom, new ShaderMaterial({
+    uniforms: {
+      color: { value: new Color(0xffffff) },
+      pointTexture: { value: new TextureLoader().load('disc.png') }
+    },
+    vertexShader: starVertexShader(),
+    fragmentShader: starFragmentShader(),
+
+    blending: AdditiveBlending,
+    depthTest: false,
+    transparent: true
+  }))
+  const pointsArray = []
+  const colorsArray = []
+  const sizesArray = []
+  const hipArray = []
+
+  for (const star of starsMain) {
+    hipArray.push(star.hip)
+    pointsArray.push(star.ax, star.ay, star.az)
+    sizesArray.push(0)
+    colorsArray.push(0, 1, 1, 1)
+  }
+  bufGeom.setAttribute('position', new Float32BufferAttribute(pointsArray, 3))
+  bufGeom.setAttribute('customColor', new Float32BufferAttribute(colorsArray, 4))
+  bufGeom.setAttribute('size', new Float32BufferAttribute(sizesArray, 1))
+
+  return { points, hipArray }
+}
 export const setupMelodyExplanation = (constellation) => {
   console.log('setupMelodyExplanation', constellation)
   const alphaStar = constellation.starsMain.find(s => s.alpha)
@@ -126,25 +157,37 @@ export const setupMelodyExplanation = (constellation) => {
   const targetPointCentre = getTargetPointForExplanation(centreVec, furthestStarFromCentre)
 
   // Create Timing Line
+  const explanationGroup = new Group()
+  scene.add(explanationGroup)
   const timingLine = createTimingExplanationLine(targetPointCentre, furthestStarFromCentre.distanceFromCentre)
-  scene.add(timingLine)
+  // TODO - Only have one timingLine at one point in time
+  explanationGroup.add(timingLine)
 
   // Create Timing Circle
   const timingCircle = createTimingExplanationCircle(targetPointAlpha)
-  scene.add(timingCircle)
+  // TODO - Only have one timingLine at one point in time
+  explanationGroup.add(timingCircle)
+  // for (const star of constellation.starsMain) {
+  //   const starEle = createStar(star.ax, star.ay, star.az, star.hip)
+  //   explanationGroup.add(starEle)
+  // }
+  const { points, hipArray } = createStars(constellation.starsMain)
+  explanationGroup.add(points)
 
   // lineGroup.setRotationFromAxisAngle(alphaVec, 0)
 
   const explanationObject = {
     timingCircle,
-    timingLine
+    timingLine,
+    hipArray,
+    points
   }
 
   explanationObject.animateCircle = (time) => {
     explanationObject.timingCircle.visible = true
     const angleTweenConfig = {radius: 0}
     new Tween(angleTweenConfig)
-      .to({radius: furthestStarFromAlpha.distanceFromAlpha}, time - 10)
+      .to({radius: furthestStarFromAlpha.distanceFromAlpha}, time - 1)
       .onUpdate(() => {
         explanationObject.timingCircle.geometry = createCircleGeo(angleTweenConfig.radius)
       })
@@ -157,7 +200,7 @@ export const setupMelodyExplanation = (constellation) => {
     explanationObject.timingLine.visible = true
     const angleTweenConfig = {angle: 0}
     new Tween(angleTweenConfig)
-      .to({angle: 360}, time - 10)
+      .to({angle: 360}, time - 1)
       .onUpdate(() => {
         explanationObject.timingLine.setRotationFromAxisAngle(centreVec, MathUtils.degToRad(angleTweenConfig.angle))
       })
@@ -166,7 +209,32 @@ export const setupMelodyExplanation = (constellation) => {
       })
       .start()
   }
-
+  explanationObject.animateStar = (starHip) => {
+    const starIndex = explanationObject.hipArray.indexOf(starHip)
+    console.log('animateStar', starHip, starIndex)
+    // explanationObject.points.geometry.attributes.size.array[starIndex] = 0.1
+    // explanationObject.points.geometry.attributes.size.needsUpdate = true
+    const sizeConfig = {size: 0}
+    const tweenA = new Tween(sizeConfig).to({size: 0.1}, 200)
+      .onUpdate(() => {
+        explanationObject.points.geometry.attributes.size.array[starIndex] = sizeConfig.size
+        explanationObject.points.geometry.attributes.size.needsUpdate = true
+      })
+      .onComplete(() => {
+        // explanationObject.timingLine.visible = false
+      })
+    const tweenB = new Tween(sizeConfig).to({size: 0}, 2000)
+      .onUpdate(() => {
+        explanationObject.points.geometry.attributes.size.array[starIndex] = sizeConfig.size
+        explanationObject.points.geometry.attributes.size.needsUpdate = true
+      })
+      .onComplete(() => {
+        // explanationObject.timingLine.visible = false
+      })
+    tweenA.chain(tweenB)
+    tweenA.start()
+  }
+  console.log('explanationObject', explanationObject)
   return explanationObject
 }
 

@@ -68,6 +68,9 @@ const triggeredAnimationAction = (visualMelody, value, timeForAnimation) => {
   if (value.melodyTimingByDistance) {
     visualMelody.animateCircle(timeForAnimation)
   }
+  if (value.starHip) {
+    visualMelody.animateStar(value.starHip)
+  }
 }
 const playToneClip = (toneData) => {
   // console.log('playToneClip', toneData)
