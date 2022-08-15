@@ -117,7 +117,7 @@ const playToneClip = (toneData) => {
     }, notesToPlay).start(0)
     Transport.bpm.value = toneData.bpm
   }
-  Transport.start()
+  Transport.start('+0.05')
 }
 
 // Potential melodies (da - distance from alpha, dc - distance from centre, aa - angle from alpha, ac - angle from centre)

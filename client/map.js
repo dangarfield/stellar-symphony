@@ -1,14 +1,14 @@
 import {Vector3, Scene, Color, PerspectiveCamera, WebGLRenderer, TextureLoader,
   BufferGeometry, Points, ShaderMaterial, AdditiveBlending, Float32BufferAttribute,
   Mesh, SphereGeometry, MeshPhongMaterial, DoubleSide, AmbientLight, Raycaster, Vector2, Line3, MathUtils, Group,
-  EllipseCurve, LineBasicMaterial, LineLoop} from 'three'
+  EllipseCurve, LineBasicMaterial, LineLoop, Object3D} from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Line2 } from 'three/examples/jsm/lines/Line2.js'
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js'
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js'
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js'
 import {updateSelectedConstellation} from './graphing.js'
-import {Tween, update as tweenUpdate} from '@tweenjs/tween.js'
+import {Tween, update as tweenUpdate, Easing} from '@tweenjs/tween.js'
 
 const starVertexShader = () => {
   return `
@@ -49,6 +49,7 @@ const pointer = new Vector2()
 const centrePoints = []
 let starData
 let sphere
+let explanationGroup
 
 const maxBy = (collection, attribute) => {
   let largestItem
@@ -72,6 +73,7 @@ const getTargetPointForExplanation = (distaceTarget, furthestStarFromTarget) => 
   return targetPoint
 }
 const createTimingExplanationLine = (targetPoint, distance) => {
+  console.log('createTimingExplanationLine', distance)
   const lineMaterial = new LineMaterial({
     color: 0xFF00FF,
     linewidth: 0.003
@@ -145,6 +147,35 @@ const createStars = (starsMain) => {
 
   return { points, hipArray }
 }
+const removeAndDisposeProperly = (object) => {
+  if (!(object instanceof Object3D)) return false
+  if (object.geometry) {
+    object.geometry.dispose()
+  }
+  if (object.material) {
+    if (object.material instanceof Array) {
+      object.material.forEach(material => material.dispose())
+    } else {
+      object.material.dispose()
+    }
+  }
+  if (object.parent) {
+    object.parent.remove(object)
+  }
+}
+const setupMelodyExplanationGroup = () => {
+  explanationGroup = new Group()
+  scene.add(explanationGroup)
+}
+const clearMelodyExplanationGroup = () => {
+  var obj, i
+  for (i = scene.children.length - 1; i >= 0; i--) {
+    obj = scene.children[ i ]
+    if (obj.is_ob) {
+      removeAndDisposeProperly(obj)
+    }
+  }
+}
 export const setupMelodyExplanation = (constellation) => {
   console.log('setupMelodyExplanation', constellation)
   const alphaStar = constellation.starsMain.find(s => s.alpha)
@@ -156,10 +187,14 @@ export const setupMelodyExplanation = (constellation) => {
   const furthestStarFromCentre = maxBy(constellation.starsMain, 'distanceFromCentre')
   const targetPointCentre = getTargetPointForExplanation(centreVec, furthestStarFromCentre)
 
+  console.log('furthestStarFromCentre', furthestStarFromCentre)
+  console.log('distances', furthestStarFromCentre.distanceFromCentre, furthestStarFromAlpha.distanceFromAlpha, targetPointCentre.distanceTo(new Vector3(furthestStarFromCentre.ax, furthestStarFromCentre.ay, furthestStarFromCentre.az)))
   // Create Timing Line
-  const explanationGroup = new Group()
-  scene.add(explanationGroup)
+
+  clearMelodyExplanationGroup()
+
   const timingLine = createTimingExplanationLine(targetPointCentre, furthestStarFromCentre.distanceFromCentre)
+
   // TODO - Only have one timingLine at one point in time
   explanationGroup.add(timingLine)
 
@@ -187,8 +222,14 @@ export const setupMelodyExplanation = (constellation) => {
     explanationObject.timingCircle.visible = true
     const angleTweenConfig = {radius: 0}
     new Tween(angleTweenConfig)
-      .to({radius: furthestStarFromAlpha.distanceFromAlpha}, time - 1)
+      .to({radius: furthestStarFromAlpha.distanceFromAlpha - (furthestStarFromAlpha.distanceFromAlpha * 0.04)}, time - 5)
+      .easing(function (value) { // Distances are not linear, add a small weighting of quadratic easing to roughly approximate
+        const q = 1
+        const l = 7
+        return ((value * value * q) + (value * l)) / (q + l)
+      })
       .onUpdate(() => {
+        explanationObject.timingCircle.geometry.dispose()
         explanationObject.timingCircle.geometry = createCircleGeo(angleTweenConfig.radius)
       })
       .onComplete(() => {
@@ -252,7 +293,6 @@ export const focusMapOnConstellation = (constellation) => {
   camera.lookAt(controls.target)
 
   controls.enabled = true
-  setupMelodyExplanation(constellation)
   updateFovFromDistance()
 }
 
@@ -444,7 +484,7 @@ export const addStarMap = (passedStarData) => {
   camera.lookAt(0, 0, 0)
   camera.position.z = 0.5 // move camera back so we can see the cube
   updateFovFromDistance()
-
+  setupMelodyExplanationGroup()
   updateSelectedConstellation(starData, starData.constellations[0].constellation, true)
   render()
 }
