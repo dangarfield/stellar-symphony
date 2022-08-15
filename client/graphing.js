@@ -105,6 +105,8 @@ const generateConstellationGraphHtml = (constellationData, showCharts) => {
                     <i class="bi bi-play-circle"></i>
                 </span>
             </p>
+        </div>
+        <div class="col-6"
             <p>Melody: ${constellationData.music.melodyText}
                 <span class="badge rounded-pill text-bg-secondary tone-clip" data-constellation="${constellationData.constellation}" data-type="melody">
                     <i class="bi bi-play-circle"></i>
@@ -361,8 +363,8 @@ export const addConstellationGraphs = (starData) => {
 
   allDiv.innerHTML = `<div class="row">
                 <div class="col-12"><h3>Visual</h3></div>
-                <div class="col-10 star-map"></div>
-                <div class="col-2">
+                <div class="col-md-10 px-0 star-map"></div>
+                <div class="col-md-2">
                     <h4>Constellations</h4>
                     <select class="form-select constellation-select">
                         <option style="display:none" value="">Select constellation</option>

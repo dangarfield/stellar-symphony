@@ -304,12 +304,15 @@ export const focusMapOnConstellation = (constellation) => {
 }
 
 const initScene = () => {
+  const canvasWidth = document.querySelector('.star-map').clientWidth
+  const canvasHeight = canvasWidth < 600 ? canvasWidth : Math.round(canvasWidth / 2)
+  console.log('canvas sizes', canvasWidth, canvasHeight)
   scene = new Scene()
   scene.background = new Color(0x000000)
 
   camera = new PerspectiveCamera(
     25, // Field of View
-    1200 / 600, // aspect ratio
+    canvasWidth / canvasHeight, // aspect ratio
     0.001, // near clipping plane
     1000 // far clipping plane
   )
@@ -317,11 +320,11 @@ const initScene = () => {
     alpha: true, // transparent background
     antialias: true // smooth edges
   })
-  renderer.setSize(1200, 600)
+  renderer.setSize(canvasWidth, canvasHeight)
   document.querySelector('.star-map').appendChild(renderer.domElement)
 
   labelRenderer = new CSS2DRenderer()
-  labelRenderer.setSize(1200, 600)
+  labelRenderer.setSize(canvasWidth, canvasHeight)
   labelRenderer.domElement.style.position = 'absolute'
   labelRenderer.domElement.style.top = '0px'
   labelRenderer.domElement.style.pointerEvents = 'none'
@@ -338,6 +341,21 @@ const initScene = () => {
     updateFovFromDistance()
     // console.log('control change', controls.getDistance(), camera.fov)
   })
+}
+
+const resizeCanvasToDisplaySize = () => {
+  const canvas = renderer.domElement
+  const width = canvas.clientWidth
+  const height = canvas.clientHeight
+  if (canvas.width !== width || canvas.height !== height) {
+    // you must pass false here or three.js sadly fights the browser
+    renderer.setSize(width, height, false)
+    labelRenderer.setSize(width, height, false)
+    camera.aspect = width / height
+    camera.updateProjectionMatrix()
+
+    // set render target sizes here
+  }
 }
 
 const loadStars = () => {
@@ -455,7 +473,7 @@ const loadTriangles = () => {
 //   }
 }
 const render = () => {
-  window.requestAnimationFrame(render)
+  resizeCanvasToDisplaySize()
   // controls.update()
   tweenUpdate()
   raycaster.setFromCamera(pointer, camera)
@@ -478,6 +496,7 @@ const render = () => {
 
   renderer.render(scene, camera)
   labelRenderer.render(scene, camera)
+  window.requestAnimationFrame(render)
 }
 export const addStarMap = (passedStarData) => {
   starData = passedStarData
