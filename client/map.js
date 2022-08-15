@@ -170,7 +170,13 @@ const clearMelodyExplanationGroup = () => {
     }
   }
 }
-
+export const stopMelodyExplanation = () => {
+  const explanationObject = explanationGroup.userData.explanationObject
+  if (explanationObject === undefined) return
+  if (explanationObject.timingCircleTween) explanationObject.timingCircleTween.stop()
+  if (explanationObject.timingLineTween) explanationObject.timingLineTween.stop()
+  if (explanationObject.starTween) explanationObject.starTween.stop()
+}
 export const setupMelodyExplanation = (constellation) => {
   console.log('setupMelodyExplanation', constellation)
   clearMelodyExplanationGroup()
@@ -209,11 +215,11 @@ export const setupMelodyExplanation = (constellation) => {
     hipArray,
     points
   }
-
+  explanationGroup.userData.explanationObject = explanationObject
   explanationObject.animateCircle = (time) => {
     explanationObject.timingCircle.visible = true
     const angleTweenConfig = {radius: 0}
-    new Tween(angleTweenConfig)
+    explanationObject.timingCircleTween = new Tween(angleTweenConfig)
       .to({radius: furthestStarFromAlpha.distanceFromAlpha - (furthestStarFromAlpha.distanceFromAlpha * 0.04)}, time - 5)
       .easing(function (value) { // Distances are not linear, add a small weighting of quadratic easing to roughly approximate
         const q = 1
@@ -227,19 +233,25 @@ export const setupMelodyExplanation = (constellation) => {
       .onComplete(() => {
         explanationObject.timingCircle.visible = false
       })
+      .onStop(() => {
+        explanationObject.timingCircle.visible = false
+      })
       .start()
   }
 
   explanationObject.animateLine = (time) => {
     explanationObject.timingLine.visible = true
     const angleTweenConfig = {angle: 0}
-    new Tween(angleTweenConfig)
+    explanationObject.timingLineTween = new Tween(angleTweenConfig)
       .to({angle: 360}, time - 1)
       .onUpdate(() => {
         explanationObject.timingLine.setRotationFromAxisAngle(centreVec, MathUtils.degToRad(angleTweenConfig.angle - furthestStarFromCentre.angleFromCentre))
         explanationObject.timingLine.visible = true
       })
       .onComplete(() => {
+        explanationObject.timingLine.visible = false
+      })
+      .onStop(() => {
         explanationObject.timingLine.visible = false
       })
       .start()
@@ -251,7 +263,7 @@ export const setupMelodyExplanation = (constellation) => {
     // explanationObject.points.geometry.attributes.size.array[starIndex] = 0.1
     // explanationObject.points.geometry.attributes.size.needsUpdate = true
     const sizeConfig = {size: 0}
-    const tweenA = new Tween(sizeConfig).to({size: 0.1}, 200)
+    explanationObject.starTween = new Tween(sizeConfig).to({size: 0.1}, 200)
       .onUpdate(() => {
         explanationObject.points.geometry.attributes.size.array[starIndex] = sizeConfig.size
         explanationObject.points.geometry.attributes.size.needsUpdate = true
@@ -267,8 +279,8 @@ export const setupMelodyExplanation = (constellation) => {
       .onComplete(() => {
         // explanationObject.timingLine.visible = false
       })
-    tweenA.chain(tweenB)
-    tweenA.start()
+    explanationObject.starTween.chain(tweenB)
+    explanationObject.starTween.start()
   }
   console.log('explanationObject', explanationObject)
   return explanationObject

@@ -1,6 +1,6 @@
 import {ScaleType, Scale, Note} from '@tonaljs/tonal'
 import {Sampler, Transport, Pattern, Part, loaded as toneLoaded, start as ToneStart, Draw} from 'tone'
-import { setupMelodyExplanation } from './map.js'
+import { setupMelodyExplanation, stopMelodyExplanation } from './map.js'
 
 export const getScaleText = (chroma) => {
   const scale = ScaleType.get(chroma)
@@ -53,6 +53,7 @@ export const stopToneClips = () => {
     currentlyPlayingMp3.pause()
     currentlyPlayingMp3 = null
   }
+  stopMelodyExplanation()
 }
 
 const playMp3 = (url) => {
@@ -85,8 +86,8 @@ const playToneClip = (toneData) => {
     Transport.bpm.value = 120
   } else if (toneData.type === 'chords' || toneData.type === 'melody') {
     const visualMelody = setupMelodyExplanation(toneData.constellation)
-    // const notesToPlay = toneData.melody ? toneData.chords.concat(toneData.melody) : toneData.chords
-    const notesToPlay = toneData.melody
+    const notesToPlay = toneData.melody ? toneData.chords.concat(toneData.melody) : toneData.chords
+    // const notesToPlay = toneData.melody
     const totalBars = notesToPlay.find(n => n.totalBars).totalBars
     const timeForAnimation = 1000 * Math.pow(toneData.bpm / 60, -1) * 4 * totalBars
     const part = new Part((time, value) => {
@@ -108,12 +109,14 @@ const playToneClip = (toneData) => {
     for (const track of toneData.song) {
       notesToPlay = notesToPlay.concat(track.notes)
     }
+    const totalBars = notesToPlay.find(n => n.totalBars).totalBars
+    const timeForAnimation = 1000 * Math.pow(toneData.bpm / 60, -1) * 4 * totalBars
     new Part((time, value) => {
       if (!value.ignore) {
         piano.triggerAttackRelease(value.note, value.duration, time)
       }
       Draw.schedule(function () {
-        triggeredAnimationAction(toneData.bpm, visualMelody, value)
+        triggeredAnimationAction(visualMelody, value, timeForAnimation)
       }, time)
     }, notesToPlay).start(0)
     Transport.bpm.value = toneData.bpm
