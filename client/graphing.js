@@ -53,7 +53,7 @@ const generateConstellationMapDataHtml = (constellationData) => {
         <span class="badge rounded-pill text-bg-secondary tone-clip" data-constellation="${constellationData.constellation}" data-type="song">
                                                         <i class="bi bi-play-circle"></i>
                                                     </span>
-        ${constellationData.music.songPath ? `<span class="badge rounded-pill text-bg-primary tone-clip" data-url="${constellationData.music.songPath}">
+        ${constellationData.music.songPath ? `<span class="badge rounded-pill text-bg-primary tone-clip" data-constellation="${constellationData.constellation}" data-type="song" data-url="${constellationData.music.songPath}">
                                                         <i class="bi bi-play-circle"></i>
                                                     </span>` : ''}</h5>
     <p>Scale: ${constellationData.music.scaleText}<br />

@@ -1,5 +1,5 @@
 import {ScaleType, Scale, Note} from '@tonaljs/tonal'
-import {Sampler, Transport, Pattern, Part, loaded as toneLoaded, start as ToneStart, Draw} from 'tone'
+import {Sampler, Transport, Pattern, Part, loaded as toneLoaded, start as ToneStart, Draw, Player} from 'tone'
 import { setupMelodyExplanation, stopMelodyExplanation } from './map.js'
 
 export const getScaleText = (chroma) => {
@@ -73,7 +73,8 @@ const triggeredAnimationAction = (visualMelody, value, timeForAnimation) => {
     visualMelody.animateStar(value.starHip)
   }
 }
-const playToneClip = (toneData) => {
+
+const playToneClip = async (toneData) => {
   // console.log('playToneClip', toneData)
   stopToneClips()
   ToneStart()
@@ -111,6 +112,25 @@ const playToneClip = (toneData) => {
     }
     const totalBars = notesToPlay.find(n => n.totalBars).totalBars
     const timeForAnimation = 1000 * Math.pow(toneData.bpm / 60, -1) * 4 * totalBars
+
+    if (toneData.url) {
+      console.log('has url', toneData.url)
+      const playerLoadingPromise = new Promise(resolve => {
+        for (const note of notesToPlay) {
+          note.ignore = true
+        }
+        const player = new Player(toneData.url, function () {
+          console.log('Player loaded', toneData.url)
+          resolve()
+        }).toDestination()
+        player.sync().start(0)
+      })
+      const playerLoadingPromiseResult = await playerLoadingPromise
+      console.log('Player  promise resolved', toneData.url, playerLoadingPromiseResult)
+    }
+
+    console.log('visualMelody setup')
+
     new Part((time, value) => {
       if (!value.ignore) {
         piano.triggerAttackRelease(value.note, value.duration, time)
@@ -139,17 +159,17 @@ const playToneClip = (toneData) => {
 // Melody 1 Notes =  angle from centre
 
 export const getToneDataFromElementAndPlay = (starData, ele) => {
-  const url = ele.getAttribute('data-url')
-  if (url) {
-    playMp3(url)
-    return
-  }
+  // const url = ele.getAttribute('data-url')
+  // if (url) {
+  //   playMp3(url)
+  //   return
+  // }
 
   const type = ele.getAttribute('data-type')
   const constellationId = ele.getAttribute('data-constellation')
   const constellation = starData.constellations.find(c => c.constellation === constellationId)
-
-  let toneData = {bpm: constellation.music.bpm, timeSig: constellation.music.timeSig, constellation}
+  const url = ele.getAttribute('data-url')
+  let toneData = {bpm: constellation.music.bpm, timeSig: constellation.music.timeSig, constellation, url: url}
   switch (type) {
     case 'scale':
       toneData.type = 'scale'
