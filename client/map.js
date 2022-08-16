@@ -225,7 +225,11 @@ export const setupMelodyExplanation = (constellation) => {
     const angleTweenConfig = {radius: 0}
     explanationObject.timingCircleTween = new Tween(angleTweenConfig)
       .to({radius: furthestStarFromAlpha.distanceFromAlpha - (furthestStarFromAlpha.distanceFromAlpha * 0.04)}, time - 5)
-      .easing(Easing.Quadratic.InOut)
+      .easing(function (value) { // Distances are not linear, add a small weighting of quadratic easing to roughly approximate
+        const q = 1
+        const l = 7
+        return ((value * value * q) + (value * l)) / (q + l)
+      })
       .onUpdate(() => {
         explanationObject.timingCircle.geometry.dispose()
         explanationObject.timingCircle.geometry = createCircleGeo(angleTweenConfig.radius)
@@ -303,9 +307,7 @@ export const focusMapOnConstellation = (constellation) => {
 
   new Tween(oldCamPos)
     .to(newCamPos, 1000)
-    .easing(function (value) {
-      return value * value
-    })
+    .easing(Easing.Quadratic.InOut)
     .onUpdate(() => {
       camera.position.x = oldCamPos.x
       camera.position.y = oldCamPos.y
