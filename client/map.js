@@ -8,7 +8,7 @@ import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js'
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js'
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js'
 import {updateSelectedConstellation, showInfoLong} from './graphing.js'
-import {Tween, update as tweenUpdate} from '@tweenjs/tween.js'
+import {Tween, update as tweenUpdate, Easing} from '@tweenjs/tween.js'
 // import * as Stats from 'stats.js'
 import Stats from 'three/examples/jsm/libs/stats.module.js'
 
@@ -225,11 +225,7 @@ export const setupMelodyExplanation = (constellation) => {
     const angleTweenConfig = {radius: 0}
     explanationObject.timingCircleTween = new Tween(angleTweenConfig)
       .to({radius: furthestStarFromAlpha.distanceFromAlpha - (furthestStarFromAlpha.distanceFromAlpha * 0.04)}, time - 5)
-      .easing(function (value) { // Distances are not linear, add a small weighting of quadratic easing to roughly approximate
-        const q = 1
-        const l = 7
-        return ((value * value * q) + (value * l)) / (q + l)
-      })
+      .easing(Easing.Quadratic.InOut)
       .onUpdate(() => {
         explanationObject.timingCircle.geometry.dispose()
         explanationObject.timingCircle.geometry = createCircleGeo(angleTweenConfig.radius)
@@ -297,11 +293,33 @@ const updateFovFromDistance = () => {
 
 export const focusMapOnConstellation = (constellation) => {
   controls.enabled = false
-  const newCamPos = new Vector3(constellation.centre.x, constellation.centre.y, constellation.centre.z).lerp(new Vector3(0, 0, 0), 1.2)
-  camera.position.x = newCamPos.x
-  camera.position.y = newCamPos.y
-  camera.position.z = newCamPos.z
-  camera.lookAt(controls.target)
+  const oldCamPos = {x: camera.position.x, y: camera.position.y, z: camera.position.z}
+  const newCamVec = new Vector3(constellation.centre.x, constellation.centre.y, constellation.centre.z).lerp(new Vector3(0, 0, 0), 1.2)
+  const newCamPos = {x: newCamVec.x, y: newCamVec.y, z: newCamVec.z}
+  // camera.position.x = newCamPos.x
+  // camera.position.y = newCamPos.y
+  // camera.position.z = newCamPos.z
+  // camera.lookAt(controls.target)
+
+  new Tween(oldCamPos)
+    .to(newCamPos, 1000)
+    .easing(function (value) {
+      return value * value
+    })
+    .onUpdate(() => {
+      camera.position.x = oldCamPos.x
+      camera.position.y = oldCamPos.y
+      camera.position.z = oldCamPos.z
+      camera.lookAt(controls.target)
+      updateFovFromDistance()
+    })
+    // .onComplete(() => {
+    //   // explanationObject.timingLine.visible = false
+    // })
+    // .onStop(() => {
+    //   // explanationObject.timingLine.visible = false
+    // })
+    .start()
 
   controls.enabled = true
   updateFovFromDistance()
