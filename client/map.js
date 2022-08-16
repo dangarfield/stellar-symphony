@@ -1,7 +1,7 @@
 import {Vector3, Scene, Color, PerspectiveCamera, WebGLRenderer, TextureLoader,
   BufferGeometry, Points, ShaderMaterial, AdditiveBlending, Float32BufferAttribute,
   Mesh, SphereGeometry, MeshPhongMaterial, DoubleSide, AmbientLight, Raycaster, Vector2, Line3, MathUtils, Group,
-  EllipseCurve, LineBasicMaterial, LineLoop, Object3D} from 'three'
+  EllipseCurve, LineBasicMaterial, LineLoop, Object3D, EdgesGeometry, LineSegments} from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Line2 } from 'three/examples/jsm/lines/Line2.js'
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js'
@@ -475,10 +475,15 @@ const loadConstellationLines = () => {
   }
 }
 const loadSphere = () => {
-  sphere = new Mesh(new SphereGeometry(1, 24, 13), new MeshPhongMaterial({ color: 0x12394C, side: DoubleSide, wireframe: true }))
+  const sphereGeo = new SphereGeometry(1, 24, 13)
+  sphere = new Mesh(sphereGeo, new MeshPhongMaterial({ color: 0x12394C, side: DoubleSide, wireframe: true }))
   sphere.doubleSided = true
-  scene.add(sphere)
+  // scene.add(sphere) // Instead, add the line helper, as it shows quads rather than tris
   scene.add(new AmbientLight(0xFFFFFF))
+
+  const edges = new EdgesGeometry(sphereGeo)
+  const line = new LineSegments(edges, new LineBasicMaterial({ color: 0x12394C }))
+  scene.add(line)
 }
 const loadTriangles = () => {
   // TRIANGLES
