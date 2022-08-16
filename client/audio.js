@@ -45,24 +45,14 @@ const piano = new Sampler({
 toneLoaded().then(() => {
   console.log('Piano samples loaded')
 })
-let currentlyPlayingMp3 = null
 export const stopToneClips = () => {
   Transport.stop()
   Transport.cancel(0)
-  if (currentlyPlayingMp3) {
-    currentlyPlayingMp3.pause()
-    currentlyPlayingMp3 = null
-  }
   stopMelodyExplanation()
   document.querySelector('.info-short .tone-clip').style.display = 'inline'
   document.querySelector('.info-short .tone-stop').style.display = 'none'
 }
 
-const playMp3 = (url) => {
-  stopToneClips()
-  currentlyPlayingMp3 = new Audio(url) // eslint-disable-line no-undef
-  currentlyPlayingMp3.play()
-}
 const triggeredAnimationAction = (visualMelody, value, timeForAnimation) => {
   console.log('Draw', value)
   if (value.melodyTimingByAngle) {
@@ -163,12 +153,6 @@ const playToneClip = async (toneData) => {
 // Melody 1 Notes =  angle from centre
 
 export const getToneDataFromElementAndPlay = (starData, ele) => {
-  // const url = ele.getAttribute('data-url')
-  // if (url) {
-  //   playMp3(url)
-  //   return
-  // }
-
   const type = ele.getAttribute('data-type')
   const constellationId = ele.getAttribute('data-constellation')
   const constellation = starData.constellations.find(c => c.constellation === constellationId)

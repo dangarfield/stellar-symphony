@@ -32,6 +32,7 @@
 
         .title {
             font-size: 20px;
+            padding-left: 10px;
         }
 
         .tone-clip {
@@ -57,10 +58,8 @@
 
         .star-map .label {
             color: #FFF;
-            /* font-family: sans-serif; */
             padding: 2px;
             background: rgba(0, 0, 0, .6);
-            /* font-family: 12px; */
         }
 
         .constellation-select {
@@ -75,7 +74,8 @@
             display: none;
         }
 
-        .info-long {
+        .info-long,
+        .info-full {
             background: rgba(0, 0, 0, 0.7);
             position: absolute;
             top: 48px;
@@ -89,8 +89,16 @@
             /* Change max-height to 190px for mobiles */
             border-radius: .375rem;
             border: 1px solid #ced4da;
-            scrollbar-color: red yellow;
             display: none;
+        }
+
+        .info-long {
+            width: 380px;
+            max-width: calc(100vw - 12px);
+        }
+
+        .info-full {
+            width: calc(100vw - 12px);
         }
 
         .modal-content .btn-close {
@@ -108,21 +116,21 @@
         .action-links i {
             font-size: 40px;
             padding: 0 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: #6c757d;
         }
 
         .action-links i:hover {
             cursor: pointer;
         }
 
-        .action-links i {
-            color: #6c757d;
-        }
 
         .action-links i.active {
             color: white;
         }
 
-        .info-long {
+        .info-long,
+        .info-full {
             flex-direction: column;
         }
 
@@ -130,6 +138,10 @@
             overflow-y: auto;
             overflow-x: hidden;
             flex: 1;
+        }
+
+        .info-body {
+            flex-direction: row;
         }
 
         /* Small scrollbars */
@@ -156,7 +168,9 @@
         }
 
         @media (max-width: 576px) {
-            .info-long {
+
+            .info-long,
+            .info-full {
                 /* background: white; */
                 top: 130px;
                 max-height: calc(100vh - 190px);
@@ -178,8 +192,6 @@
         <nav class="d-flex w-100 p-2 justify-content-between flex-column flex-sm-row">
             <div class="text-center">
                 <img src="orbit.svg" class="logo">
-                <!-- <img src="orbit2.svg" class="logo"> -->
-                <!-- <img src="orbit3.svg" class="logo"> -->
                 <span class="navbar-text title">Stellar Symphony</span>
             </div>
             <div class="navbar-text text-center info-short">
@@ -215,44 +227,35 @@
                 </div>
             </div>
         </div>
-    </div>
-    <footer class="fixed-bottom">
-        <nav class="w-100 text-center">
-            <!-- <div class="navbar-text text-center">1</div> -->
-            <div class="navbar-text action-links">
-                <i class="bi bi-info-circle action-info"></i>
-                <i class="bi bi-bar-chart-line action-graph"></i>
-                <i class="bi bi-chat-quote action-explain"></i>
-                <i class="bi bi-stars action-all-stars active"></i>
+        <div class="info-full container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="name pt-1">Constellation</h5>
+                        <i class="bi bi-x-lg close"></i>
+                    </div>
+                </div>
             </div>
-            <!-- <div class="navbar-text text-center">3</div> -->
-            <!-- <div class="navbar-text text-center info-short">
-                <span class="name">Constellation</span> -
-                <i class="bi bi-play-circle tone-clip"></i>
-                <i class="bi bi-stop-circle tone-stop"></i>
-            </div> -->
-            <!-- <select class="form-select constellation-select">
-                <option style="display:none" value="">Select constellation</option>
-            </select> -->
-        </nav>
-    </footer>
-    <!-- <div class="modal" style="display: blocks;">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Modal title</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Modal body text goes here.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+            <div class="row">
+                <hr />
+            </div>
+            <div class="row info-body-parent">
+                <div class="info-body">
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
+    <footer class="fixed-bottom">
+        <nav class="w-100 text-center">
+            <div class="navbar-text action-links">
+                <i class="bi bi-info-circle action-info"></i>
+                <i class="bi bi-bar-chart-line action-graph-all"></i>
+                <i class="bi bi-graph-up action-graph-one"></i>
+                <i class="bi bi-chat-quote action-explain"></i>
+                <i class="bi bi-stars action-all-stars active"></i>
+            </div>
+        </nav>
+    </footer>
 
     <script src="client.min.js"></script>
 

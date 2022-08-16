@@ -1,6 +1,6 @@
 import {Vector3, Scene, Color, PerspectiveCamera, WebGLRenderer, TextureLoader,
   BufferGeometry, Points, ShaderMaterial, AdditiveBlending, Float32BufferAttribute,
-  Mesh, SphereGeometry, MeshPhongMaterial, DoubleSide, AmbientLight, Raycaster, Vector2, Line3, MathUtils, Group,
+  Mesh, SphereGeometry, MeshPhongMaterial, DoubleSide, Raycaster, Vector2, Line3, MathUtils, Group,
   EllipseCurve, LineBasicMaterial, LineLoop, Object3D, EdgesGeometry, LineSegments} from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Line2 } from 'three/examples/jsm/lines/Line2.js'
@@ -50,7 +50,7 @@ const raycaster = new Raycaster()
 const pointer = new Vector2()
 
 const centrePoints = []
-let bgStarsList = []
+const bgStarsList = []
 let starData
 let sphere
 let explanationGroup
@@ -369,6 +369,9 @@ const initScene = () => {
   stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
   stats.dom.style.cssText = 'position:fixed;bottom:0;right:0;cursor:pointer;opacity:0.9;z-index:10000'
   document.querySelector('.stats').appendChild(stats.dom)
+
+  window.addEventListener('resize', onWindowResize)
+  document.addEventListener('pointermove', onPointerMove)
 }
 
 const resizeCanvasToDisplaySize = () => {
@@ -475,14 +478,13 @@ const loadConstellationLines = () => {
   }
 }
 const loadSphere = () => {
-  const sphereGeo = new SphereGeometry(1, 24, 13)
+  const sphereGeo = new SphereGeometry(1, 24, 13) // TODO adjust to match equatorial grid
   sphere = new Mesh(sphereGeo, new MeshPhongMaterial({ color: 0x12394C, side: DoubleSide, wireframe: true }))
   sphere.doubleSided = true
-  // scene.add(sphere) // Instead, add the line helper, as it shows quads rather than tris
-  scene.add(new AmbientLight(0xFFFFFF))
+  // scene.add(sphere) // Add the line helper instead, as it shows quads rather than tris
+  // scene.add(new AmbientLight(0xFFFFFF))
 
-  const edges = new EdgesGeometry(sphereGeo)
-  const line = new LineSegments(edges, new LineBasicMaterial({ color: 0x12394C }))
+  const line = new LineSegments(new EdgesGeometry(sphereGeo), new LineBasicMaterial({ color: 0x12394C }))
   scene.add(line)
 }
 const loadTriangles = () => {
@@ -506,12 +508,22 @@ const loadTriangles = () => {
 //     }
 //   }
 }
+const onWindowResize = () => {
+  camera.aspect = window.innerWidth / window.innerHeight
+  camera.updateProjectionMatrix()
+  renderer.setSize(window.innerWidth, window.innerHeight)
+}
+
+const onPointerMove = (event) => {
+  pointer.x = (event.clientX / window.innerWidth) * 2 - 1
+  pointer.y = -(event.clientY / window.innerHeight) * 2 + 1
+}
 const render = () => {
   stats.begin()
   resizeCanvasToDisplaySize()
   // controls.update()
   tweenUpdate()
-  raycaster.setFromCamera(pointer, camera)
+  raycaster.setFromCamera(new Vector2(), camera)
   const intersects = raycaster.intersectObjects([sphere])
   if (intersects.length > 0) {
     const point = intersects[0].point
@@ -528,6 +540,12 @@ const render = () => {
     // console.log('Closest', constellationId)
     updateSelectedConstellation(starData, constellationId, false)
   }
+  // TODO - Potentially add a raycaster for c
+  // bgRaycaster.setFromCamera(pointer, camera)
+  // const bgStarsIntersects = bgRaycaster.intersectObjects(bgStarsList, false)
+  // if (bgStarsIntersects.length > 0) {
+  //   console.log('bgStars Intersect', bgStarsIntersects, bgStarsIntersects[0], bgStarsIntersects[0].point)
+  // }
 
   renderer.render(scene, camera)
   labelRenderer.render(scene, camera)
