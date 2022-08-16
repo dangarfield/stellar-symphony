@@ -7,8 +7,10 @@ import { Line2 } from 'three/examples/jsm/lines/Line2.js'
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js'
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js'
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js'
-import {updateSelectedConstellation} from './graphing.js'
-import {Tween, update as tweenUpdate, Easing} from '@tweenjs/tween.js'
+import {updateSelectedConstellation, showInfoLong} from './graphing.js'
+import {Tween, update as tweenUpdate} from '@tweenjs/tween.js'
+// import * as Stats from 'stats.js'
+import Stats from 'three/examples/jsm/libs/stats.module.js'
 
 const starVertexShader = () => {
   return `
@@ -42,11 +44,13 @@ let camera
 let scene
 let renderer
 let labelRenderer
+let stats
 
 const raycaster = new Raycaster()
 const pointer = new Vector2()
 
 const centrePoints = []
+let bgStars
 let starData
 let sphere
 let explanationGroup
@@ -305,7 +309,7 @@ export const focusMapOnConstellation = (constellation) => {
 
 const initScene = () => {
   const canvasWidth = document.querySelector('.star-map').clientWidth
-  const canvasHeight = canvasWidth < 600 ? canvasWidth : Math.round(canvasWidth / 2)
+  const canvasHeight = document.querySelector('.star-map').clientHeight // canvasWidth < 600 ? canvasWidth : Math.round(canvasWidth / 2)
   console.log('canvas sizes', canvasWidth, canvasHeight)
   scene = new Scene()
   scene.background = new Color(0x000000)
@@ -341,28 +345,32 @@ const initScene = () => {
     updateFovFromDistance()
     // console.log('control change', controls.getDistance(), camera.fov)
   })
+  stats = new Stats()
+  stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
+  stats.dom.style.cssText = 'position:fixed;bottom:0;right:0;cursor:pointer;opacity:0.9;z-index:10000'
+  document.querySelector('.stats').appendChild(stats.dom)
 }
 
 const resizeCanvasToDisplaySize = () => {
   const canvas = renderer.domElement
   const width = canvas.clientWidth
   const height = canvas.clientHeight
-  if (canvas.width !== width || canvas.height !== height) {
-    // you must pass false here or three.js sadly fights the browser
-    renderer.setSize(width, height, false)
-    labelRenderer.setSize(width, height, false)
-    camera.aspect = width / height
-    camera.updateProjectionMatrix()
+  // if (canvas.width !== width || canvas.height !== height) {
+  // you must pass false here or three.js sadly fights the browser
+  renderer.setSize(width, height, false)
+  labelRenderer.setSize(width, height, false)
+  camera.aspect = width / height
+  camera.updateProjectionMatrix()
 
-    // set render target sizes here
-  }
+  // set render target sizes here
+  // }
 }
 
 const loadStars = () => {
   new TextureLoader().load('disc.png')
 
   const bufGeom = new BufferGeometry()
-  const points = new Points(bufGeom, new ShaderMaterial({
+  bgStars = new Points(bufGeom, new ShaderMaterial({
     uniforms: {
       color: { value: new Color(0xffffff) },
       pointTexture: { value: new TextureLoader().load('disc.png') }
@@ -410,7 +418,7 @@ const loadStars = () => {
   bufGeom.setAttribute('customColor', new Float32BufferAttribute(colorsArray, 4))
   bufGeom.setAttribute('size', new Float32BufferAttribute(sizesArray, 1))
 
-  scene.add(points)
+  scene.add(bgStars)
 }
 const loadConstellationLines = () => {
   const lineMaterial = new LineMaterial({
@@ -473,6 +481,7 @@ const loadTriangles = () => {
 //   }
 }
 const render = () => {
+  stats.begin()
   resizeCanvasToDisplaySize()
   // controls.update()
   tweenUpdate()
@@ -496,7 +505,11 @@ const render = () => {
 
   renderer.render(scene, camera)
   labelRenderer.render(scene, camera)
+  stats.end()
   window.requestAnimationFrame(render)
+}
+export const setBgStarsVisibility = (visible) => {
+  bgStars.visible = visible
 }
 export const addStarMap = (passedStarData) => {
   starData = passedStarData
@@ -511,6 +524,9 @@ export const addStarMap = (passedStarData) => {
   camera.position.z = 0.5 // move camera back so we can see the cube
   updateFovFromDistance()
   setupMelodyExplanationGroup()
-  updateSelectedConstellation(starData, starData.constellations[0].constellation, true)
+  const initialConstellation = starData.constellations.find(c => c.constellationName === 'Aquarius') || starData.constellations[0]
+  console.log('initialConstellation', initialConstellation)
+  updateSelectedConstellation(starData, initialConstellation.constellation, true)
+  showInfoLong()
   render()
 }

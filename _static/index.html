@@ -11,35 +11,224 @@
         /* .constellations .constellation canvas {
             width: 200px;
         } */
+        body {
+            background-color: black;
+            color: white;
+        }
 
-        .tone-clip:hover {
+        .tone-clip {
+            font-style: normal;
+        }
+
+        .tone-clip:hover,
+        .tone-stop:hover {
             cursor: pointer;
         }
 
-        .star-map {
-            position: relative;
+        .star-map,
+        .icon-holders {
+            position: fixed;
+            top: 0;
+            left: 0;
+            outline: none;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
         }
 
-        .label {
+        .star-map .label {
             color: #FFF;
             font-family: sans-serif;
             padding: 2px;
             background: rgba(0, 0, 0, .6);
             font-family: 12px;
         }
+
+        .constellation-select {
+            width: 220px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.7);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e")
+        }
+
+        .info-short,
+        .tone-stop {
+            display: none;
+        }
+
+        .info-long {
+            background: rgba(0, 0, 0, 0.7);
+            position: absolute;
+            top: 48px;
+            /* Change top to 130px for mobiles */
+            left: 0px;
+            width: 380px;
+            max-width: calc(100vw - 12px);
+            margin: 6px;
+            min-height: 200px;
+            max-height: calc(100vh - 115px);
+            /* Change max-height to 190px for mobiles */
+            border-radius: .375rem;
+            border: 1px solid #ced4da;
+            scrollbar-color: red yellow;
+            display: none;
+        }
+
+        .modal-content .btn-close {
+            background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+        }
+
+        .close {
+            font-size: 20px;
+        }
+
+        .close:hover {
+            cursor: pointer;
+        }
+
+        .action-links i {
+            font-size: 40px;
+            padding: 0 10px;
+        }
+
+        .action-links i:hover {
+            cursor: pointer;
+        }
+
+        .action-links i {
+            color: #6c757d;
+        }
+
+        .action-links i.active {
+            color: white;
+        }
+
+        .info-long {
+            flex-direction: column;
+        }
+
+        .info-body-parent {
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex: 1;
+        }
+
+        /* Small scrollbars */
+        ::-webkit-scrollbar {
+            width: 7px;
+            padding-left: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            box-shadow: inset 0 0 2px grey;
+            border-radius: 5px;
+            padding-left: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: white;
+            border-radius: 5px;
+            padding-left: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: grey;
+            padding-left: 5px;
+        }
+
+        @media (max-width: 576px) {
+            .info-long {
+                /* background: white; */
+                top: 130px;
+                max-height: calc(100vh - 190px);
+            }
+
+            .action-links i {
+                font-size: 30px;
+                padding: 0 3px;
+            }
+
+        }
     </style>
 </head>
 
 <body>
-    <div class="container-fluid loading">
-        <div class="row">
-            <div class="col">
-                <h3 class="loading-text">Loading...</h3>
+
+
+    <header class="fixed-top">
+        <nav class="d-flex w-100 p-2 justify-content-between flex-column flex-sm-row">
+            <div class="navbar-text text-center">Stellar Symphony</div>
+            <div class="navbar-text text-center info-short">
+                <span class="name">Constellation</span> -
+                <i class="bi bi-play-circle tone-clip"></i>
+                <i class="bi bi-stop-circle tone-stop"></i>
+            </div>
+            <select class="form-select constellation-select">
+                <option style="display:none" value="">Select constellation</option>
+            </select>
+        </nav>
+    </header>
+    <div class="stats"></div>
+    <div class="icon-holders">
+        <div class="star-map"></div>
+        <div class="loading position-absolute top-50 start-50 translate-middle">
+            <h3 class="loading-text">Loading...</h3>
+        </div>
+        <div class="info-long container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="name pt-1">Constellation</h5>
+                        <i class="bi bi-x-lg close"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <hr />
+            </div>
+            <div class="row info-body-parent">
+                <div class="col-12 info-body">
+                </div>
             </div>
         </div>
     </div>
-    <div class="container-fluid constellations">
-    </div>
+    <footer class="fixed-bottom">
+        <nav class="w-100 text-center">
+            <!-- <div class="navbar-text text-center">1</div> -->
+            <div class="navbar-text action-links">
+                <i class="bi bi-info-circle action-info"></i>
+                <i class="bi bi-bar-chart-line action-graph"></i>
+                <i class="bi bi-stars action-all-stars active"></i>
+            </div>
+            <!-- <div class="navbar-text text-center">3</div> -->
+            <!-- <div class="navbar-text text-center info-short">
+                <span class="name">Constellation</span> -
+                <i class="bi bi-play-circle tone-clip"></i>
+                <i class="bi bi-stop-circle tone-stop"></i>
+            </div> -->
+            <!-- <select class="form-select constellation-select">
+                <option style="display:none" value="">Select constellation</option>
+            </select> -->
+        </nav>
+    </footer>
+    <!-- <div class="modal" style="display: blocks;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Modal body text goes here.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div> -->
 
     <script src="client.min.js"></script>
 

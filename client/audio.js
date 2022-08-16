@@ -54,6 +54,8 @@ export const stopToneClips = () => {
     currentlyPlayingMp3 = null
   }
   stopMelodyExplanation()
+  document.querySelector('.info-short .tone-clip').style.display = 'inline'
+  document.querySelector('.info-short .tone-stop').style.display = 'none'
 }
 
 const playMp3 = (url) => {
@@ -77,6 +79,8 @@ const triggeredAnimationAction = (visualMelody, value, timeForAnimation) => {
 const playToneClip = async (toneData) => {
   // console.log('playToneClip', toneData)
   stopToneClips()
+  document.querySelector('.info-short .tone-clip').style.display = 'none'
+  document.querySelector('.info-short .tone-stop').style.display = 'inline'
   ToneStart()
   if (toneData.type === 'scale') {
     const scaleNotes = Scale.get(toneData.scale.chroma).intervals.map(Note.transposeFrom('C')).map(v => (v) + '4')

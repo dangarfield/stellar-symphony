@@ -10,7 +10,7 @@
 // import {addConstellationGraphs} from './graphing.js'
 
 import {setLoadingText, removeLoadingText, filterConstellationsFromUrl, globalBindings} from './utils.js'
-import {addConstellationGraphs} from './graphing.js'
+import {addConstellationGraphs, initConstellationData} from './graphing.js'
 import {addStarMap} from './map.js'
 
 const init = async () => {
@@ -21,8 +21,8 @@ const init = async () => {
   filterConstellationsFromUrl(starData)
   setLoadingText('Drawing graphs...')
   console.log('Drawing Graphs', 'starData', starData)
-  addConstellationGraphs(starData)
-
+  // addConstellationGraphs(starData)
+  initConstellationData(starData)
   addStarMap(starData)
   globalBindings()
   console.log('Ready')

@@ -1,6 +1,6 @@
 import {setLoadingText} from './utils.js'
-import {getScaleText, getToneDataFromElementAndPlay} from './audio.js'
-import {focusMapOnConstellation} from './map.js'
+import {getScaleText, getToneDataFromElementAndPlay, stopToneClips} from './audio.js'
+import {focusMapOnConstellation, setBgStarsVisibility} from './map.js'
 import {Chart, ScatterController, LinearScale, PointElement, LineController, CategoryScale, LineElement, Legend} from 'chart.js'
 Chart.register(ScatterController, LinearScale, PointElement, LineController, CategoryScale, LineElement, Legend)
 
@@ -9,19 +9,49 @@ export const updateSelectedConstellation = (starData, constellationId, moveMap) 
   if (starData.selectedConstellation !== constellationId) {
     starData.selectedConstellation = constellationId
     const constellationData = starData.constellations.find(c => c.constellation === constellationId)
+
+    // Move map
     if (moveMap) {
       focusMapOnConstellation(constellationData)
     }
-    const selectedConstellationHtml = generateConstellationMapDataHtml(constellationData)
-    document.querySelector('.selected-constellation').innerHTML = selectedConstellationHtml
-    for (const button of document.querySelectorAll('.selected-constellation .tone-clip')) {
+
+    // Ensure select box is correct
+    const constellationSelect = document.querySelector('.constellation-select')
+    if (constellationSelect.value !== constellationId) {
+      constellationSelect.value = constellationId
+    }
+
+    // Set info short
+    const infoShort = document.querySelector('.info-short')
+    infoShort.querySelector('.name').textContent = constellationData.constellationName
+    const toneClipEle = infoShort.querySelector('.tone-clip')
+
+    toneClipEle.setAttribute('data-type', 'song')
+    toneClipEle.setAttribute('data-constellation', constellationData.constellation)
+    toneClipEle.removeAttribute('data-url')
+    if (constellationData.music.songPath) {
+      toneClipEle.setAttribute('data-url', constellationData.music.songPath)
+    }
+    infoShort.style.display = 'block'
+
+    // Set info text
+    const infoLong = document.querySelector('.info-long')
+    infoLong.querySelector('.name').innerHTML = `${constellationData.constellationName} <span class="text-muted">(${constellationId})</span>`
+    infoLong.querySelector('.info-body').innerHTML = generateConstellationMapDataHtml(constellationData)
+    for (const button of document.querySelectorAll('.info-body .tone-clip')) {
       button.addEventListener('click', function () {
-        // console.log('this', this)\
         getToneDataFromElementAndPlay(starData, this)
       })
     }
-    // console.log('updated selected constellation', constellationId)
   }
+}
+const bindInfoShortToneClip = (starData) => {
+  document.querySelector('.info-short .tone-clip').addEventListener('click', function () {
+    getToneDataFromElementAndPlay(starData, this)
+  })
+  document.querySelector('.info-short .tone-stop').addEventListener('click', function () {
+    stopToneClips()
+  })
 }
 const getColor = (i) => {
   const Tableau20 = ['#4E79A7', '#A0CBE8', '#F28E2B', '#FFBE7D', '#59A14F', '#8CD17D', '#B6992D', '#F1CE63',
@@ -49,33 +79,47 @@ const toRomanNumeral = (i) => {
 }
 const generateConstellationMapDataHtml = (constellationData) => {
   return `
-    <h5 class="mt-3">${constellationData.constellationName} - ${constellationData.constellation}
-        <span class="badge rounded-pill text-bg-secondary tone-clip" data-constellation="${constellationData.constellation}" data-type="song">
-                                                        <i class="bi bi-play-circle"></i>
-                                                    </span>
-        ${constellationData.music.songPath ? `<span class="badge rounded-pill text-bg-primary tone-clip" data-constellation="${constellationData.constellation}" data-type="song" data-url="${constellationData.music.songPath}">
-                                                        <i class="bi bi-play-circle"></i>
-                                                    </span>` : ''}</h5>
-    <p>Scale: ${constellationData.music.scaleText}<br />
-        <span class="badge rounded-pill text-bg-secondary tone-clip" data-constellation="${constellationData.constellation}" data-type="scale">
-                                                        <i class="bi bi-play-circle"></i>
-                                                    </span>
+    <p>
+      Song:
+      <i class="bi bi-play-circle tone-clip"
+        data-constellation="${constellationData.constellation}" data-type="song">
+        Basic notes
+      </i>
+      ${constellationData.music.songPath ? `
+      - <i class="bi bi-play-circle tone-clip"
+        data-constellation="${constellationData.constellation}" data-type="song" data-url="${constellationData.music.songPath}">
+        Full band
+      </i>` : ''}
+
     </p>
-    <p>Chords: ${constellationData.music.chords.text}<br />
-        <span class="badge rounded-pill text-bg-secondary tone-clip" data-constellation="${constellationData.constellation}" data-type="chords">
-                                                        <i class="bi bi-play-circle"></i>
-                                                    </span>
+    <p>
+      Scale:
+      <i class="bi bi-play-circle tone-clip"
+        data-constellation="${constellationData.constellation}" data-type="scale">
+        ${constellationData.music.scaleText}
+      </i>
     </p>
-    <p>Melody: ${constellationData.music.melodyText}<br />
-        <span class="badge rounded-pill text-bg-secondary tone-clip" data-constellation="${constellationData.constellation}" data-type="melody">
-                                                        <i class="bi bi-play-circle"></i>
-                                                    </span>
+    <p>
+      Chords:
+      <i class="bi bi-play-circle tone-clip"
+        data-constellation="${constellationData.constellation}" data-type="chords">
+        ${constellationData.music.chords.text}
+      </i>
+    </p>
+    <p>
+      Melody:
+      <i class="bi bi-play-circle tone-clip"
+        data-constellation="${constellationData.constellation}" data-type="melody">
+        ${constellationData.music.melodyText}
+      </i>
     </p>
 
-    <p>Melody2: ${constellationData.music.melody2Text}<br />
-        <span class="badge rounded-pill text-bg-secondary tone-clip" data-constellation="${constellationData.constellation}" data-type="melody2">
-                                                        <i class="bi bi-play-circle"></i>
-                                                    </span>
+    <p>
+      Melody 2:
+      <i class="bi bi-play-circle tone-clip"
+        data-constellation="${constellationData.constellation}" data-type="melody2">
+        ${constellationData.music.melody2Text}
+      </i>
     </p>`
 }
 const generateConstellationGraphHtml = (constellationData, showCharts) => {
@@ -315,13 +359,6 @@ export const addConstellationGraphs = (starData) => {
     }
     // ciConstellationDiffList.push(ciConstellationDiff)
 
-    constellationData.music.scaleText = getScaleText(constellationData.music.scale.chroma)
-
-    constellationData.music.chords.text = constellationData.music.chords.structure.map(v => toRomanNumeral(v.interval) + (v.decoration ? `add${v.decoration}` : '')).join(', ')
-
-    constellationData.music.melodyText = constellationData.music.melody.filter(m => !m.ignore).map(m => `${m.note}-${m.time}`).join(', ')
-    constellationData.music.melody2Text = constellationData.music.melody2.filter(m => !m.ignore).map(m => `${m.note}-${m.time}`).join(', ')
-
     div.innerHTML = generateConstellationGraphHtml(constellationData, starData.showCharts)
 
     document.querySelector('.constellations').appendChild(div)
@@ -363,7 +400,7 @@ export const addConstellationGraphs = (starData) => {
 
   allDiv.innerHTML = `<div class="row">
                 <div class="col-12"><h3>Visual</h3></div>
-                <div class="col-md-10 px-0 star-map"></div>
+                // <div class="col-md-10 px-0 star-map"></div>
                 <div class="col-md-2">
                     <h4>Constellations</h4>
                     <select class="form-select constellation-select">
@@ -420,4 +457,65 @@ export const addConstellationGraphs = (starData) => {
       getToneDataFromElementAndPlay(starData, this)
     })
   }
+}
+
+const addConstellationSelectOptions = (starData) => {
+  const constellationSelect = document.querySelector('.constellation-select')
+  for (const constellation of starData.constellations) {
+    const opt = document.createElement('option')
+    opt.value = constellation.constellation
+    opt.text = constellation.constellationName
+    constellationSelect.add(opt)
+  }
+
+  constellationSelect.addEventListener('change', function () {
+    const constellationId = this.value
+    console.log('select constellation', constellationId)
+    updateSelectedConstellation(starData, constellationId, true)
+  })
+}
+const processMandatoryConstellationData = (starData) => {
+  for (const constellationData of starData.constellations) {
+    // Music Data
+    constellationData.music.scaleText = getScaleText(constellationData.music.scale.chroma)
+    constellationData.music.chords.text = constellationData.music.chords.structure.map(v => toRomanNumeral(v.interval) + (v.decoration ? `add${v.decoration}` : '')).join(', ')
+    constellationData.music.melodyText = constellationData.music.melody.filter(m => !m.ignore).map(m => `${m.note}-${m.time}`).join(', ')
+    constellationData.music.melody2Text = constellationData.music.melody2.filter(m => !m.ignore).map(m => `${m.note}-${m.time}`).join(', ')
+  }
+}
+const bindInfoLongClose = () => {
+  document.querySelector('.info-long .close').addEventListener('click', function () {
+    hideInfoLong()
+  })
+}
+export const showInfoLong = () => {
+  document.querySelector('.info-long').style.display = 'flex'
+  document.querySelector('.action-info').classList.add('active')
+}
+const hideInfoLong = () => {
+  document.querySelector('.info-long').style.display = 'none'
+  document.querySelector('.action-info').classList.remove('active')
+}
+const showAllStars = () => {
+  setBgStarsVisibility(true)
+  document.querySelector('.action-all-stars').classList.add('active')
+}
+const hideAllStars = () => {
+  setBgStarsVisibility(false)
+  document.querySelector('.action-all-stars').classList.remove('active')
+}
+const bindActionLinks = () => {
+  document.querySelector('.action-info').addEventListener('click', function () {
+    this.classList.contains('active') ? hideInfoLong() : showInfoLong()
+  })
+  document.querySelector('.action-all-stars').addEventListener('click', function () {
+    this.classList.contains('active') ? hideAllStars() : showAllStars()
+  })
+}
+export const initConstellationData = (starData) => {
+  addConstellationSelectOptions(starData)
+  bindInfoShortToneClip(starData)
+  bindInfoLongClose()
+  bindActionLinks()
+  processMandatoryConstellationData(starData)
 }
