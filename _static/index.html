@@ -7,13 +7,31 @@
     <title>Stellar Symphony</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300&display=swap" rel="stylesheet">
+
     <style>
-        /* .constellations .constellation canvas {
-            width: 200px;
-        } */
         body {
             background-color: black;
             color: white;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .logo {
+            color: white;
+            width: 60px;
+            height: 40px;
+            object-fit: cover;
+        }
+
+        .title {
+            font-size: 20px;
         }
 
         .tone-clip {
@@ -39,10 +57,10 @@
 
         .star-map .label {
             color: #FFF;
-            font-family: sans-serif;
+            /* font-family: sans-serif; */
             padding: 2px;
             background: rgba(0, 0, 0, .6);
-            font-family: 12px;
+            /* font-family: 12px; */
         }
 
         .constellation-select {
@@ -158,7 +176,12 @@
 
     <header class="fixed-top">
         <nav class="d-flex w-100 p-2 justify-content-between flex-column flex-sm-row">
-            <div class="navbar-text text-center">Stellar Symphony</div>
+            <div class="text-center">
+                <img src="orbit.svg" class="logo">
+                <!-- <img src="orbit2.svg" class="logo"> -->
+                <!-- <img src="orbit3.svg" class="logo"> -->
+                <span class="navbar-text title">Stellar Symphony</span>
+            </div>
             <div class="navbar-text text-center info-short">
                 <span class="name">Constellation</span> -
                 <i class="bi bi-play-circle tone-clip"></i>
