@@ -298,12 +298,8 @@ const updateFovFromDistance = () => {
 export const focusMapOnConstellation = (constellation) => {
   controls.enabled = false
   const oldCamPos = {x: camera.position.x, y: camera.position.y, z: camera.position.z}
-  const newCamVec = new Vector3(constellation.centre.x, constellation.centre.y, constellation.centre.z).lerp(new Vector3(0, 0, 0), 1.2)
+  const newCamVec = new Vector3(constellation.centre.x, constellation.centre.y, constellation.centre.z).lerp(new Vector3(0, 0, 0), 1.3)
   const newCamPos = {x: newCamVec.x, y: newCamVec.y, z: newCamVec.z}
-  // camera.position.x = newCamPos.x
-  // camera.position.y = newCamPos.y
-  // camera.position.z = newCamPos.z
-  // camera.lookAt(controls.target)
 
   new Tween(oldCamPos)
     .to(newCamPos, 1000)
@@ -315,12 +311,6 @@ export const focusMapOnConstellation = (constellation) => {
       camera.lookAt(controls.target)
       updateFovFromDistance()
     })
-    // .onComplete(() => {
-    //   // explanationObject.timingLine.visible = false
-    // })
-    // .onStop(() => {
-    //   // explanationObject.timingLine.visible = false
-    // })
     .start()
 
   controls.enabled = true
@@ -567,7 +557,7 @@ export const addStarMap = (passedStarData) => {
   loadTriangles()
 
   camera.lookAt(0, 0, 0)
-  camera.position.z = 0.5 // move camera back so we can see the cube
+  camera.position.z = 0.7
   updateFovFromDistance()
   setupMelodyExplanationGroup()
   const initialConstellation = starData.constellations.find(c => c.constellationName === 'Aquarius') || starData.constellations[0]
