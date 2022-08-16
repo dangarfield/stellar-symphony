@@ -464,7 +464,7 @@ const addConstellationSelectOptions = (starData) => {
   for (const constellation of starData.constellations) {
     const opt = document.createElement('option')
     opt.value = constellation.constellation
-    opt.text = constellation.constellationName
+    opt.text = constellation.constellationName + `${constellation.music.songPath ? ' (Full band)' : ''}`
     constellationSelect.add(opt)
   }
 

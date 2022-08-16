@@ -80,7 +80,7 @@ const createTimingExplanationLine = (targetPoint, starPoint, angleFromCentre) =>
   // console.log('createTimingExplanationLine')
   const lineMaterial = new LineMaterial({
     color: 0xFF00FF,
-    linewidth: 0.003
+    linewidth: 0.001
   })
   const linePoints = [starPoint.x, starPoint.y, starPoint.z, targetPoint.x, targetPoint.y, targetPoint.z]
 
@@ -444,7 +444,7 @@ const loadStars = () => {
 const loadConstellationLines = () => {
   const lineMaterial = new LineMaterial({
     color: 0x1363DF,
-    linewidth: 0.003
+    linewidth: 0.002
   })
   for (const constellation of starData.constellations) {
     for (const lines of constellation.lines) {
