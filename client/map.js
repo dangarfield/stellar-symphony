@@ -50,7 +50,7 @@ const raycaster = new Raycaster()
 const pointer = new Vector2()
 
 const centrePoints = []
-let bgStars
+let bgStarsList = []
 let starData
 let sphere
 let explanationGroup
@@ -386,25 +386,24 @@ const resizeCanvasToDisplaySize = () => {
 
 const loadStars = () => {
   new TextureLoader().load('disc.png')
-
-  const bufGeom = new BufferGeometry()
-  bgStars = new Points(bufGeom, new ShaderMaterial({
-    uniforms: {
-      color: { value: new Color(0xffffff) },
-      pointTexture: { value: new TextureLoader().load('disc.png') }
-    },
-    vertexShader: starVertexShader(),
-    fragmentShader: starFragmentShader(),
-
-    blending: AdditiveBlending,
-    depthTest: false,
-    transparent: true
-  }))
-  const pointsArray = []
-  const colorsArray = []
-  const sizesArray = []
-
   for (const constellation of starData.constellations) { // .filter(c => c.constellationName === 'Sagitta')) {
+    const bufGeom = new BufferGeometry()
+    const bgStars = new Points(bufGeom, new ShaderMaterial({
+      uniforms: {
+        color: { value: new Color(0xffffff) },
+        pointTexture: { value: new TextureLoader().load('disc.png') }
+      },
+      vertexShader: starVertexShader(),
+      fragmentShader: starFragmentShader(),
+
+      blending: AdditiveBlending,
+      depthTest: false,
+      transparent: true
+    }))
+    const pointsArray = []
+    const colorsArray = []
+    const sizesArray = []
+
     const mainStarHips = constellation.starsMain.map(s => s.hip)
     for (const star of constellation.stars.filter(s => !mainStarHips.includes(s.hip))) {
       pointsArray.push(star.ax, star.ay, star.az)
@@ -425,18 +424,20 @@ const loadStars = () => {
         // colorsArray.push(0.82,0.89,1,1)
         colorsArray.push(0, 1, 1, 1)
       }
-    }
-    pointsArray.push(constellation.centre.x, constellation.centre.y, constellation.centre.z)
-    sizesArray.push(0.03)
-    colorsArray.push(1, 0, 0, 1)
-    centrePoints.push({c: constellation.constellation, v: new Vector3(constellation.centre.x, constellation.centre.y, constellation.centre.z)})
-  }
-  // console.log('sizeArray', sizesArray)
-  bufGeom.setAttribute('position', new Float32BufferAttribute(pointsArray, 3))
-  bufGeom.setAttribute('customColor', new Float32BufferAttribute(colorsArray, 4))
-  bufGeom.setAttribute('size', new Float32BufferAttribute(sizesArray, 1))
 
-  scene.add(bgStars)
+      pointsArray.push(constellation.centre.x, constellation.centre.y, constellation.centre.z)
+      sizesArray.push(0.03)
+      colorsArray.push(1, 0, 0, 1)
+      centrePoints.push({c: constellation.constellation, v: new Vector3(constellation.centre.x, constellation.centre.y, constellation.centre.z)})
+    }
+    // console.log('sizeArray', sizesArray)
+    bufGeom.setAttribute('position', new Float32BufferAttribute(pointsArray, 3))
+    bufGeom.setAttribute('customColor', new Float32BufferAttribute(colorsArray, 4))
+    bufGeom.setAttribute('size', new Float32BufferAttribute(sizesArray, 1))
+
+    scene.add(bgStars)
+    bgStarsList.push(bgStars)
+  }
 }
 const loadConstellationLines = () => {
   const lineMaterial = new LineMaterial({
@@ -527,7 +528,9 @@ const render = () => {
   window.requestAnimationFrame(render)
 }
 export const setBgStarsVisibility = (visible) => {
-  bgStars.visible = visible
+  for (const bgStars of bgStarsList) {
+    bgStars.visible = visible
+  }
 }
 export const addStarMap = (passedStarData) => {
   starData = passedStarData
