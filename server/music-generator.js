@@ -4,11 +4,74 @@ import fs from 'fs-extra'
 
 import _ from 'lodash'
 
+const sortingOrder = [
+  // Don't actually use boosts, keep them here until I decided to get rid of it
+  {name: 'major', boost: 2},
+  {name: 'lydian', boost: 2},
+  {name: 'mixolydian', boost: 2},
+  {name: 'phrygian', boost: 2},
+  {name: 'dorian', boost: 2},
+  {name: 'locrian', boost: 2},
+  {name: 'aeolian', boost: 2},
+
+  {name: 'lydian dominant', boost: 1},
+  {name: 'lydian augmented', boost: 1},
+  {name: 'lydian minor', boost: 1},
+  {name: 'lydian #9', boost: 1},
+  {name: 'phrygian dominant', boost: 1},
+  {name: 'dorian b2', boost: 1},
+  {name: 'mixolydian b6', boost: 1},
+  {name: 'major augmented', boost: 1},
+
+  {name: 'flamenco', boost: 0},
+  {name: 'neopolitan major', boost: 0},
+  {name: 'harmonic major', boost: 0},
+  {name: 'locrian major', boost: 0},
+  {name: 'leading whole tone', boost: 0},
+  // {name: 'double harmonic lydian', boost: 0},
+  {name: 'harmonic minor', boost: 0},
+  {name: 'altered', boost: 0},
+  {name: 'locrian #2', boost: 0},
+  {name: 'melodic minor', boost: 0},
+  // {name: 'ultralocrian', boost: 0},
+  // {name: 'locrian 6', boost: 0},
+  {name: 'augmented heptatonic', boost: 0},
+  {name: 'dorian #4', boost: 0},
+  {name: 'lydian diminished', boost: 0},
+  {name: 'balinese', boost: 0},
+  {name: 'double harmonic major', boost: 0},
+  {name: 'hungarian minor', boost: 0},
+  {name: 'hungarian major', boost: 0}
+  // {name: 'oriental', boost: 0}
+  // {name: 'todi raga', boost: 0},
+  // {name: 'persian', boost: 0},
+  // {name: 'enigmatic', boost: 0}
+]
+const sortingOrderFlat = sortingOrder.map(s => s.name)
+sortingOrderFlat.reverse()
+
+const allScales = ScaleType.all().filter(s => s.intervals.length === 7 && sortingOrderFlat.includes(s.name))
+
+// let up = [0, 0, 0, 0, 0, 0]
+// let down = [0, 0, 0, 0, 0, 0]
+
 export const getScale = (bucketValues) => {
   let scale = [...bucketValues]
   scale.sort((a, b) => Math.abs(b) - Math.abs(a))
-  scale = scale.slice(0, 6).map(v => v > 0)
+  // console.log('scale.length', scale.length, scale.slice(1, 7))
+
+  const offset = 2 // Add offset to that it's more balanced
+  scale = scale.slice(0 + offset, 6 + offset).map(v => v > 0)
   // Use chroma. for the 6 pairs, set 2 or b2 etc for all, then use chroma to find a found scale, removing one note as required until a match
+
+  // const c = [0, 0, 0, 0, 0, 0]
+  // for (let i = 0; i < scale.length; i++) {
+  //   scale[i] ? up[i]++ : down[i]++
+  //   c[i] = Math.round(100 * (down[i] / (up[i] + down[i])))
+  // }
+
+  // scale[2] ? totalMajor++ : totalMinor++
+  // console.log('potential scale', scale, 'up', up, 'down', down, 'c', c)
 
   const chromaString = new Array(12).fill(0)
   chromaString[0] = 1
@@ -24,27 +87,36 @@ export const getScale = (bucketValues) => {
     }
   }
   const chroma = chromaString.join('')
-  const allScales = ScaleType.all().filter(s => s.intervals.length === 7)
+  // Filter the scale list
+
   for (const potentialScale of allScales) {
     const distance = chromaDifference(chroma, potentialScale.chroma)
     potentialScale.distance = distance
+    potentialScale.boost = sortingOrder.find(s => s.name === potentialScale.name).boost
   }
   // allScales.sort((a, b) => a.distance - b.distance)
 
   allScales.sort((a, b) => {
-    function findFirstDiffPos (a, b) {
-      if (a.length < b.length)[a, b] = [b, a]
-      return [...a].findIndex((chr, i) => chr !== b[i])
-    }
-    return a.distance - b.distance || findFirstDiffPos(b.chroma.split(''), chroma) - findFirstDiffPos(a.chroma.split(''), chroma)
+    // function findFirstDiffPos (a, b) {
+    //   if (a.length < b.length)[a, b] = [b, a]
+    //   return [...a].findIndex((chr, i) => chr !== b[i])
+    // }
+    // return a.distance - b.distance || findFirstDiffPos(b.chroma.split(''), chroma) - findFirstDiffPos(a.chroma.split(''), chroma)
+
+    return a.distance - b.distance || sortingOrderFlat.indexOf(b.name) - sortingOrderFlat.indexOf(a.name)
+    // return (a.distance - a.boost) - (b.distance - b.boost) ||
+    // sortingOrderFlat.indexOf(b.name) - sortingOrderFlat.indexOf(a.name) ||
+    // findFirstDiffPos(b.chroma.split(''), chroma) - findFirstDiffPos(a.chroma.split(''), chroma)
   })
 
-  // console.log('allScales', chroma, allScales, allScales.map(s => `${chroma} : ${s.chroma} - ${s.distance} - ${s.name}`))
-
+  // console.log('allScales', chroma, allScales.map(s => `${chroma} : ${s.chroma} - ${s.distance}-${s.boost}= ${s.distance - s.boost} - ${s.name}`))
+  // const allScales = ScaleType.all().filter(s => s.intervals.length === 7)
+  // console.log('allScales', ScaleType.all().filter(s => s.intervals.length === 7).map(s => s.name))
   // const scaleFound = allScales[0]
   // console.log('scaleFound', scaleFound)
   return allScales[0]
 }
+
 export const toRomanNumeral = (i) => {
   if (i === 1) {
     return 'I'
@@ -583,7 +655,7 @@ export const generateSong = (constellationData) => {
         }
       }
     }
-
+    // console.log('track.notes', track)
     // track.notes = JSON.stringify(track.notes)
   }
   const byteArray = convertNotesToMidi(bpm, timeSig, constellationData.constellationName, tracks)
@@ -594,4 +666,117 @@ export const generateSong = (constellationData) => {
   fs.writeFileSync(filePath, byteArray)
 
   return tracks
+}
+const printScaleSummary = (starData) => {
+  // const scaleList = []
+  // for (const constellation of starData.constellations) {
+  //   const scale = constellation.music.scale
+
+  //   let foundScale = scaleList.find(s => s.c === scale.chroma)
+  //   if (!foundScale) {
+  //     // foundScale = { chroma: scale.chroma, name: scale.name, c: [] }
+  //     foundScale = { c: scale.chroma, n: scale.name, m: scale.chroma.split('')[4] === '1' ? 1 : 0, l: 0 }
+  //     scaleList.push(foundScale)
+  //   }
+  //   // foundScale.c.push(constellation.constellationName)
+  //   foundScale.l++
+  // }
+  // scaleList.sort((a, b) => b.l - a.l)
+  // console.log('scaleList', scaleList)
+  // console.log('total', _.sumBy(scaleList, 'l'))
+  // console.log('major', _.sumBy(scaleList, function (s) { return s.l * s.m }))
+  // console.log('minor', _.sumBy(scaleList, function (s) { return s.l * (s.m === 0 ? 1 : 0) }))
+}
+const printNotesForIntrumentsSummary = (starData) => {
+  const types = []
+  for (const constellationData of starData.constellations) {
+    // console.log('constellationData.music.songNotes', constellationData.music.songNotes)
+    for (const track of constellationData.music.songNotes) {
+      // console.log('track', track)
+      let type = types.find(t => t.type === track.type)
+      if (!type) {
+        type = {type: track.type, notes: [], durations: []}
+        types.push(type)
+      }
+      // if (typeof (track.notes.note) === 'array') {
+
+      for (const note of track.notes) {
+        // console.log('notes type', typeof (note.note), note.note)
+        const individualNotes = typeof (note.note) === 'string' ? [note.note] : note.note
+        for (const individualNote of individualNotes) {
+          // const midiValue = Note.midi(individualNote)
+          if (!type.notes.includes(individualNote) && individualNote !== 'C0') {
+            type.notes.push(individualNote)
+          }
+        }
+        // console.log('duration', note.duration)
+        if (!type.durations.includes(note.duration)) {
+          type.durations.push(note.duration)
+        }
+        // type.durations.push(type.duration)
+      }
+    }
+  }
+  const durationSortOrder = [
+    '16n',
+    '8n',
+    '4n',
+    '2n',
+    '1n',
+    '1m',
+    '2m',
+    '3m',
+    '4m'
+  ]
+  for (const type of types) {
+    type.durations.sort((a, b) => durationSortOrder.indexOf(b) - durationSortOrder.indexOf(a))
+    let durationIndex = durationSortOrder.indexOf(type.durations[0])
+    if (durationIndex < 4) {
+      durationIndex = 4
+    }
+    type.duration = durationSortOrder[1 + durationIndex]
+    delete type.durations
+    type.notes = ['2', '3', '4', '5', '6']
+      .map(o => {
+        const l = type.notes.filter(n => n.includes(o)).length
+        const notes = []
+        if (l === 1) {
+          notes.push(Note.get(`C${o}`).name)
+        }
+        if (l > 1) {
+          const fromMidiNote = Note.get(`C${o}`).midi
+          const toMidiNote = Note.get(`B${o}`).midi
+          // console.log('midi', fromMidiNote, toMidiNote)
+          for (let m = fromMidiNote; m <= toMidiNote; m++) {
+          // console.log('m', m, Note.fromMidi(m))
+            notes.push(Note.fromMidi(m))
+          }
+        }
+        return {o: o, l: l, all: l > 1, root: l === 1, notes: notes}
+      })
+      .reduce(function (a, b) {
+        a = a.concat(b.notes)
+        return a
+      }, [])
+      // .map((n, i) => {
+      //   const bar = parseInt(type.duration.split('')[0]) * i * 2 // TODO - No space for note ending here
+      //   return {time: `${bar}:0`, note: n, duration: type.duration, bar}
+      // })
+      .map((n, i) => {
+        return {type: n, notes: [{time: `0:0`, note: n, duration: type.duration}]}
+      })
+    // console.log('type', type)
+    const bpm = 80
+    const timeSig = [4, 4]
+    const byteArray = convertNotesToMidi(bpm, timeSig, `_all-notes-${type.type}`, type.notes)
+    // console.log('generateSong', byteArray)
+    const midiDir = 'midi'
+    const filePath = `${midiDir}/_all-notes-${type.type}.mid`
+    fs.ensureDirSync(midiDir)
+    fs.writeFileSync(filePath, byteArray)
+  }
+}
+export const debugNotes = (starData) => {
+  printScaleSummary(starData)
+  printNotesForIntrumentsSummary(starData)
 }

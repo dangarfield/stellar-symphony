@@ -4,7 +4,8 @@ import _ from 'lodash'
 import * as THREE from 'three'
 import * as path from 'path'
 import fetch from 'node-fetch'
-import { getScale, getChords, getMelodyWithTimingByDistance, getMelodyWithTimingByAngle, chordsToToneNotes, generateSong } from './music-generator.js'
+import { getScale, getChords, getMelodyWithTimingByDistance, getMelodyWithTimingByAngle, chordsToToneNotes,
+  generateSong, debugNotes } from './music-generator.js'
 
 const downloadDataFile = async (url, path) => {
   const res = await fetch(url)
@@ -334,9 +335,6 @@ const calculateAndAddAveragesToConstellations = (starData) => {
   const ciConstellationDiffListData = [{constellation: 'ALL', data: starData.ranges.ci.averages}]
   const hrAllListData = []
 
-  const scaleList = []
-  const chordList = []
-
   for (const [i, constellationData] of starData.constellations.entries()) {
     console.log(`Processing ${i + 1} of ${starData.constellations.length} - ${constellationData.constellationName} - ${constellationData.constellation}`)
     const absmagList = []
@@ -451,8 +449,6 @@ const calculateAndAddAveragesToConstellations = (starData) => {
       name: scale.name,
       chroma: scale.chroma
     }
-    scaleList.push(constellationData.music.scale)
-
     // Chords
     const chords = getChords(constellationData.ranges.absmag.diffs, [13, 14, 15, 16], 0.075, scale)
     // constellationData.chords = chords
@@ -461,7 +457,6 @@ const calculateAndAddAveragesToConstellations = (starData) => {
       structure: chords,
       toneNotes: chordsToToneNotes(chords, 0)
     }
-    chordList.push(chords)
     // console.log('chords', chords)
 
     const melody = getMelodyWithTimingByDistance(constellationData.starsMain, scale, 'distanceFromAlpha', 'angleFromCentre')
@@ -488,17 +483,6 @@ const calculateAndAddAveragesToConstellations = (starData) => {
   starData.ranges.rv.constellationDiffListData = rvConstellationDiffListData
   starData.ranges.lum.constellationDiffListData = lumConstellationDiffListData
   starData.ranges.ci.constellationDiffListData = ciConstellationDiffListData
-
-  // const sumArrays = (arrayList) => {
-  //   const total = new Array(arrayList[0].length).fill(0)
-  //   for (const array of arrayList) {
-  //     for (let i = 0; i < array.length; i++) {
-  //       total[i] += array[i]
-  //     }
-  //   }
-  //   return total
-  // }
-  // console.log('scaleList', scaleList, _.countBy(scaleList, 'name'), sumArrays((scaleList.map(s => s.chroma.split('').map(v => parseInt(v))))))
 }
 const reduceStarDataSize = (starData) => {
   const allowedKeys = ['absmag', 'mag', 'hip', 'ax', 'ay', 'az', 'alpha', 'distanceFromAlpha', 'distanceFromCentre', 'angleFromCentre', 'angleFromAlpha']
@@ -524,7 +508,9 @@ const init = async () => {
   const starData = {constellations: groupedByConstellation, ranges, averages}
   calculateAndAddAveragesToConstellations(starData)
   reduceStarDataSize(starData)
+  debugNotes(starData)
   // console.log('rawStarData', groupedByConstellation.map(d => d.constellation), Object.keys(groupedByConstellation[0]))
+  console.log('Writing star-data.json')
   fs.writeJsonSync(`_static/data/star-data.json`, starData)
   console.log('FINISHED')
 }
