@@ -5,4 +5,5 @@ threejs-star-map
 node_modules
 .DS_Store
 audio
+sounds
 .netlify

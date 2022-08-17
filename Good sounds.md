@@ -4,35 +4,35 @@ Good sounds
 Chords:
         LABS
     Foghorn
-The Deeps
-The Lightkeeper
+* The Deeps
+* The Lightkeeper
     Soft Piano
-Soft Piano
+* Soft Piano
     Siren Songs
-Earth Sign
-Thirds Organ
+* Earth Sign
+* Thirds Organ
     Tape Orchestra
-Vox Humana
+* Vox Humana
     Lap Steel
-Plucks
+* Plucks
     Tape Piano
-Capstan Upright
-Magnetic Reader
-Spliced Upright
+* Capstan Upright
+* Magnetic Reader
+* Spliced Upright
     Guitar Harmonics
-Space Pluck 2
+* Space Pluck 2
     Glass Piano
-Floe
+* Floe
     Dulcimer
-Fingered
+* Fingered
     Micahs Choir
-Sustain Ahhs
-Sustain Oohs
+* Sustain Ahhs
+* Sustain Oohs
     Music Box
-Hannah Peel's Music Box
+* Hannah Peel's Music Box
     Astral Forms
-Circular Mmm's
-Nasty Tines
+* Circular Mmm's
+* Nasty Tines
 
 
 Melody:
