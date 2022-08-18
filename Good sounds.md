@@ -40,63 +40,63 @@ Chords:
     Tape Piano
 * Capstan Upright
 * Magnetic Reader
-Spliced Upright
+* Spliced Upright
     Guitar Harmonics
-Space Pluck 2
+* Space Pluck 2
     Glass Piano
-Floe
+* Floe
     Dulcimer
-Fingered
+* Fingered
     Micahs Choir
-Sustain Ahhs
-Sustain Oohs
+* Sustain Ahhs
+* Sustain Oohs
     Music Box
-Hannah Peel's Music Box
+* Hannah Peel's Music Box
     Astral Forms
-Circular Mmm's
-  Nasty Tines
+* Circular Mmm's
+* Nasty Tines
 
 
 Melody:
         LABS
     Soft Piano
-  Soft Piano
+* Soft Piano
     Siren Songs
-  Earth Sign
+* Earth Sign
     Hand Bells
-Ghost Hand Bells
+* Ghost Hand Bells
     Lap Steel
-Trems Slow
+* Trems Slow
     Granular Whalesong
-Gentle
-Nautilus
-Nautilus Soft
+* Gentle
+* Nautilus
+* Nautilus Soft
     Tape Piano
-Felt Cassette
-Magnetic Reader
-Spliced Upright
+* Felt Cassette
+* Magnetic Reader
+* Spliced Upright
     Guitar Harmonics
-Gieger
-Plucks
-Sustain Tuned
+* Gieger
+* Plucks
+* Sustain Tuned
     Tundra Atmos
-Choir In The Rain
-Sevastopol
+* Choir In The Rain
+* Sevastopol
     Glass Piano
-Anthem
+* Anthem
     Piano Pads
-Organ
+* Organ
     Dulcimer
-Fingered
-Mini
+* Fingered
+* Mini
     Micahs Choir
-Warp Laments
-Warp Souls
+* Warp Laments
+* Warp Souls
     Astral Forms
-Chorus Pad
-Nasty Tines
+* Chorus Pad
+* Nasty Tines
     Modular Pianos
-03 Piano Heaven
+* Piano Heaven
 
 
 Bass:
@@ -104,29 +104,29 @@ Bass:
     Foghorn
 Sound The Alarm
 Sumburgh Steel
-The Lightkeeper
+* The Lightkeeper
 VT - Ancients
 VT - Brutalize
 VT - Nightfrost
 VT - Phosphor
     Siren Songs
-Earth Sign
+* Earth Sign
     Granular Whalesong
 Drone
-Gentle
-Nautilus Soft
+* Gentle
+* Nautilus Soft
     Tundra Atmos
-Choir In The Rain
+* Choir In The Rain
 Lost In The Cavern
-Sevastopol
+* Sevastopol
     Peel Guitar
 Peer Guitar Ensemble
     Micahs Choir
 Sustain The Choir ( -1ve)
-Sustain Uhs
+* Sustain Uhs
     Astral Forms
 Guitar Bowed Drone
-Nasty Tines
+* Nasty Tines
 
 
 
@@ -134,46 +134,46 @@ Nasty Tines
 High Notes:
         LABS
     Choir
-Long
+* Long
     Textural Pads
-Cyclosa
-Foehn
-Hireth
-Oseny
-Petrichor
-Saudade
+* Cyclosa
+* Foehn
+* Hireth
+* Oseny
+* Petrichor
+* Saudade
     Hand Bells
-Ghost Hand Bells
+* Ghost Hand Bells
     Tape Orchestra
-Brass Loop
-Vox Humana Crinkle
-Woods Hollow Crinkle
+* Brass Loop
+* Vox Humana Crinkle
+* Woods Hollow Crinkle
     Lap Steel
-Plucks
-Resonance Chaos
-Trems Slow
-Nautilus Soft
+* Plucks
+* Resonance Chaos
+* Trems Slow
+* Nautilus Soft
 Whale Song
     Guitar Harmonics
 Glass Cabinet
 Sustain
-Sustain Tuned
+* Sustain Tuned
     Arctic Swells
 Decay
 Swells
     Tundar Atmos
-Choir In The Rain
-Ghost At The Habour
+* Choir In The Rain
+Ghost At The Harbour
 Glacial Pad
 Lost In The Cavern
-Sevastopol
+* Sevastopol
     Glass Piano
-Anthem
+* Anthem
     Piano Pads
 Glass 2
     Micahs Choir
 Warp Fracture
-Warp Laments
+* Warp Laments
     Pedal Pads
 Ethereal Guitar
 Sustain Guitar
@@ -252,17 +252,17 @@ Short
 03 Piano Heaven
 07 Pipe Piano
     Tape Orchestra
-Vox Humana
+* Vox Humana
     Strings 2
 Pizzicato Ensemble
     Granular Whalesong
 Underwater Bass
     Guitar Harmonics
-Plucks
+* Plucks
     Glass Piano
-Floe
+* Floe
     Music Box
-Rsonator Music Box
+Resonator Music Box
 
 
 
