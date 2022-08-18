@@ -775,6 +775,46 @@ const printNotesForIntrumentsSummary = (starData) => {
     fs.ensureDirSync(midiDir)
     fs.writeFileSync(filePath, byteArray)
   }
+  createAllMidiNotesFile()
+}
+const createAllMidiNotesFile = () => {
+// C0 Eb0 Gb0 A0
+// C1 Eb1 Gb1 A1
+// C2 Eb2 Gb2 A2
+// 3 *
+// 4 *
+// 5 *
+// C6 Eb6 Gb6 A6
+// C7 Eb7 Gb7 A7
+  const noteValues = [
+    ['C', 'Eb', 'Gb', 'A'],
+    ['C', 'Eb', 'Gb', 'A'],
+    ['C', 'Eb', 'Gb', 'A'],
+    ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'],
+    ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'],
+    ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'],
+    ['C', 'Eb', 'Gb', 'A'],
+    ['C', 'Eb', 'Gb', 'A']
+  ]
+    .reduce(function (a, b, i) {
+      a = a.concat(b.map(n => n + i))
+      return a
+    }, [])
+    .map((n, i) => {
+      return {type: n, notes: [{time: `0:0`, note: n, duration: '3m'}]}
+    })
+  // console.log('noteValues', noteValues)
+  // for (const noteValue of noteValues) {
+  //   console.log('noteValue',noteValue)
+  // }
+  const bpm = 80
+  const timeSig = [4, 4]
+  const byteArray = convertNotesToMidi(bpm, timeSig, `_all-notes`, noteValues)
+  // console.log('generateSong', byteArray)
+  const midiDir = 'midi'
+  const filePath = `${midiDir}/_all-notes.mid`
+  fs.ensureDirSync(midiDir)
+  fs.writeFileSync(filePath, byteArray)
 }
 export const debugNotes = (starData) => {
   printScaleSummary(starData)

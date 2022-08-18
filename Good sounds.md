@@ -40,29 +40,29 @@ Chords:
     Tape Piano
 * Capstan Upright
 * Magnetic Reader
-* Spliced Upright
+Spliced Upright
     Guitar Harmonics
-* Space Pluck 2
+Space Pluck 2
     Glass Piano
-* Floe
+Floe
     Dulcimer
-* Fingered
+Fingered
     Micahs Choir
-* Sustain Ahhs
-* Sustain Oohs
+Sustain Ahhs
+Sustain Oohs
     Music Box
-* Hannah Peel's Music Box
+Hannah Peel's Music Box
     Astral Forms
-* Circular Mmm's
-* Nasty Tines
+Circular Mmm's
+  Nasty Tines
 
 
 Melody:
         LABS
     Soft Piano
-* Soft Piano
+  Soft Piano
     Siren Songs
-* Earth Sign
+  Earth Sign
     Hand Bells
 Ghost Hand Bells
     Lap Steel
