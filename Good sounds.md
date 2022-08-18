@@ -1,6 +1,28 @@
 Good sounds
 
 
+  Low Drone       - C2          3m *** Low C2 3m
+
+  Root Bass       - C3 B3       1m
+  Picking         - C3 C4       1m
+* Chords Drone    - C3 B4       2m *** Chords C3 B4 2m
+* Chords          - C3 B4       1m
+  Fast Arpeggio   - C3 B4       1m
+
+  High Notes      - C5 B5       3m *** Melody C5 B5 3m
+  Melody          - C5 B5       1m
+
+
+All notes
+C0 Eb0 Gb0 A0
+C1 Eb1 Gb1 A1
+C2 Eb2 Gb2 A2
+3 *
+4 *
+5 *
+C6 Eb6 Gb6 A6
+C7 Eb7 Gb7 A7
+
 Chords:
         LABS
     Foghorn
@@ -37,12 +59,10 @@ Chords:
 
 Melody:
         LABS
-    Foghorn
-The Lightkeeper
     Soft Piano
-Soft Piano
+* Soft Piano
     Siren Songs
-Earth Sign
+* Earth Sign
     Hand Bells
 Ghost Hand Bells
     Lap Steel
