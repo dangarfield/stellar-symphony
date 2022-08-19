@@ -102,30 +102,30 @@ Melody:
 Bass:
         LABS
     Foghorn
-Sound The Alarm
-Sumburgh Steel
+* Sound The Alarm
+* Sumburgh Steel
 * The Lightkeeper
-VT - Ancients
-VT - Brutalize
-VT - Nightfrost
-VT - Phosphor
+* Ancients
+* Brutalizer
+* Nightfrost
+* Phosphor
     Siren Songs
 * Earth Sign
     Granular Whalesong
-Drone
+* Drone
 * Gentle
 * Nautilus Soft
     Tundra Atmos
 * Choir In The Rain
-Lost In The Cavern
+* Lost In The Cavern
 * Sevastopol
     Peel Guitar
-Peer Guitar Ensemble
+* Peer Guitar Ensemble
     Micahs Choir
 Sustain The Choir ( -1ve)
 * Sustain Uhs
     Astral Forms
-Guitar Bowed Drone
+* Guitar Bowed Drone
 * Nasty Tines
 
 
@@ -153,92 +153,92 @@ High Notes:
 * Resonance Chaos
 * Trems Slow
 * Nautilus Soft
-Whale Song
+* Whale Song
     Guitar Harmonics
-Glass Cabinet
-Sustain
+* Glass Cabinet
+* Sustain
 * Sustain Tuned
     Arctic Swells
-Decay
-Swells
-    Tundar Atmos
+* Decay
+* Swells
+    Tundra Atmos
 * Choir In The Rain
-Ghost At The Harbour
-Glacial Pad
-Lost In The Cavern
+* Ghost At The Harbour
+* Glacial Pad
+* Lost In The Cavern
 * Sevastopol
     Glass Piano
 * Anthem
     Piano Pads
-Glass 2
+* Glass 2
     Micahs Choir
-Warp Fracture
+* Warp Fracture
 * Warp Laments
     Pedal Pads
-Ethereal Guitar
-Sustain Guitar
-Tape Piano
+* Ethereal Guitar
+* Sustain Guitar
+* Tape Piano
     Harmonic Flights
-Sage's Pad
+* Sage's Pad
     Astral Forms
-Breathy Mist
-Chorus Pad
-Guitar Bowed Drone
-Vocal Pad
+* Breathy Mist
+* Chorus Pad
+* Guitar Bowed Drone
+* Vocal Pad
     Ondes Musicales
-Granules
-Metallique Cries
-Octave Echoes
-Ribbon
+* Granules
+* Metallique Cries
+* Octave Echoes
+* Ribbon
 
 
 Low Drone:
         LABS
     Foghorn (C1)
-Sumburgh Steel
-The Lightkeeper
-VT - Ancients
-VT - Andromeda
-VT - Nascent
-VT - Nightfrost
-VT - Phosphor
+* Sumburgh Steel
+* The Lightkeeper
+* Ancients
+* Andromeda
+* Nascent
+* Nightfrost
+* Phosphor
     Siren Songs (C2)
-Balm
-Deep Dream
-Earth Sign
-Plaintive Wail
-Thirds Organ
-Transreal
-Whalesong
+* Balm
+* Deep Dream
+* Earth Sign
+* Plaintive Wail
+* Thirds Organ
+* Transreal
+* Whalesong
     London Atmos (C2)
-2 on the Platform
-Break Emergency Glass
-Hayward Crane
-Night Tube
+* 2 on the Platform
+* Break Emergency Glass
+* Hayward Crane
+* Night Tube
     Granular Whalesong (C1)
-Nautilus
-Nautilus Soft
-Rattle
-Submerged
+* Nautilus
+* Nautilus Soft
+* Rattle
+* Submerged
     Arctic Swells (C2)
-Decay
+* Decay
     Tundra Atmos (C3)
-Ghost At The Harbour
-Glacial Pad
-Lost
+* Ghost At The Harbour
+* Glacial Pad
+* Lost In The Cavern
     LA Atmos (C3)
-Helicopter
-Horn
-Metro
+* Helicopter
+* Horn
+* Metro
     Astral Forms (C2)
-Breathy Mist
-Chorus Pad
+* Breathy Mist
+* Chorus Pad
     Ondes Musicales (C2)
-Fragile Air
-Granules
-Metallique
-Metallique Cries
-Ribbon
+* Fragile Air
+* Granules
+* Metallique
+* Metallique Cries
+* Ribbon
 
 
 
@@ -247,22 +247,22 @@ Ribbon
 Picking:
         LABS
     Strings
-Short
+* Short
     Modular Piano
-03 Piano Heaven
-07 Pipe Piano
+* Piano Heaven
+* Pipe Piano
     Tape Orchestra
 * Vox Humana
     Strings 2
-Pizzicato Ensemble
+* Pizzicato Ensemble
     Granular Whalesong
-Underwater Bass
+* Underwater Bass
     Guitar Harmonics
 * Plucks
     Glass Piano
 * Floe
     Music Box
-Resonator Music Box
+* Resonator Music Box
 
 
 
@@ -271,50 +271,50 @@ Resonator Music Box
 Fast Arpeggio:
         LABS
     Foghorn
-Sound The Alarm
-The Deeps
+* Sound The Alarm
+* The Deeps
     Siren Songs
-Gossip
-Thirds Organ
+* Gossip
+* Thirds Organ
     Tape Orchestra
-Brass Loop
-Vox Humana
-Vox Humana Crinkle
+* Brass Loop
+* Vox Humana
+* Vox Humana Crinkle
     Lap Steel
-Muted Plucks
-Plucks
+* Muted Plucks
+* Plucks
     Granular Whalesong
-Underwater Bass
+* Underwater Bass
     Tape Piano
-Magnetic Reader
+* Magnetic Reader
     Glass Piano
-Glass Grand Soft
+* Glass Grand Soft
     Dulcimer
-Tremolo
+* Tremolo
     Micahs Choir
-Sustain Oohs
+* Sustain Oohs
     Music Box
-Resonator Music Box
+* Resonator Music Box
     Harmonic Flights
-Sage's Pad
+* Sages Pad
     Astral Forms
-Chorus Pad
-Nasty Tines
+* Chorus Pad
+* Nasty Tines
     Ondes Musicales
-Mobius Blips
+* Mobius Blips
     Strings
-Ensemble
+* Ensemble
     Trumpet Fields
-Bumblebee
+* Bumblebee
     Modular Piano
-01 Granular Piano
-03 Piano Heaven
-06 Tank Piano
-11 Tape Piano
+* Granular Piano
+* Piano Heaven
+* Tank Piano
+* Tape Piano
     Strings 2
-Pizzicato Ensemble
+* Pizzicato Ensemble
     Opia
-Synth Stab
+* Synth Stab
 
 
 Pads:
