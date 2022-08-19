@@ -1,9 +1,9 @@
-import {getScaleText, getToneDataFromElementAndPlay, stopToneClips} from './audio.js'
+import {getScaleText, getToneDataFromElementAndPlay, stopToneClips, loadSampler} from './audio.js'
 import {focusMapOnConstellation, setBgStarsVisibility} from './map.js'
 import {Chart, ScatterController, LinearScale, PointElement, LineController, CategoryScale, LineElement, Legend} from 'chart.js'
 Chart.register(ScatterController, LinearScale, PointElement, LineController, CategoryScale, LineElement, Legend)
 
-export const updateSelectedConstellation = (starData, constellationId, moveMap) => {
+export const updateSelectedConstellation = async (starData, constellationId, moveMap) => {
   // console.log('updateSelectedConstellation', starData.selectedConstellation ,constellationId,starData.selectedConstellation !== constellationId)
   if (starData.selectedConstellation !== constellationId) {
     starData.selectedConstellation = constellationId
@@ -36,10 +36,23 @@ export const updateSelectedConstellation = (starData, constellationId, moveMap) 
     // Set info text
     const infoLong = document.querySelector('.info-long')
     infoLong.querySelector('.name').innerHTML = `${constellationData.constellationName} <span class="text-muted">(${constellationId})</span>`
-    infoLong.querySelector('.info-body').innerHTML = generateConstellationMapDataHtml(constellationData)
+    infoLong.querySelector('.info-body').innerHTML = generateConstellationMapDataHtml(constellationData, starData.instruments.tracks)
     for (const button of document.querySelectorAll('.info-body .tone-clip')) {
       button.addEventListener('click', function () {
         getToneDataFromElementAndPlay(starData, this)
+      })
+    }
+    for (const select of document.querySelectorAll('.info-body .info-long-instrument-select')) {
+      select.addEventListener('change', async function () {
+        const instrument = this.value
+        const trackType = this.getAttribute('data-type')
+
+        const track = constellationData.music.songNotes.find(t => t.type === trackType)
+        console.log('info-long-instrument-select change', trackType, instrument, track)
+        track.instrument = instrument
+        if (track.sampler) { // If this is playing, update the sampler
+          track.sampler = await loadSampler(starData.instruments.notes, track.instrument, track.notes)
+        }
       })
     }
   }
@@ -76,7 +89,19 @@ const toRomanNumeral = (i) => {
   }
   return i
 }
-const generateConstellationMapDataHtml = (constellationData) => {
+const getInstrumentSelectHtml = (trackType, constellationData, tracks) => {
+  const instrument = constellationData.music.songNotes.find(t => t.type === trackType).instrument
+  return `
+    <div class="mb-3 row">
+      <label class="col-sm-5 col-form-label">${trackType}</label>
+      <div class="col-sm-7">
+        <select class="form-select info-long-instrument-select" data-type="${trackType}">
+        ${tracks[trackType].map(i => `<option value="${i}"${i === instrument ? ' selected' : ''}>${i}</option>`)}
+        </select>
+      </div>
+    </div>`
+}
+const generateConstellationMapDataHtml = (constellationData, instruments) => {
   return `
     <p>
       Song:
@@ -89,8 +114,19 @@ const generateConstellationMapDataHtml = (constellationData) => {
         data-constellation="${constellationData.constellation}" data-type="song" data-url="${constellationData.music.songPath}">
         Full band
       </i>` : ''}
-
     </p>
+    </p>
+
+    ${getInstrumentSelectHtml('Chords', constellationData, instruments)}
+    ${getInstrumentSelectHtml('Chords Drone', constellationData, instruments)}
+    ${getInstrumentSelectHtml('Melody 1', constellationData, instruments)}
+    ${getInstrumentSelectHtml('Melody 2', constellationData, instruments)}
+    ${getInstrumentSelectHtml('Root Bass', constellationData, instruments)}
+    ${getInstrumentSelectHtml('High Notes', constellationData, instruments)}
+    ${getInstrumentSelectHtml('Picking', constellationData, instruments)}
+    ${getInstrumentSelectHtml('Fast Arpeggio', constellationData, instruments)}
+    ${getInstrumentSelectHtml('Low Drone', constellationData, instruments)}
+
     <p>
       Scale:
       <i class="bi bi-play-circle tone-clip"

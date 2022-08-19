@@ -821,7 +821,7 @@ export const debugNotes = (starData) => {
   printScaleSummary(starData)
   printNotesForIntrumentsSummary(starData)
 }
-const getInstrumentForTrack = () => {
+export const getInstrumentForTrack = () => {
   const chords = [
     'The Deeps',
     'The Lightkeeper',
@@ -1033,7 +1033,7 @@ export const getInstruments = () => {
   // for (const instrument of instruments) {
   //   console.log('instrument', instrument)
   // }
-  return instruments
+  return {notes: instruments, tracks: getInstrumentForTrack()}
 }
 export const applyInstrumentsToMusic = (starData) => {
   const instrumentTypes = getInstrumentForTrack()

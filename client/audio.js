@@ -95,7 +95,8 @@ const getRequiredSampleNotes = (instruments, instrument, requiredNotes) => {
   return sampleNotes
 }
 
-const loadSampler = async (instruments, instrument, requiredNotes) => {
+export const loadSampler = async (instruments, instrument, requiredNotes) => {
+  console.log('loadSampler', instruments, instrument, requiredNotes)
   return new Promise(resolve => {
     const sampleNotes = getRequiredSampleNotes(instruments, instrument, requiredNotes)
 
@@ -178,14 +179,15 @@ const playToneClip = async (starData, toneData) => {
       }, notesToPlay).start(0)
     } else {
       for (const track of toneData.song) {
-        const sampler = await loadSampler(starData.instruments, track.instrument, track.notes)
+        console.log('about to loadSampler', starData.instruments.notes, track.instrument, track.notes, track)
+        track.sampler = await loadSampler(starData.instruments.notes, track.instrument, track.notes)
+        // TODO - Add reverb to melody tracks
         // const sampler = piano
-        console.log('track', track, sampler)
+        console.log('track', track)
         new Part((time, value) => {
           // if (!value.ignore && !track.type.startsWith('Melody')) {
           if (!value.ignore) {
-            sampler.triggerAttackRelease(value.note, value.duration, time)
-            // sampler.triggerAttackRelease(value.note, value.duration, time)
+            track.sampler.triggerAttackRelease(value.note, value.duration, time)
           }
           Draw.schedule(function () {
             triggeredAnimationAction(visualMelody, value, timeForAnimation, track.instrument)
