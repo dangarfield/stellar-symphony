@@ -51,9 +51,9 @@ Chords:
 * Sustain Ahhs
 * Sustain Oohs
     Music Box
-* Hannah Peel's Music Box
+* Hannah Peels Music Box
     Astral Forms
-* Circular Mmm's
+* Circular Mmms
 * Nasty Tines
 
 

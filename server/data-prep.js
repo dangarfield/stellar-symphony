@@ -5,7 +5,7 @@ import * as THREE from 'three'
 import * as path from 'path'
 import fetch from 'node-fetch'
 import { getScale, getChords, getMelodyWithTimingByDistance, getMelodyWithTimingByAngle, chordsToToneNotes,
-  generateSong, debugNotes } from './music-generator.js'
+  generateSong, debugNotes, getInstruments, applyInstrumentsToMusic } from './music-generator.js'
 
 const downloadDataFile = async (url, path) => {
   const res = await fetch(url)
@@ -336,7 +336,7 @@ const calculateAndAddAveragesToConstellations = (starData) => {
   const hrAllListData = []
 
   for (const [i, constellationData] of starData.constellations.entries()) {
-    console.log(`Processing ${i + 1} of ${starData.constellations.length} - ${constellationData.constellationName} - ${constellationData.constellation}`)
+    // console.log(`Processing ${i + 1} of ${starData.constellations.length} - ${constellationData.constellationName} - ${constellationData.constellation}`)
     const absmagList = []
     const magList = []
     const rvList = []
@@ -483,6 +483,7 @@ const calculateAndAddAveragesToConstellations = (starData) => {
   starData.ranges.rv.constellationDiffListData = rvConstellationDiffListData
   starData.ranges.lum.constellationDiffListData = lumConstellationDiffListData
   starData.ranges.ci.constellationDiffListData = ciConstellationDiffListData
+  applyInstrumentsToMusic(starData)
 }
 const reduceStarDataSize = (starData) => {
   const allowedKeys = ['absmag', 'mag', 'hip', 'ax', 'ay', 'az', 'alpha', 'distanceFromAlpha', 'distanceFromCentre', 'angleFromCentre', 'angleFromAlpha']
@@ -500,15 +501,17 @@ const reduceStarDataSize = (starData) => {
 const init = async () => {
   await downloadDataFiles()
   const rawData = await getRawData()
+  const instruments = getInstruments()
   const ranges = getMinMaxAndRanges(rawData.rawStarData)
   //   console.log('rawData', rawStarData, constellationShip)
   const groupedByConstellation = groupByConstellation(rawData)
   const averages = getConstellationAverages(groupedByConstellation)
   setMinMaxAndRangesForConstellations(groupedByConstellation, ranges)
-  const starData = {constellations: groupedByConstellation, ranges, averages}
+  const starData = {constellations: groupedByConstellation, ranges, averages, instruments}
   calculateAndAddAveragesToConstellations(starData)
   reduceStarDataSize(starData)
   debugNotes(starData)
+
   // console.log('rawStarData', groupedByConstellation.map(d => d.constellation), Object.keys(groupedByConstellation[0]))
   console.log('Writing star-data.json')
   fs.writeJsonSync(`_static/data/star-data.json`, starData)

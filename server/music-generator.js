@@ -1,6 +1,7 @@
 import { ScaleType, Note, Interval } from '@tonaljs/tonal'
 import Midi from '@tonejs/midi'
 import fs from 'fs-extra'
+import {join} from 'path'
 
 import _ from 'lodash'
 
@@ -67,7 +68,7 @@ export const getScale = (bucketValues) => {
   // const c = [0, 0, 0, 0, 0, 0]
   // for (let i = 0; i < scale.length; i++) {
   //   scale[i] ? up[i]++ : down[i]++
-  //   c[i] = Math.round(100 * (down[i] / (up[i] + down[i])))
+  //   c[i] = Math.round(100 '(down[i] / (up[i] + down[i])))
   // }
 
   // scale[2] ? totalMajor++ : totalMinor++
@@ -256,7 +257,7 @@ export const getMelodyWithTimingByAngle = (stars, scale, distanceAttribute, angl
     // const note = scaleNotes[Math.floor((s[angleAttribute]%180)/(180/7))]
     const note = scaleNotes[Math.floor((s[distanceAttribute] / maxDistance) * (scaleNotes.length - 1))]
 
-    // console.log('star', s.bayer, s.proper, '-', s[angleAttribute], noteCount, '-', scaleNotes, s[distanceAttribute], s[distanceAttribute]/maxDistance, (s[distanceAttribute]/maxDistance) * (scaleNotes.length-1), note)
+    // console.log('star', s.bayer, s.proper, '-', s[angleAttribute], noteCount, '-', scaleNotes, s[distanceAttribute], s[distanceAttribute]/maxDistance, (s[distanceAttribute]/maxDistance) '(scaleNotes.length-1), note)
     return {
       noteCount: noteCount,
       note: note, // scaleNotes[i % scaleNotes.length],
@@ -320,7 +321,7 @@ const noteToMidi = (lengthBarSec, lengthBeatSec, lengthSubDSec, chordNotesFlat) 
         duration = 4 * lengthBarSec
         break
     }
-    // const duration = durationCount * durationOneLength // TODO - This isn't right, test 1n,2n,4n,8n,1m,2m
+    // const duration = durationCount 'durationOneLength // TODO - This isn't right, test 1n,2n,4n,8n,1m,2m
 
     let timeSeconds = (bars * lengthBarSec) + (beats * lengthBeatSec) + (subdivisions * lengthSubDSec)
 
@@ -684,8 +685,8 @@ const printScaleSummary = (starData) => {
   // scaleList.sort((a, b) => b.l - a.l)
   // console.log('scaleList', scaleList)
   // console.log('total', _.sumBy(scaleList, 'l'))
-  // console.log('major', _.sumBy(scaleList, function (s) { return s.l * s.m }))
-  // console.log('minor', _.sumBy(scaleList, function (s) { return s.l * (s.m === 0 ? 1 : 0) }))
+  // console.log('major', _.sumBy(scaleList, function (s) { return s.l 's.m }))
+  // console.log('minor', _.sumBy(scaleList, function (s) { return s.l '(s.m === 0 ? 1 : 0) }))
 }
 const printNotesForIntrumentsSummary = (starData) => {
   const types = []
@@ -759,7 +760,7 @@ const printNotesForIntrumentsSummary = (starData) => {
         return a
       }, [])
       // .map((n, i) => {
-      //   const bar = parseInt(type.duration.split('')[0]) * i * 2 // TODO - No space for note ending here
+      //   const bar = parseInt(type.duration.split('')[0]) 'i '2 // TODO - No space for note ending here
       //   return {time: `${bar}:0`, note: n, duration: type.duration, bar}
       // })
       .map((n, i) => {
@@ -819,4 +820,248 @@ const createAllMidiNotesFile = () => {
 export const debugNotes = (starData) => {
   printScaleSummary(starData)
   printNotesForIntrumentsSummary(starData)
+}
+const getInstrumentForTrack = () => {
+  const chords = [
+    'The Deeps',
+    'The Lightkeeper',
+    'Soft Piano',
+    'Earth Sign',
+    'Thirds Organ',
+    'Vox Humana',
+    'Plucks',
+    'Capstan Upright',
+    'Magnetic Reader',
+    'Spliced Upright',
+    'Space Pluck 2',
+    'Floe',
+    'Fingered',
+    'Sustain Ahhs',
+    'Sustain Oohs',
+    'Hannah Peels Music Box',
+    'Circular Mmms',
+    'Nasty Tines']
+
+  const melody = [
+    'Soft Piano',
+    'Earth Sign',
+    'Ghost Hand Bells',
+    'Trems Slow',
+    'Gentle',
+    'Nautilus',
+    'Nautilus Soft',
+    'Felt Cassette',
+    'Magnetic Reader',
+    'Spliced Upright',
+    'Gieger',
+    'Plucks',
+    'Sustain Tuned',
+    'Choir In The Rain',
+    'Sevastopol',
+    'Anthem',
+    'Organ',
+    'Fingered',
+    'Mini',
+    'Warp Laments',
+    'Warp Souls',
+    'Chorus Pad',
+    'Nasty Tines',
+    'Piano Heaven']
+
+  const bass = [
+    'Sound The Alarm',
+    'Sumburgh Steel',
+    'The Lightkeeper',
+    'Ancients',
+    'Brutalizer',
+    'Nightfrost',
+    'Phosphor',
+    'Earth Sign',
+    'Drone',
+    'Gentle',
+    'Nautilus Soft',
+    'Choir In The Rain',
+    'Lost In The Cavern',
+    'Sevastopol',
+    'Peer Guitar Ensemble',
+    'Sustain Uhs',
+    'Guitar Bowed Drone',
+    'Nasty Tines']
+
+  const highNotes = [
+    'Long',
+    'Cyclosa',
+    'Foehn',
+    'Hireth',
+    'Oseny',
+    'Petrichor',
+    'Saudade',
+    'Ghost Hand Bells',
+    'Brass Loop',
+    'Vox Humana Crinkle',
+    'Woods Hollow Crinkle',
+    'Plucks',
+    'Resonance Chaos',
+    'Trems Slow',
+    'Nautilus Soft',
+    'Whale Song',
+    'Glass Cabinet',
+    'Sustain',
+    'Sustain Tuned',
+    'Decay',
+    'Swells',
+    'Choir In The Rain',
+    'Ghost At The Harbour',
+    'Glacial Pad',
+    'Lost In The Cavern',
+    'Sevastopol',
+    'Anthem',
+    'Glass 2',
+    'Warp Fracture',
+    'Warp Laments',
+    'Ethereal Guitar',
+    'Sustain Guitar',
+    'Tape Piano',
+    'Sages Pad',
+    'Breathy Mist',
+    'Chorus Pad',
+    'Guitar Bowed Drone',
+    'Vocal Pad',
+    'Granules',
+    'Metallique Cries',
+    'Octave Echoes',
+    'Ribbon']
+
+  const picking = [
+    'Short',
+    'Piano Heaven',
+    'Pipe Piano',
+    'Vox Humana',
+    'Pizzicato Ensemble',
+    'Underwater Bass',
+    'Plucks',
+    'Floe',
+    'Resonator Music Box']
+
+  const fastArpeggio = [
+    'Sound The Alarm',
+    'The Deeps',
+    'Gossip',
+    'Thirds Organ',
+    'Brass Loop',
+    'Vox Humana',
+    'Vox Humana Crinkle',
+    'Muted Plucks',
+    'Plucks',
+    'Underwater Bass',
+    'Magnetic Reader',
+    'Glass Grand Soft',
+    'Tremolo',
+    'Sustain Oohs',
+    'Resonator Music Box',
+    'Sages Pad',
+    'Chorus Pad',
+    'Nasty Tines',
+    'Mobius Blips',
+    'Ensemble',
+    'Bumblebee',
+    'Granular Piano',
+    'Piano Heaven',
+    'Tank Piano',
+    'Tape Piano',
+    'Pizzicato Ensemble',
+    'Synth Stab']
+  const lowDrone = [
+    'Sumburgh Steel',
+    'The Lightkeeper',
+    'Ancients',
+    'Andromeda',
+    'Nascent',
+    'Nightfrost',
+    'Phosphor',
+    'Balm',
+    'Deep Dream',
+    'Earth Sign',
+    'Plaintive Wail',
+    'Thirds Organ',
+    'Transreal',
+    'Whalesong',
+    '2 on the Platform',
+    'Break Emergency Glass',
+    'Hayward Crane',
+    'Night Tube',
+    'Nautilus',
+    'Nautilus Soft',
+    'Rattle',
+    'Submerged',
+    'Decay',
+    'Ghost At The Harbour',
+    'Glacial Pad',
+    'Lost In The Cavern',
+    'Helicopter',
+    'Horn',
+    'Metro',
+    'Breathy Mist',
+    'Chorus Pad',
+    'Fragile Air',
+    'Granules',
+    'Metallique',
+    'Metallique Cries',
+    'Ribbon']
+
+  return {
+    'Chords': chords,
+    'Chords Drone': chords,
+    'Melody 1': melody,
+    'Melody 2': melody,
+    'Root Bass': bass,
+    'High Notes': highNotes,
+    'Picking': picking,
+    'Fast Arpeggio': fastArpeggio,
+    'Low Drone': lowDrone }
+}
+export const getInstruments = () => {
+  const soundsDir = join('_static', 'sounds')
+  const instrumentList = fs.readdirSync(soundsDir).filter(f => fs.statSync(join(soundsDir, f)).isDirectory())
+  // console.log('instrumentList', instrumentList)
+  const instruments = instrumentList.map(name => {
+    const notes = fs.readdirSync(join(soundsDir, name))
+      .filter(f => f.endsWith('.mp3'))
+      .map(f => f.replace(`${name} - `, '').replace('.mp3', ''))
+    return { name: name, notes }
+  })
+  // for (const instrument of instruments) {
+  //   console.log('instrument', instrument)
+  // }
+  return instruments
+}
+export const applyInstrumentsToMusic = (starData) => {
+  const instrumentTypes = getInstrumentForTrack()
+  const constellations = starData.constellations.map(c => c)
+
+  const trackTypeToAttributeList = [
+    {track: 'Chords', bucket: 0},
+    {track: 'Chords Drone', bucket: 1},
+    {track: 'Melody 1', bucket: 2},
+    {track: 'Melody 2', bucket: 3},
+    {track: 'Root Bass', bucket: 4},
+    {track: 'High Notes', bucket: 5},
+    {track: 'Picking', bucket: 6},
+    {track: 'Fast Arpeggio', bucket: 7},
+    {track: 'Low Drone', bucket: 8}
+  ]
+  for (const trackTypeToAttribute of trackTypeToAttributeList) {
+    // console.log('')
+    constellations.sort((a, b) => b.ranges.ci.averages[trackTypeToAttribute.bucket] - a.ranges.ci.averages[trackTypeToAttribute.bucket])
+
+    const instruMappings = constellations.map((c, i) => {
+      const instrument = instrumentTypes[trackTypeToAttribute.track][Math.floor(i / (constellations.length / instrumentTypes[trackTypeToAttribute.track].length))]
+      return {constellationName: c.constellationName, trackType: trackTypeToAttribute.track, instrument}
+    })
+    for (const instruMapping of instruMappings) {
+      const track = starData.constellations.find(c => c.constellationName === instruMapping.constellationName).music.songNotes.find(t => t.type === instruMapping.trackType)
+      track.instrument = instruMapping.instrument
+    }
+    // console.log('instruMappings', instruMappings)
+  }
 }

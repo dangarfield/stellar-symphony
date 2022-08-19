@@ -66,7 +66,8 @@ const triggeredAnimationAction = (visualMelody, value, timeForAnimation) => {
     visualMelody.animateStar(value.starHip)
   }
 }
-const getRequiredSampleNotes = (instrument, requiredNotes) => {
+
+const getRequiredSampleNotes = (instruments, instrument, requiredNotes) => {
   console.log('getRequiredSampleNotes requiredNotes', requiredNotes)
   let sampleNotes = []
   for (const requiredNote of requiredNotes) {
@@ -85,20 +86,23 @@ const getRequiredSampleNotes = (instrument, requiredNotes) => {
     }
   }
   // TODO - Filter based on available notes from instrument
-  sampleNotes = sampleNotes.filter(n => n !== 'C0')
+  const allSampleNoteValuesFromInstrument = instruments.find(i => i.name === instrument).notes
+
+  sampleNotes = sampleNotes.filter(n => n !== 'C0' && allSampleNoteValuesFromInstrument.includes(n))
   console.log('getRequiredSampleNotes sampleNotes', sampleNotes)
 
   return sampleNotes
 }
 
-const loadSampler = async (instrument, requiredNotes) => {
+const loadSampler = async (instruments, instrument, requiredNotes) => {
   return new Promise(resolve => {
-    const sampleNotes = getRequiredSampleNotes(instrument, requiredNotes)
+    const sampleNotes = getRequiredSampleNotes(instruments, instrument, requiredNotes)
 
     const sampleNotesObject = {}
     for (const sampleNote of sampleNotes) {
       sampleNotesObject[sampleNote] = `${instrument} - ${sampleNote}.mp3`
     }
+    console.log('loadSampler', instrument, sampleNotesObject)
     const sampler = new Sampler({
       urls: sampleNotesObject,
       baseUrl: `sounds/${instrument}/`,
@@ -110,7 +114,7 @@ const loadSampler = async (instrument, requiredNotes) => {
   })
 }
 
-const playToneClip = async (toneData) => {
+const playToneClip = async (starData, toneData) => {
   // console.log('playToneClip', toneData)
   stopToneClips()
   document.querySelector('.info-short .tone-clip').style.display = 'none'
@@ -172,26 +176,28 @@ const playToneClip = async (toneData) => {
       }, notesToPlay).start(0)
     } else {
       for (const track of toneData.song) {
-        console.log('track', track)
         let sampler
+
         switch (track.type) {
-          case 'Chords': sampler = await loadSampler('Nasty Tines', track.notes); break
-          case 'Chords Drone': sampler = await loadSampler('Circular Mmms', track.notes); break
-          case 'Melody 1': sampler = await loadSampler('Soft Piano', track.notes); break
-          case 'Melody 2': sampler = await loadSampler('Earth Sign', track.notes); break
-          case 'Root Bass': sampler = await loadSampler('Space Pluck 2', track.notes); break
-          case 'High Notes': sampler = await loadSampler('Ghost Hand Bells', track.notes); break
-          case 'Picking': sampler = await loadSampler('Sustain Ahhs', track.notes); break
-          case 'Fast Arpeggio': sampler = await loadSampler('Plucks', track.notes); break
-          case 'Low Drone': sampler = await loadSampler('The Lightkeeper', track.notes); break
-          default: sampler = await loadSampler('Floe', track.notes); break
+          case 'Chords': sampler = await loadSampler(starData.instruments, 'The Deeps', track.notes); break
+          case 'Chords Drone': sampler = await loadSampler(starData.instruments, 'Vox Humana', track.notes); break
+          case 'Melody 1': sampler = await loadSampler(starData.instruments, 'Sevastopol', track.notes); break
+          case 'Melody 2': sampler = await loadSampler(starData.instruments, 'Nautilus Soft', track.notes); break
+          case 'Root Bass': sampler = await loadSampler(starData.instruments, 'Brutalizer', track.notes); break
+          case 'High Notes': sampler = await loadSampler(starData.instruments, 'Metallique Cries', track.notes); break
+          case 'Picking': sampler = await loadSampler(starData.instruments, 'Sustain Ahhs', track.notes); break
+          case 'Fast Arpeggio': sampler = await loadSampler(starData.instruments, 'Sustain Oohs', track.notes); break
+          case 'Low Drone': sampler = await loadSampler(starData.instruments, 'Andromeda', track.notes); break
+          default: sampler = await loadSampler(starData.instruments, 'Floe', track.notes); break
         }
+        console.log('track', track, sampler)
         // TODO - Can uncomment to load test piano sounds only
         // sampler = piano
 
         // console.log('sampler loaded', sampler)
         new Part((time, value) => {
-          if (!value.ignore) {
+          if (!value.ignore && !track.type.startsWith('Melody')) {
+          // if (!value.ignore) {
             sampler.triggerAttackRelease(value.note, value.duration, time)
             // sampler.triggerAttackRelease(value.note, value.duration, time)
           }
@@ -252,5 +258,5 @@ export const getToneDataFromElementAndPlay = (starData, ele) => {
       break
   }
   console.log('.tone-clip click', type, constellationId, constellation, toneData)
-  playToneClip(toneData)
+  playToneClip(starData, toneData)
 }
