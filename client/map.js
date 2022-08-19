@@ -233,6 +233,7 @@ export const setupMelodyExplanation = (constellation) => {
       .onUpdate(() => {
         explanationObject.timingCircle.geometry.dispose()
         explanationObject.timingCircle.geometry = createCircleGeo(angleTweenConfig.radius)
+        explanationObject.timingCircle.visible = true
       })
       .onComplete(() => {
         explanationObject.timingCircle.visible = false

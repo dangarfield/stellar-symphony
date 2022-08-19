@@ -7,6 +7,7 @@ export const getScaleText = (chroma) => {
   return `${scale.name} - ${scale.chroma}`
 }
 const piano = new Sampler({
+  name: 'Salamander Piano',
   urls: {
     A0: 'A0.mp3',
     C1: 'C1.mp3',
@@ -54,8 +55,8 @@ export const stopToneClips = () => {
   document.querySelector('.info-short .tone-stop').style.display = 'none'
 }
 
-const triggeredAnimationAction = (visualMelody, value, timeForAnimation) => {
-  console.log('Draw', value)
+const triggeredAnimationAction = (visualMelody, value, timeForAnimation, instrument) => {
+  console.log('Draw', value, instrument)
   if (value.melodyTimingByAngle) {
     visualMelody.animateLine(timeForAnimation)
   }
@@ -104,6 +105,7 @@ const loadSampler = async (instruments, instrument, requiredNotes) => {
     }
     console.log('loadSampler', instrument, sampleNotesObject)
     const sampler = new Sampler({
+      name: instrument,
       urls: sampleNotesObject,
       baseUrl: `sounds/${instrument}/`,
       onload: () => {
@@ -176,33 +178,17 @@ const playToneClip = async (starData, toneData) => {
       }, notesToPlay).start(0)
     } else {
       for (const track of toneData.song) {
-        let sampler
-
-        switch (track.type) {
-          case 'Chords': sampler = await loadSampler(starData.instruments, 'The Deeps', track.notes); break
-          case 'Chords Drone': sampler = await loadSampler(starData.instruments, 'Vox Humana', track.notes); break
-          case 'Melody 1': sampler = await loadSampler(starData.instruments, 'Sevastopol', track.notes); break
-          case 'Melody 2': sampler = await loadSampler(starData.instruments, 'Nautilus Soft', track.notes); break
-          case 'Root Bass': sampler = await loadSampler(starData.instruments, 'Brutalizer', track.notes); break
-          case 'High Notes': sampler = await loadSampler(starData.instruments, 'Metallique Cries', track.notes); break
-          case 'Picking': sampler = await loadSampler(starData.instruments, 'Sustain Ahhs', track.notes); break
-          case 'Fast Arpeggio': sampler = await loadSampler(starData.instruments, 'Sustain Oohs', track.notes); break
-          case 'Low Drone': sampler = await loadSampler(starData.instruments, 'Andromeda', track.notes); break
-          default: sampler = await loadSampler(starData.instruments, 'Floe', track.notes); break
-        }
+        const sampler = await loadSampler(starData.instruments, track.instrument, track.notes)
+        // const sampler = piano
         console.log('track', track, sampler)
-        // TODO - Can uncomment to load test piano sounds only
-        // sampler = piano
-
-        // console.log('sampler loaded', sampler)
         new Part((time, value) => {
-          if (!value.ignore && !track.type.startsWith('Melody')) {
-          // if (!value.ignore) {
+          // if (!value.ignore && !track.type.startsWith('Melody')) {
+          if (!value.ignore) {
             sampler.triggerAttackRelease(value.note, value.duration, time)
             // sampler.triggerAttackRelease(value.note, value.duration, time)
           }
           Draw.schedule(function () {
-            triggeredAnimationAction(visualMelody, value, timeForAnimation)
+            triggeredAnimationAction(visualMelody, value, timeForAnimation, track.instrument)
           }, time)
         }, track.notes).start(0)
       }
