@@ -47,7 +47,7 @@ const triggeredAnimationAction = (visualMelody, value, timeForAnimation, instrum
 }
 
 const getRequiredSampleNotes = (instruments, instrument, requiredNotes) => {
-  // console.log('getRequiredSampleNotes requiredNotes', requiredNotes)
+  // console.log('getRequiredSampleNotes requiredNotes', requiredNotes, instrument)
   let sampleNotes = []
   for (const requiredNote of requiredNotes) {
     if (typeof (requiredNote.note) === 'string') {

@@ -1117,7 +1117,9 @@ export const getInstrumentForTrack = () => {
     // 'Metallique',
     'Metallique Cries',
     'Ribbon']
-
+  const drums = [
+    'ACT Algier Action'
+  ]
   return {
     'Chords': chords,
     'Chords Drone': chordsDrone,
@@ -1127,7 +1129,8 @@ export const getInstrumentForTrack = () => {
     'High Notes': highNotes,
     'Picking': picking,
     'Fast Arpeggio': fastArpeggio,
-    'Low Drone': lowDrone }
+    'Low Drone': lowDrone,
+    'Drums': drums }
 }
 export const getInstruments = () => {
   const soundsDir = join('_static', 'sounds')
@@ -1157,7 +1160,8 @@ export const applyInstrumentsToMusic = (starData) => {
     {track: 'High Notes', bucket: 5},
     {track: 'Picking', bucket: 6},
     {track: 'Fast Arpeggio', bucket: 7},
-    {track: 'Low Drone', bucket: 8}
+    {track: 'Low Drone', bucket: 8},
+    {track: 'Drums', bucket: 9}
   ]
   for (const trackTypeToAttribute of trackTypeToAttributeList) {
     // console.log('')

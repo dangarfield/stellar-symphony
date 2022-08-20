@@ -126,6 +126,7 @@ const generateConstellationMapDataHtml = (constellationData, instruments) => {
     ${getInstrumentSelectHtml('Picking', constellationData, instruments)}
     ${getInstrumentSelectHtml('Fast Arpeggio', constellationData, instruments)}
     ${getInstrumentSelectHtml('Low Drone', constellationData, instruments)}
+    ${getInstrumentSelectHtml('Drums', constellationData, instruments)}
 
     <p>
       Scale:

@@ -319,7 +319,7 @@ Fast Arpeggio:
 
 Drums:
 
-ACT Algier Action       ***
+* ACT Algier Action       ***
 ACT Distress            **
 ACT Forward Mission     **
 ACT Mounting Danger     **
