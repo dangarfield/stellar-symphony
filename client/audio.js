@@ -1,62 +1,33 @@
 import {ScaleType, Scale, Note} from '@tonaljs/tonal'
-import {Sampler, Transport, Pattern, Part, loaded as toneLoaded, start as ToneStart, Draw, Player, Reverb, Freeverb, JCReverb} from 'tone'
+import {Sampler, Transport, Pattern, Part, start as ToneStart, Draw, Player, JCReverb} from 'tone'
 import { setupMelodyExplanation, stopMelodyExplanation } from './map.js'
 
+const activeSamplers = []
+const removeAllSamplers = () => {
+  // console.log('removeAllSamplers', activeSamplers)
+  while (activeSamplers.length > 0) {
+    let sampler = activeSamplers.shift()
+    sampler.dispose()
+    sampler = null
+  }
+}
 export const getScaleText = (chroma) => {
   const scale = ScaleType.get(chroma)
   return `${scale.name} - ${scale.chroma}`
 }
-const piano = new Sampler({
-  name: 'Salamander Piano',
-  urls: {
-    A0: 'A0.mp3',
-    C1: 'C1.mp3',
-    'D#1': 'Ds1.mp3',
-    'F#1': 'Fs1.mp3',
-    A1: 'A1.mp3',
-    C2: 'C2.mp3',
-    'D#2': 'Ds2.mp3',
-    'F#2': 'Fs2.mp3',
-    A2: 'A2.mp3',
-    C3: 'C3.mp3',
-    'D#3': 'Ds3.mp3',
-    'F#3': 'Fs3.mp3',
-    A3: 'A3.mp3',
-    C4: 'C4.mp3',
-    'D#4': 'Ds4.mp3',
-    'F#4': 'Fs4.mp3',
-    A4: 'A4.mp3',
-    C5: 'C5.mp3',
-    'D#5': 'Ds5.mp3',
-    'F#5': 'Fs5.mp3',
-    A5: 'A5.mp3',
-    C6: 'C6.mp3',
-    'D#6': 'Ds6.mp3',
-    'F#6': 'Fs6.mp3',
-    A6: 'A6.mp3',
-    C7: 'C7.mp3',
-    'D#7': 'Ds7.mp3',
-    'F#7': 'Fs7.mp3',
-    A7: 'A7.mp3',
-    C8: 'C8.mp3'
-  },
-  release: 1,
-  baseUrl: 'https://tonejs.github.io/audio/salamander/'
-}).toDestination()
 
-toneLoaded().then(() => {
-  console.log('Piano samples loaded')
-})
 Transport.on('stop', function () {
+  console.log('Transport stop')
   stopToneClips()
 })
+
 export const stopToneClips = () => {
   console.log('stopToneClips')
   if (Transport.state === 'started') {
     Transport.stop()
     Transport.cancel(0)
   }
-
+  removeAllSamplers()
   stopMelodyExplanation()
   document.querySelector('.info-short .tone-clip').style.display = 'inline'
   document.querySelector('.info-short .tone-stop').style.display = 'none'
@@ -93,7 +64,6 @@ const getRequiredSampleNotes = (instruments, instrument, requiredNotes) => {
       }
     }
   }
-  // TODO - Filter based on available notes from instrument
   const allSampleNoteValuesFromInstrument = instruments.find(i => i.name === instrument).notes
 
   sampleNotes = sampleNotes.filter(n => n !== 'C0' && allSampleNoteValuesFromInstrument.includes(n))
@@ -102,6 +72,51 @@ const getRequiredSampleNotes = (instruments, instrument, requiredNotes) => {
   return sampleNotes
 }
 
+export const loadPianoSampler = async () => {
+  return new Promise(resolve => {
+    const piano = new Sampler({
+      name: 'Salamander Piano',
+      urls: {
+        A0: 'A0.mp3',
+        C1: 'C1.mp3',
+        'D#1': 'Ds1.mp3',
+        'F#1': 'Fs1.mp3',
+        A1: 'A1.mp3',
+        C2: 'C2.mp3',
+        'D#2': 'Ds2.mp3',
+        'F#2': 'Fs2.mp3',
+        A2: 'A2.mp3',
+        C3: 'C3.mp3',
+        'D#3': 'Ds3.mp3',
+        'F#3': 'Fs3.mp3',
+        A3: 'A3.mp3',
+        C4: 'C4.mp3',
+        'D#4': 'Ds4.mp3',
+        'F#4': 'Fs4.mp3',
+        A4: 'A4.mp3',
+        C5: 'C5.mp3',
+        'D#5': 'Ds5.mp3',
+        'F#5': 'Fs5.mp3',
+        A5: 'A5.mp3',
+        C6: 'C6.mp3',
+        'D#6': 'Ds6.mp3',
+        'F#6': 'Fs6.mp3',
+        A6: 'A6.mp3',
+        C7: 'C7.mp3',
+        'D#7': 'Ds7.mp3',
+        'F#7': 'Fs7.mp3',
+        A7: 'A7.mp3',
+        C8: 'C8.mp3'
+      },
+      release: 1,
+      baseUrl: 'https://tonejs.github.io/audio/salamander/',
+      onload: () => {
+        // sampler.triggerAttackRelease(["C1", "E1", "G1", "B1"], 0.5);
+        resolve(piano)
+      }
+    }).toDestination()
+  })
+}
 export const loadSampler = async (instruments, instrument, requiredNotes, addReverb) => {
   // console.log('loadSampler', instruments, instrument, requiredNotes)
   return new Promise(resolve => {
@@ -118,24 +133,13 @@ export const loadSampler = async (instruments, instrument, requiredNotes, addRev
       baseUrl: `sounds/${instrument}/`,
       onload: () => {
         // sampler.triggerAttackRelease(["C1", "E1", "G1", "B1"], 0.5);
+
+        activeSamplers.push(sampler)
         resolve(sampler)
       }
     })
     if (addReverb) {
-      // console.log('Add REVERB')
-      // const reverb = new Reverb({ // TODO - This is rubbish
-      //   decay: 2,
-      //   preDelay: 0.5,
-      //   wet: 0
-      // }).toDestination()
-      // const reverb = new Freeverb({ // TODO - This is ok
-      //   roomSize: 0.7
-      // }).toDestination()
-      // sampler.connect(reverb)
-      const reverb = new JCReverb({ // TODO - This is ok
-        // roomSize: 0.7
-        // wet: 0
-      }).toDestination()
+      const reverb = new JCReverb().toDestination()
       sampler.connect(reverb)
     } else {
       // console.log('NO REVERB')
@@ -144,6 +148,8 @@ export const loadSampler = async (instruments, instrument, requiredNotes, addRev
   })
 }
 
+let piano = null
+
 const playToneClip = async (starData, toneData) => {
   // console.log('playToneClip', toneData)
   stopToneClips()
@@ -151,6 +157,9 @@ const playToneClip = async (starData, toneData) => {
   document.querySelector('.info-short .tone-stop').style.display = 'inline'
   ToneStart()
   if (toneData.type === 'scale') {
+    if (piano === null) {
+      piano = await loadPianoSampler()
+    }
     const scaleNotes = Scale.get(toneData.scale.chroma).intervals.map(Note.transposeFrom('C')).map(v => (v) + '4')
     scaleNotes.push('C5')
     new Pattern(function (time, note) {
@@ -158,10 +167,13 @@ const playToneClip = async (starData, toneData) => {
     }, scaleNotes, 'up').start(0)
     Transport.bpm.value = 120
   } else if (toneData.type === 'chords' || toneData.type === 'melody') {
+    if (piano === null) {
+      piano = await loadPianoSampler()
+    }
     const visualMelody = setupMelodyExplanation(toneData.constellation)
     const notesToPlay = toneData.melody ? toneData.chords.concat(toneData.melody) : toneData.chords
     // const notesToPlay = toneData.melody
-    const totalBars = notesToPlay.find(n => n.totalBars).totalBars
+    const totalBars = toneData.type === 'melody' ? notesToPlay.find(n => n.totalBars).totalBars : 4
     const timeForAnimation = 1000 * Math.pow(toneData.bpm / 60, -1) * 4 * totalBars
     const part = new Part((time, value) => {
       if (!value.ignore) {
@@ -208,16 +220,6 @@ const playToneClip = async (starData, toneData) => {
       for (const track of toneData.song) {
         // console.log('about to loadSampler', starData.instruments.notes, track.instrument, track.notes, track)
         track.sampler = await loadSampler(starData.instruments.notes, track.instrument, track.notes, track.type.startsWith('Melody'))
-        // TODO - Add reverb to melody tracks
-        // if (track.type.startsWith('Melody')) {
-        //   console.log('Melody track, add reverb')
-        //   const reverb = new Freeverb({
-        //     roomSize: 0.7,
-        //     dampening: 8000
-        //   })
-        //   track.sampler.chain(reverb)
-        // }
-
         // const sampler = piano
         console.log('track', track)
         new Part((time, value) => {

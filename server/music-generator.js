@@ -885,7 +885,7 @@ export const getInstrumentForTrack = () => {
     'Mini',
     // 'Warp Laments', // ?
     // 'Warp Souls', // ?
-    'Chorus Pad',
+    // 'Chorus Pad',
     'Nasty Tines', // good
     'Piano Heaven']
 

@@ -336,7 +336,7 @@ const calculateAndAddAveragesToConstellations = (starData) => {
   const hrAllListData = []
 
   for (const [i, constellationData] of starData.constellations.entries()) {
-    // console.log(`Processing ${i + 1} of ${starData.constellations.length} - ${constellationData.constellationName} - ${constellationData.constellation}`)
+    console.log(`Processing ${i + 1} of ${starData.constellations.length} - ${constellationData.constellationName} - ${constellationData.constellation}`)
     const absmagList = []
     const magList = []
     const rvList = []
