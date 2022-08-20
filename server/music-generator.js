@@ -614,6 +614,88 @@ const scaleToLowDroneNotes = (scaleChroma, barOffset, variant) => {
 
   return notes
 }
+const drumNotes = (barOffset, variant) => {
+  switch (variant) {
+    case 1:
+      return [{
+        time: `${3 + barOffset}:2`,
+        note: 'Db5',
+        duration: '2n'
+      }]
+    case 2:
+      return [{
+        time: `${0 + barOffset}:0`,
+        note: 'C3',
+        duration: '2n'
+      }, {
+        time: `${1 + barOffset}:0`,
+        note: 'C3',
+        duration: '2n'
+      }, {
+        time: `${2 + barOffset}:0`,
+        note: 'C3',
+        duration: '2n'
+      }, {
+        time: `${3 + barOffset}:0`,
+        note: 'C3',
+        duration: '2n'
+      }]
+    case 3:
+      return [{
+        time: `${0 + barOffset}:0`,
+        note: 'C3',
+        duration: '4m'
+      }]
+    case 4:
+      return [{
+        time: `${0 + barOffset}:0`,
+        note: 'D3',
+        duration: '4m'
+      }]
+    case 5:
+      return [{
+        time: `${0 + barOffset}:0`,
+        note: 'F3',
+        duration: '4m'
+      }]
+    case 6:
+      return [{
+        time: `${0 + barOffset}:0`,
+        note: 'E4',
+        duration: '2m'
+      }, {
+        time: `${2 + barOffset}:0`,
+        note: 'G4',
+        duration: '2m'
+      }]
+    case 7:
+      return [{
+        time: `${0 + barOffset}:0`,
+        note: 'B4',
+        duration: '4m'
+      }]
+    case 8:
+      return [{
+        time: `${0 + barOffset}:0`,
+        note: 'A3',
+        duration: '2m'
+      }, {
+        time: `${2 + barOffset}:0`,
+        note: 'D5',
+        duration: '1m'
+      }, {
+        time: `${3 + barOffset}:0`,
+        note: 'Bb4',
+        duration: '2n'
+      }, {
+        time: `${3 + barOffset}:2`,
+        note: 'Db5',
+        duration: '2n'
+      }]
+    default:
+      return []
+  }
+}
 export const generateSong = (constellationData) => {
   const bpm = constellationData.music.bpm
   const timeSig = constellationData.music.timeSig
@@ -627,7 +709,8 @@ export const generateSong = (constellationData) => {
     {structure: '0001311111113', type: 'High Notes'},
     {structure: '0000000001113', type: 'Picking'}, // A general picking thing can sound pretty bad, scrap it for now
     {structure: '0000000111113', type: 'Fast Arpeggio'},
-    {structure: '1111300000000', type: 'Low Drone'}
+    {structure: '1111300000000', type: 'Low Drone'},
+    {structure: '0000123445678', type: 'Drums'}
   ]
   for (const track of tracks) {
     track.notes = []
@@ -653,6 +736,8 @@ export const generateSong = (constellationData) => {
           track.notes = track.notes.concat(scaleToFastArpeggioNotes(constellationData.music.chords.structure, constellationData.music.scale.chroma, i * timeSig[1], variant))
         } else if (track.type === 'Low Drone') {
           track.notes = track.notes.concat(scaleToLowDroneNotes(constellationData.music.scale.chroma, i * timeSig[1], variant))
+        } else if (track.type === 'Drums') {
+          track.notes = track.notes.concat(drumNotes(i * timeSig[1], variant))
         }
       }
     }
