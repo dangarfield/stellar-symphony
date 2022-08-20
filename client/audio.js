@@ -1,5 +1,5 @@
 import {ScaleType, Scale, Note} from '@tonaljs/tonal'
-import {Sampler, Transport, Pattern, Part, loaded as toneLoaded, start as ToneStart, Draw, Player} from 'tone'
+import {Sampler, Transport, Pattern, Part, loaded as toneLoaded, start as ToneStart, Draw, Player, Reverb, Freeverb, JCReverb} from 'tone'
 import { setupMelodyExplanation, stopMelodyExplanation } from './map.js'
 
 export const getScaleText = (chroma) => {
@@ -47,9 +47,16 @@ const piano = new Sampler({
 toneLoaded().then(() => {
   console.log('Piano samples loaded')
 })
+Transport.on('stop', function () {
+  stopToneClips()
+})
 export const stopToneClips = () => {
-  Transport.stop()
-  Transport.cancel(0)
+  console.log('stopToneClips')
+  if (Transport.state === 'started') {
+    Transport.stop()
+    Transport.cancel(0)
+  }
+
   stopMelodyExplanation()
   document.querySelector('.info-short .tone-clip').style.display = 'inline'
   document.querySelector('.info-short .tone-stop').style.display = 'none'
@@ -69,7 +76,7 @@ const triggeredAnimationAction = (visualMelody, value, timeForAnimation, instrum
 }
 
 const getRequiredSampleNotes = (instruments, instrument, requiredNotes) => {
-  console.log('getRequiredSampleNotes requiredNotes', requiredNotes)
+  // console.log('getRequiredSampleNotes requiredNotes', requiredNotes)
   let sampleNotes = []
   for (const requiredNote of requiredNotes) {
     if (typeof (requiredNote.note) === 'string') {
@@ -90,13 +97,13 @@ const getRequiredSampleNotes = (instruments, instrument, requiredNotes) => {
   const allSampleNoteValuesFromInstrument = instruments.find(i => i.name === instrument).notes
 
   sampleNotes = sampleNotes.filter(n => n !== 'C0' && allSampleNoteValuesFromInstrument.includes(n))
-  console.log('getRequiredSampleNotes sampleNotes', sampleNotes)
+  // console.log('getRequiredSampleNotes sampleNotes', sampleNotes)
 
   return sampleNotes
 }
 
-export const loadSampler = async (instruments, instrument, requiredNotes) => {
-  console.log('loadSampler', instruments, instrument, requiredNotes)
+export const loadSampler = async (instruments, instrument, requiredNotes, addReverb) => {
+  // console.log('loadSampler', instruments, instrument, requiredNotes)
   return new Promise(resolve => {
     const sampleNotes = getRequiredSampleNotes(instruments, instrument, requiredNotes)
 
@@ -104,7 +111,7 @@ export const loadSampler = async (instruments, instrument, requiredNotes) => {
     for (const sampleNote of sampleNotes) {
       sampleNotesObject[sampleNote] = `${instrument} - ${sampleNote}.mp3`
     }
-    console.log('loadSampler', instrument, sampleNotesObject)
+    // console.log('loadSampler', instrument, sampleNotesObject)
     const sampler = new Sampler({
       name: instrument,
       urls: sampleNotesObject,
@@ -113,7 +120,27 @@ export const loadSampler = async (instruments, instrument, requiredNotes) => {
         // sampler.triggerAttackRelease(["C1", "E1", "G1", "B1"], 0.5);
         resolve(sampler)
       }
-    }).toDestination()
+    })
+    if (addReverb) {
+      // console.log('Add REVERB')
+      // const reverb = new Reverb({ // TODO - This is rubbish
+      //   decay: 2,
+      //   preDelay: 0.5,
+      //   wet: 0
+      // }).toDestination()
+      // const reverb = new Freeverb({ // TODO - This is ok
+      //   roomSize: 0.7
+      // }).toDestination()
+      // sampler.connect(reverb)
+      const reverb = new JCReverb({ // TODO - This is ok
+        // roomSize: 0.7
+        // wet: 0
+      }).toDestination()
+      sampler.connect(reverb)
+    } else {
+      // console.log('NO REVERB')
+      sampler.toDestination()
+    }
   })
 }
 
@@ -159,13 +186,13 @@ const playToneClip = async (starData, toneData) => {
     const timeForAnimation = 1000 * Math.pow(toneData.bpm / 60, -1) * 4 * totalBars
 
     if (toneData.url) {
-      console.log('has url', toneData.url)
+      // console.log('has url', toneData.url)
       const playerLoadingPromise = new Promise(resolve => {
         for (const note of notesToPlay) {
           note.ignore = true
         }
         const player = new Player(toneData.url, function () {
-          console.log('Player loaded', toneData.url)
+          // console.log('Player loaded', toneData.url)
           resolve()
         }).toDestination()
         player.sync().start(0)
@@ -179,9 +206,18 @@ const playToneClip = async (starData, toneData) => {
       }, notesToPlay).start(0)
     } else {
       for (const track of toneData.song) {
-        console.log('about to loadSampler', starData.instruments.notes, track.instrument, track.notes, track)
-        track.sampler = await loadSampler(starData.instruments.notes, track.instrument, track.notes)
+        // console.log('about to loadSampler', starData.instruments.notes, track.instrument, track.notes, track)
+        track.sampler = await loadSampler(starData.instruments.notes, track.instrument, track.notes, track.type.startsWith('Melody'))
         // TODO - Add reverb to melody tracks
+        // if (track.type.startsWith('Melody')) {
+        //   console.log('Melody track, add reverb')
+        //   const reverb = new Freeverb({
+        //     roomSize: 0.7,
+        //     dampening: 8000
+        //   })
+        //   track.sampler.chain(reverb)
+        // }
+
         // const sampler = piano
         console.log('track', track)
         new Part((time, value) => {

@@ -51,7 +51,7 @@ export const updateSelectedConstellation = async (starData, constellationId, mov
         console.log('info-long-instrument-select change', trackType, instrument, track)
         track.instrument = instrument
         if (track.sampler) { // If this is playing, update the sampler
-          track.sampler = await loadSampler(starData.instruments.notes, track.instrument, track.notes)
+          track.sampler = await loadSampler(starData.instruments.notes, track.instrument, track.notes, track.type.startsWith('Melody'))
         }
       })
     }
