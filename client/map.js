@@ -129,7 +129,8 @@ const createPitchExplanationDistanceCircle = (targetPoint, starPoint, angleFromC
     const innerRadius = i * segmentRadius
     const outerRadius = (i + 1) * segmentRadius
     // const color = i % 2 === 0 ? 0xFF00FF : 0x1363DF
-    const color = i % 2 === 0 ? 0xFFFF00 : 0x0000FF
+    let color = i % 2 === 0 ? 0xFFFF00 : 0x0000FF
+    if (i === 0 || i === segmentTotal - 1) color = 0xFFFFFF
     const geometry = new RingGeometry(innerRadius, outerRadius, 32)
     const material = new MeshBasicMaterial({ color: color, opacity: 0.15, transparent: true, side: DoubleSide })
     const mesh = new Mesh(geometry, material)
@@ -173,7 +174,20 @@ const createPitchExplanationAngleCircle = (targetPoint, starPoint, angleFromCent
   for (let i = 0; i < segmentTotal * 2; i++) {
     // Shape
     const geometry = new CircleGeometry(radius, 8, (Math.PI / segmentTotal) * (-i + 3 + (Math.PI / segmentTotal)), Math.PI / segmentTotal)
-    const color = i % 2 === 0 ? 0xFFFF00 : 0x0000FF
+    // const color = i % 2 === 0 ? 0xFFFF00 : 0x0000FF
+    const notePos = i % segmentTotal === 0 ? 0 : segmentTotal - (i % segmentTotal)
+    let color
+    switch (notePos) {
+      case 0: color = 0xFFFF00; break
+      case 1: color = 0x0000FF; break
+      case 2: color = 0xFFFF00; break
+      case 3: color = 0x0000FF; break
+      case 4: color = 0xFFFF00; break
+      case 5: color = 0x0000FF; break
+      case 6: color = 0xFFFFFF; break
+
+      default: color = 0xFFFF00; break
+    }
     const material = new MeshBasicMaterial({ color: color, opacity: 0.15, transparent: true, side: DoubleSide })
     const mesh = new Mesh(geometry, material)
     mesh.position.x = targetPoint.x
@@ -182,14 +196,14 @@ const createPitchExplanationAngleCircle = (targetPoint, starPoint, angleFromCent
     mesh.visible = true
     // material.wireframe = true
     mesh.lookAt(new Vector3(0, 0, 0))
-    console.log('mesh', mesh, i, geometry)
+    // console.log('mesh', mesh, i, geometry)
     explanationCircle.add(mesh)
 
     // Labels
     const expDiv = document.createElement('div')
     expDiv.className = 'label-note'
-    // TODO - Thee don't match, eg, not the right direction around the circle
-    expDiv.textContent = `${toRomanNumeral((i % segmentTotal) + 1)} ${scaleNotes[i % segmentTotal].substring(0, scaleNotes[i % segmentTotal].length - 1)}`
+
+    expDiv.innerHTML = `${toRomanNumeral(notePos + 1)} ${scaleNotes[notePos].substring(0, scaleNotes[notePos].length - 1)}`
     const expLabel = new CSS2DObject(expDiv)
     // const expPos = new Vector3()
     // expPos.lerpVectors(targetPoint, starPoint, i / segmentTotal + (0.5 / segmentTotal))
@@ -216,7 +230,7 @@ const createPitchExplanationAngleCircle = (targetPoint, starPoint, angleFromCent
     explanationCircle.add(expLabel)
     explanationCircle.userData.expLabels.push(expLabel)
   }
-  // explanationCircle.visible = false
+  explanationCircle.visible = false
   explanationCircle.userData.setLabelsVisible = (shouldBeVisible) => {
     for (const expLabel of explanationCircle.userData.expLabels) {
       expLabel.visible = shouldBeVisible

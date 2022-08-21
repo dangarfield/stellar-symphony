@@ -219,11 +219,11 @@ export const getMelodyWithTimingByDistance = (stars, scale, distanceAttribute, a
 
   const scaleNotes = scale.intervals.map(Note.transposeFrom('C')).map(v => (v) + '5')
 
-  console.log('scaleNotes', scaleNotes,
-    distanceAttribute, melodyStars[0][distanceAttribute],
-    angleAttribute, melodyStars[0][angleAttribute],
-    melodyStars[0].alpha
-  )
+  // console.log('scaleNotes', scaleNotes,
+  //   distanceAttribute, melodyStars[0][distanceAttribute],
+  //   angleAttribute, melodyStars[0][angleAttribute],
+  //   melodyStars[0].alpha
+  // )
   const melody = melodyStars.map((s, i) => {
     const noteCount = Math.round(s[distanceAttribute] / timeFactor)
     const note = scaleNotes[Math.floor((s[angleAttribute] % 180) / (180 / 7))]
@@ -1166,13 +1166,13 @@ export const getInstrumentForTrack = () => {
     'COL Amboss Troops',
     'COL Big Bottoms',
     'COL Big Hurry',
-    'COL Death Of A King'
-    // 'COL Doppler Monster',
+    'COL Death Of A King',
+    'COL Doppler Monster',
 
-    // 'CPY Chucka',
-    // 'CPY Gaterade',
-    // 'CPY Hip Movement',
-    // 'CPY Rhytmn Gator',
+    'CPY Chucka',
+    'CPY Gaterade',
+    'CPY Hip Movement',
+    'CPY Rhytmn Gator'
     // 'CPY Space X Delay',
     // 'CPY Stutter Groove',
     // 'CPY Thru Gates',
