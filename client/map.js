@@ -1,7 +1,7 @@
 import {Vector3, Scene, Color, PerspectiveCamera, WebGLRenderer, TextureLoader,
   BufferGeometry, Points, ShaderMaterial, AdditiveBlending, Float32BufferAttribute,
   Mesh, SphereGeometry, MeshPhongMaterial, DoubleSide, Raycaster, Vector2, Line3, MathUtils, Group,
-  EllipseCurve, LineBasicMaterial, LineLoop, Object3D, EdgesGeometry, LineSegments, RingGeometry, BoxHelper, MeshBasicMaterial} from 'three'
+  EllipseCurve, LineBasicMaterial, LineLoop, Object3D, EdgesGeometry, LineSegments, RingGeometry, CircleGeometry, MeshBasicMaterial} from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Line2 } from 'three/examples/jsm/lines/Line2.js'
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js'
@@ -125,6 +125,7 @@ const createPitchExplanationDistanceCircle = (targetPoint, starPoint, angleFromC
   console.log('createPitchExplanationDistanceCircle', targetPoint, starPoint, angleFromCentre, scaleChroma, scaleNotes)
   explanationCircle.userData.expLabels = []
   for (let i = 0; i < segmentTotal; i++) {
+    // Shape
     const innerRadius = i * segmentRadius
     const outerRadius = (i + 1) * segmentRadius
     // const color = i % 2 === 0 ? 0xFF00FF : 0x1363DF
@@ -140,15 +141,14 @@ const createPitchExplanationDistanceCircle = (targetPoint, starPoint, angleFromC
     // console.log('mesh', mesh, i, innerRadius, outerRadius)
     explanationCircle.add(mesh)
 
+    // Labels
     const expDiv = document.createElement('div')
     expDiv.className = 'label-note'
     expDiv.textContent = `${toRomanNumeral(i + 1)} ${scaleNotes[i].substring(0, scaleNotes[i].length - 1)}`
-
-    // conDiv.style.marginTop = '-1em';
     const expLabel = new CSS2DObject(expDiv)
     const expPos = new Vector3()
     expPos.lerpVectors(targetPoint, starPoint, i / segmentTotal + (0.5 / segmentTotal))
-
+    // TODO - Label positions change when zoom changes
     expLabel.position.set(expPos.x, expPos.y, expPos.z)
     expLabel.visible = false
     explanationCircle.add(expLabel)
@@ -160,6 +160,69 @@ const createPitchExplanationDistanceCircle = (targetPoint, starPoint, angleFromC
       expLabel.visible = shouldBeVisible
     }
   }
+  return explanationCircle
+}
+const createPitchExplanationAngleCircle = (targetPoint, starPoint, angleFromCentre, scaleChroma) => {
+  const scaleNotes = getScaleNotesFromChrome(scaleChroma)
+  // scaleNotes.push(scaleNotes[0])
+  const explanationCircle = new Group()
+  const radius = targetPoint.distanceTo(starPoint)
+  const segmentTotal = 7
+  explanationCircle.userData.expLabels = []
+  // const i = 0
+  for (let i = 0; i < segmentTotal * 2; i++) {
+    // Shape
+    const geometry = new CircleGeometry(radius, 8, (Math.PI / segmentTotal) * (-i + 3 + (Math.PI / segmentTotal)), Math.PI / segmentTotal)
+    const color = i % 2 === 0 ? 0xFFFF00 : 0x0000FF
+    const material = new MeshBasicMaterial({ color: color, opacity: 0.15, transparent: true, side: DoubleSide })
+    const mesh = new Mesh(geometry, material)
+    mesh.position.x = targetPoint.x
+    mesh.position.y = targetPoint.y
+    mesh.position.z = targetPoint.z
+    mesh.visible = true
+    // material.wireframe = true
+    mesh.lookAt(new Vector3(0, 0, 0))
+    console.log('mesh', mesh, i, geometry)
+    explanationCircle.add(mesh)
+
+    // Labels
+    const expDiv = document.createElement('div')
+    expDiv.className = 'label-note'
+    // TODO - Thee don't match, eg, not the right direction around the circle
+    expDiv.textContent = `${toRomanNumeral((i % segmentTotal) + 1)} ${scaleNotes[i % segmentTotal].substring(0, scaleNotes[i % segmentTotal].length - 1)}`
+    const expLabel = new CSS2DObject(expDiv)
+    // const expPos = new Vector3()
+    // expPos.lerpVectors(targetPoint, starPoint, i / segmentTotal + (0.5 / segmentTotal))
+    // expLabel.position.set(expPos.x, expPos.y, expPos.z)
+
+    const posIndexOffset = 6
+
+    // TODO - Label positions change when zoom changes
+    const edgeCircleVec = new Vector3(
+      geometry.attributes.position.array[(posIndexOffset * 3) + 0],
+      geometry.attributes.position.array[(posIndexOffset * 3) + 1],
+      geometry.attributes.position.array[(posIndexOffset * 3) + 2]
+    )
+    const aToBDistance = new Vector3(0, 0, 0).distanceTo(edgeCircleVec)
+    const adjustedFactor = radius / aToBDistance
+    const expLabelPos = new Vector3()
+    expLabelPos.lerpVectors(new Vector3(0, 0, 0), edgeCircleVec, adjustedFactor)
+
+    expLabel.position.x = expLabelPos.x
+    expLabel.position.y = expLabelPos.y
+    expLabel.position.z = expLabelPos.z
+    expLabel.position.lerp(new Vector3(0, 0, 0), 0.75)
+    expLabel.visible = false
+    explanationCircle.add(expLabel)
+    explanationCircle.userData.expLabels.push(expLabel)
+  }
+  // explanationCircle.visible = false
+  explanationCircle.userData.setLabelsVisible = (shouldBeVisible) => {
+    for (const expLabel of explanationCircle.userData.expLabels) {
+      expLabel.visible = shouldBeVisible
+    }
+  }
+
   return explanationCircle
 }
 const createTimingExplanationCircle = (targetPoint) => {
@@ -283,7 +346,26 @@ export const setupMelodyExplanation = (constellation) => {
   // timingLine.visible = true
   explanationGroup.add(timingLine)
 
+  // TEMP for showing star notes
+  // for (const noteData of constellation.music.melody) {
+  //   const star = constellation.starsMain.find(s => s.hip === noteData.starHip)
+  //   const v = Math.floor((star.angleFromCentre % 180) / (180 / 7))
+  //   const expDiv = document.createElement('div')
+  //   expDiv.className = 'label-note'
+  //   expDiv.innerHTML = `${noteData.note}<br/>${parseInt(star.angleFromCentre)}<br/>${v}`
+  //   const expLabel = new CSS2DObject(expDiv)
+  //   expLabel.position.set(star.ax, star.ay, star.az)
+  //   expLabel.visible = true
+  //   explanationGroup.add(expLabel)
+  // }
+
   // Create Timing Circle
+  const notesCircleAngle = createPitchExplanationAngleCircle(targetPointCentre,
+    new Vector3(furthestStarFromCentre.ax, furthestStarFromCentre.ay, furthestStarFromCentre.az),
+    furthestStarFromCentre.angleFromCentre,
+    constellation.music.scale.chroma)
+  explanationGroup.add(notesCircleAngle)
+
   const timingCircle = createTimingExplanationCircle(targetPointAlpha)
   explanationGroup.add(timingCircle)
 
@@ -295,12 +377,15 @@ export const setupMelodyExplanation = (constellation) => {
     timingCircle,
     timingLine,
     notesCircleDistance,
+    notesCircleAngle,
     hipArray,
     points
   }
   explanationGroup.userData.explanationObject = explanationObject
   explanationObject.animateCircle = (time) => {
     explanationObject.timingCircle.visible = true
+    explanationObject.notesCircleAngle.visible = true
+    explanationObject.notesCircleAngle.userData.setLabelsVisible(true)
     const angleTweenConfig = {radius: 0}
     explanationObject.timingCircleTween = new Tween(angleTweenConfig)
       .to({radius: furthestStarFromAlpha.distanceFromAlpha - (furthestStarFromAlpha.distanceFromAlpha * 0.04)}, time - 5)
@@ -313,12 +398,18 @@ export const setupMelodyExplanation = (constellation) => {
         explanationObject.timingCircle.geometry.dispose()
         explanationObject.timingCircle.geometry = createCircleGeo(angleTweenConfig.radius)
         explanationObject.timingCircle.visible = true
+        explanationObject.notesCircleAngle.visible = true
+        explanationObject.notesCircleAngle.userData.setLabelsVisible(true)
       })
       .onComplete(() => {
         explanationObject.timingCircle.visible = false
+        explanationObject.notesCircleAngle.visible = false
+        explanationObject.notesCircleAngle.userData.setLabelsVisible(false)
       })
       .onStop(() => {
         explanationObject.timingCircle.visible = false
+        explanationObject.notesCircleAngle.visible = false
+        explanationObject.notesCircleAngle.userData.setLabelsVisible(false)
       })
       .start()
   }
@@ -352,7 +443,7 @@ export const setupMelodyExplanation = (constellation) => {
 
   explanationObject.animateStar = (starHip) => {
     const starIndex = explanationObject.hipArray.indexOf(starHip)
-    console.log('animateStar', starHip, starIndex)
+    // console.log('animateStar', starHip, starIndex)
     // explanationObject.points.geometry.attributes.size.array[starIndex] = 0.1
     // explanationObject.points.geometry.attributes.size.needsUpdate = true
     const sizeConfig = {size: 0}

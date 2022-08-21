@@ -171,8 +171,8 @@ const playToneClip = async (starData, toneData) => {
       piano = await loadPianoSampler()
     }
     const visualMelody = setupMelodyExplanation(toneData.constellation)
-    const notesToPlay = toneData.melody ? toneData.chords.concat(toneData.melody) : toneData.chords
-    // const notesToPlay = toneData.melody
+    // const notesToPlay = toneData.melody ? toneData.chords.concat(toneData.melody) : toneData.chords
+    const notesToPlay = toneData.melody
     const totalBars = toneData.type === 'melody' ? notesToPlay.find(n => n.totalBars).totalBars : 4
     const timeForAnimation = 1000 * Math.pow(toneData.bpm / 60, -1) * 4 * totalBars
     const part = new Part((time, value) => {
