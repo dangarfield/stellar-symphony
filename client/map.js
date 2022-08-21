@@ -1,7 +1,7 @@
 import {Vector3, Scene, Color, PerspectiveCamera, WebGLRenderer, TextureLoader,
   BufferGeometry, Points, ShaderMaterial, AdditiveBlending, Float32BufferAttribute,
   Mesh, SphereGeometry, MeshPhongMaterial, DoubleSide, Raycaster, Vector2, Line3, MathUtils, Group,
-  EllipseCurve, LineBasicMaterial, LineLoop, Object3D, EdgesGeometry, LineSegments} from 'three'
+  EllipseCurve, LineBasicMaterial, LineLoop, Object3D, EdgesGeometry, LineSegments, RingGeometry, BoxHelper, MeshBasicMaterial} from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Line2 } from 'three/examples/jsm/lines/Line2.js'
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js'
@@ -9,6 +9,7 @@ import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js'
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js'
 import {updateSelectedConstellation, showInfoLong} from './graphing.js'
 import {Tween, update as tweenUpdate, Easing} from '@tweenjs/tween.js'
+import {getScaleNotesFromChrome} from './audio.js'
 // import * as Stats from 'stats.js'
 import Stats from 'three/examples/jsm/libs/stats.module.js'
 
@@ -90,6 +91,76 @@ const createTimingExplanationLine = (targetPoint, starPoint, angleFromCentre) =>
   line.visible = false
 
   return line
+}
+const toRomanNumeral = (i) => {
+  if (i === 1) {
+    return 'I'
+  } else if (i === 2) {
+    return 'II'
+  } else if (i === 3) {
+    return 'III'
+  } else if (i === 4) {
+    return 'IV'
+  } else if (i === 5) {
+    return 'V'
+  } else if (i === 6) {
+    return 'VI'
+  } else if (i === 7) {
+    return 'VII'
+  } else if (i === 8) {
+    return 'VIII'
+  }
+  return i
+}
+
+const createPitchExplanationDistanceCircle = (targetPoint, starPoint, angleFromCentre, scaleChroma) => {
+  // TODO - Change the angle
+  const scaleNotes = getScaleNotesFromChrome(scaleChroma)
+  scaleNotes.push(scaleNotes[0])
+  const explanationCircle = new Group()
+  const radius = targetPoint.distanceTo(starPoint)
+  const segmentTotal = 8
+  const segmentRadius = radius / segmentTotal
+  // console.log('radius', radius, segmentRadius)
+  console.log('createPitchExplanationDistanceCircle', targetPoint, starPoint, angleFromCentre, scaleChroma, scaleNotes)
+  explanationCircle.userData.expLabels = []
+  for (let i = 0; i < segmentTotal; i++) {
+    const innerRadius = i * segmentRadius
+    const outerRadius = (i + 1) * segmentRadius
+    // const color = i % 2 === 0 ? 0xFF00FF : 0x1363DF
+    const color = i % 2 === 0 ? 0xFFFF00 : 0x0000FF
+    const geometry = new RingGeometry(innerRadius, outerRadius, 32)
+    const material = new MeshBasicMaterial({ color: color, opacity: 0.15, transparent: true, side: DoubleSide })
+    const mesh = new Mesh(geometry, material)
+    mesh.position.x = targetPoint.x
+    mesh.position.y = targetPoint.y
+    mesh.position.z = targetPoint.z
+    mesh.visible = true
+    mesh.lookAt(new Vector3(0, 0, 0))
+    // console.log('mesh', mesh, i, innerRadius, outerRadius)
+    explanationCircle.add(mesh)
+
+    const expDiv = document.createElement('div')
+    expDiv.className = 'label-note'
+    expDiv.textContent = `${toRomanNumeral(i + 1)} ${scaleNotes[i].substring(0, scaleNotes[i].length - 1)}`
+
+    // conDiv.style.marginTop = '-1em';
+    const expLabel = new CSS2DObject(expDiv)
+    const expPos = new Vector3()
+    expPos.lerpVectors(targetPoint, starPoint, i / segmentTotal + (0.5 / segmentTotal))
+
+    expLabel.position.set(expPos.x, expPos.y, expPos.z)
+    expLabel.visible = false
+    explanationCircle.add(expLabel)
+    explanationCircle.userData.expLabels.push(expLabel)
+  }
+  explanationCircle.visible = false
+  explanationCircle.userData.setLabelsVisible = (shouldBeVisible) => {
+    for (const expLabel of explanationCircle.userData.expLabels) {
+      expLabel.visible = shouldBeVisible
+    }
+  }
+  return explanationCircle
 }
 const createTimingExplanationCircle = (targetPoint) => {
   const geo = createCircleGeo(0)
@@ -200,6 +271,13 @@ export const setupMelodyExplanation = (constellation) => {
   )
 
   // Create Timing Line
+  const notesCircleDistance = createPitchExplanationDistanceCircle(targetPointCentre,
+    new Vector3(furthestStarFromCentre.ax, furthestStarFromCentre.ay, furthestStarFromCentre.az),
+    furthestStarFromCentre.angleFromCentre,
+    constellation.music.scale.chroma)
+  explanationGroup.add(notesCircleDistance)
+  // scene.add(new BoxHelper(notesCircle, 0xFF00FF))
+
   const timingLine = createTimingExplanationLine(targetPointCentre, new Vector3(furthestStarFromCentre.ax, furthestStarFromCentre.ay, furthestStarFromCentre.az), furthestStarFromCentre.angleFromCentre)
   // timingLine.lookAt(new Vector3(furthestStarFromCentre.ax, furthestStarFromCentre.ay, furthestStarFromCentre.az))
   // timingLine.visible = true
@@ -216,6 +294,7 @@ export const setupMelodyExplanation = (constellation) => {
   const explanationObject = {
     timingCircle,
     timingLine,
+    notesCircleDistance,
     hipArray,
     points
   }
@@ -246,18 +325,27 @@ export const setupMelodyExplanation = (constellation) => {
 
   explanationObject.animateLine = (time) => {
     explanationObject.timingLine.visible = true
+    explanationObject.notesCircleDistance.visible = true
+    explanationObject.notesCircleDistance.userData.setLabelsVisible(true)
+    explanationObject.notesCircleDistance.setRotationFromAxisAngle(centreVec, MathUtils.degToRad(0 - furthestStarFromCentre.angleFromCentre))
     const angleTweenConfig = {angle: 0}
     explanationObject.timingLineTween = new Tween(angleTweenConfig)
       .to({angle: 360}, time - 1)
       .onUpdate(() => {
         explanationObject.timingLine.setRotationFromAxisAngle(centreVec, MathUtils.degToRad(angleTweenConfig.angle - furthestStarFromCentre.angleFromCentre))
         explanationObject.timingLine.visible = true
+        explanationObject.notesCircleDistance.visible = true
+        explanationObject.notesCircleDistance.userData.setLabelsVisible(true)
       })
       .onComplete(() => {
         explanationObject.timingLine.visible = false
+        explanationObject.notesCircleDistance.visible = false
+        explanationObject.notesCircleDistance.userData.setLabelsVisible(false)
       })
       .onStop(() => {
         explanationObject.timingLine.visible = false
+        explanationObject.notesCircleDistance.visible = false
+        explanationObject.notesCircleDistance.userData.setLabelsVisible(false)
       })
       .start()
   }

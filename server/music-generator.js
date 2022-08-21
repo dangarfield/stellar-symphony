@@ -1154,7 +1154,7 @@ export const getInstrumentForTrack = () => {
     'BAT Heart Pump',
     'BRU Eleven Inch Nails',
 
-    'CIN Adrenaline Building',
+    'CIN Adrenaline Building'
     // 'CIN Attack From East',
     // 'CIN Pumped Hannibal',
     // 'CIN Right Behind You',

@@ -239,6 +239,9 @@ const playToneClip = async (starData, toneData) => {
   Transport.start('+0.05')
 }
 
+export const getScaleNotesFromChrome = (chroma) => {
+  return ScaleType.get(chroma).intervals.map(Note.transposeFrom('C')).map(v => (v) + '5')
+}
 // Potential melodies (da - distance from alpha, dc - distance from centre, aa - angle from alpha, ac - angle from centre)
 // # - timing - notes
 // 1 - da - aa
