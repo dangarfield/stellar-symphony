@@ -320,11 +320,11 @@ Fast Arpeggio:
 Drums:
 
 * ACT Algier Action       ***
-ACT Distress            **
-ACT Forward Mission     **
-ACT Mounting Danger     **
-ACT Rimshot Dance       ***
-ACT Rolling Thunder     **
+* ACT Distress            **
+* ACT Forward Mission     **
+* ACT Mounting Danger     **
+* ACT Rimshot Dance       ***
+* ACT Rolling Thunder     **
 
 ACT Cyberlicious        ***
 ACT Morse Code          **

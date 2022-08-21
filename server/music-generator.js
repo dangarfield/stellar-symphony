@@ -1118,7 +1118,91 @@ export const getInstrumentForTrack = () => {
     'Metallique Cries',
     'Ribbon']
   const drums = [
-    'ACT Algier Action'
+    'ACT Algier Action',
+    'ACT Distress',
+    'ACT Forward Mission',
+    'ACT Mounting Danger',
+    'ACT Rimshot Dance',
+    'ACT Rolling Thunder',
+
+    'ACT Cyberlicious',
+    'ACT Morse Code',
+    'ACT Platic Box Ensemble',
+    'ACT Purring Alien',
+    'ACT Steady Rolling',
+    'ACT Taiko Army',
+
+    'AIR A Bit Foggy',
+    'AIR Bouncing Static',
+    'AIR Dubbie Hats',
+    'AIR High Tubes',
+    'AIR Just Say Hi',
+    'AIR Sizzles On Top',
+
+    'ALN Clock Groove',
+    'ALN Diving Danger',
+    'ALN Ear Piercer',
+    'ALN Earsick',
+    'ALN Ebb and Flow',
+    'ALN Lost In Space Echo',
+    'ALN Pipe Drumming',
+    'ALN Strange Mess',
+    'ALN Whatdidhesayyyy',
+
+    'BAT Battery',
+    'BAT Carol of Drums',
+    'BAT Heart Pump',
+    'BRU Eleven Inch Nails',
+
+    'CIN Adrenaline Building',
+    // 'CIN Attack From East',
+    // 'CIN Pumped Hannibal',
+    // 'CIN Right Behind You',
+
+    // 'COL Amboss Troops',
+    // 'COL Big Bottoms',
+    // 'COL Big Hurry',
+    // 'COL Death Of A King',
+    // 'COL Doppler Monster',
+
+    // 'CPY Chucka',
+    // 'CPY Gaterade',
+    // 'CPY Hip Movement',
+    // 'CPY Rhytmn Gator',
+    // 'CPY Space X Delay',
+    // 'CPY Stutter Groove',
+    // 'CPY Thru Gates',
+
+    // 'DRT Diry Needle',
+    // 'GIA Attila',
+    // 'GIA The Siege',
+    // 'GIA Twin Hits',
+
+    // 'GLT Brrrbs',
+    // 'GLT I Found A Gameboy',
+    // 'GLT Step Fiter Groove',
+
+    // 'GRO Coming And Going',
+    // 'GRO Diving Bell',
+    // 'GRO Dubganger',
+    // 'GRO Relaxed Big Drums',
+
+    // 'POW David And Goliath',
+    // 'POW In A Strut',
+    // 'POW Micro Brewery',
+    // 'POW Ping Pong Armies',
+    // 'POW Procssor Progressor',
+    // 'POW Washing Machine',
+
+    // 'SUS Are You Nervous',
+    // 'SUS Bam Bam',
+    // 'SUS Off Beating',
+    // 'SUS Fried Transistors',
+    // 'SUS Start Stop',
+
+    // 'THR Death By Gravity',
+    // 'THR March Of The Drums',
+    // 'THR Valley Of The King'
   ]
   return {
     'Chords': chords,
