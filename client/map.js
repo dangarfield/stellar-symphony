@@ -34,7 +34,7 @@ const starFragmentShader = () => {
         uniform sampler2D pointTexture;
         varying vec3 vColor;
         void main() {
-            gl_FragColor = vec4( color * vColor, 1.0 );
+            gl_FragColor = vec4( color * vColor, 0.5 );
             gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord );
         }
     `
@@ -112,9 +112,7 @@ const toRomanNumeral = (i) => {
   }
   return i
 }
-
 const createPitchExplanationDistanceCircle = (targetPoint, starPoint, angleFromCentre, scaleChroma) => {
-  // TODO - Change the angle
   const scaleNotes = getScaleNotesFromChrome(scaleChroma)
   scaleNotes.push(scaleNotes[0])
   const explanationCircle = new Group()
@@ -122,7 +120,7 @@ const createPitchExplanationDistanceCircle = (targetPoint, starPoint, angleFromC
   const segmentTotal = 8
   const segmentRadius = radius / segmentTotal
   // console.log('radius', radius, segmentRadius)
-  console.log('createPitchExplanationDistanceCircle', targetPoint, starPoint, angleFromCentre, scaleChroma, scaleNotes)
+  // console.log('createPitchExplanationDistanceCircle', targetPoint, starPoint, angleFromCentre, scaleChroma, scaleNotes)
   explanationCircle.userData.expLabels = []
   for (let i = 0; i < segmentTotal; i++) {
     // Shape
@@ -149,7 +147,6 @@ const createPitchExplanationDistanceCircle = (targetPoint, starPoint, angleFromC
     const expLabel = new CSS2DObject(expDiv)
     const expPos = new Vector3()
     expPos.lerpVectors(targetPoint, starPoint, i / segmentTotal + (0.5 / segmentTotal))
-    // TODO - Label positions change when zoom changes
     expLabel.position.set(expPos.x, expPos.y, expPos.z)
     expLabel.visible = false
     explanationCircle.add(expLabel)
@@ -163,28 +160,30 @@ const createPitchExplanationDistanceCircle = (targetPoint, starPoint, angleFromC
   }
   return explanationCircle
 }
-const createPitchExplanationAngleCircle = (targetPoint, starPoint, angleFromCentre, scaleChroma) => {
+const createPitchExplanationAngleCircle = (targetPoint, starPoint, angleFromCentre, scaleChroma, centreVec) => {
   const scaleNotes = getScaleNotesFromChrome(scaleChroma)
   // scaleNotes.push(scaleNotes[0])
   const explanationCircle = new Group()
   const radius = targetPoint.distanceTo(starPoint)
   const segmentTotal = 7
   explanationCircle.userData.expLabels = []
-  // const i = 0
   for (let i = 0; i < segmentTotal * 2; i++) {
     // Shape
-    const geometry = new CircleGeometry(radius, 8, (Math.PI / segmentTotal) * (-i + 3 + (Math.PI / segmentTotal)), Math.PI / segmentTotal)
+    const thetaStart = ((Math.PI / segmentTotal) * 2.5) - ((Math.PI / segmentTotal) * i)
+
+    const geometry = new CircleGeometry(radius, 8, thetaStart, Math.PI / segmentTotal)
     // const color = i % 2 === 0 ? 0xFFFF00 : 0x0000FF
-    const notePos = i % segmentTotal === 0 ? 0 : segmentTotal - (i % segmentTotal)
+    const notePos = i % segmentTotal// === 0 ? 0 : segmentTotal - (i % segmentTotal)
+    // console.log('circle', i, thetaStart, notePos)
     let color
     switch (notePos) {
-      case 0: color = 0xFFFF00; break
-      case 1: color = 0x0000FF; break
-      case 2: color = 0xFFFF00; break
-      case 3: color = 0x0000FF; break
-      case 4: color = 0xFFFF00; break
-      case 5: color = 0x0000FF; break
-      case 6: color = 0xFFFFFF; break
+      case 0: color = 0xFFFFFF; break
+      case 1: color = 0xFFFF00; break
+      case 2: color = 0x0000FF; break
+      case 3: color = 0xFFFF00; break
+      case 4: color = 0x0000FF; break
+      case 5: color = 0xFFFF00; break
+      case 6: color = 0x0000FF; break
 
       default: color = 0xFFFF00; break
     }
@@ -200,34 +199,23 @@ const createPitchExplanationAngleCircle = (targetPoint, starPoint, angleFromCent
     explanationCircle.add(mesh)
 
     // Labels
+
     const expDiv = document.createElement('div')
     expDiv.className = 'label-note'
-
-    expDiv.innerHTML = `${toRomanNumeral(notePos + 1)} ${scaleNotes[notePos].substring(0, scaleNotes[notePos].length - 1)}`
+    expDiv.textContent = `${toRomanNumeral(notePos + 1)} ${scaleNotes[notePos].substring(0, scaleNotes[notePos].length - 1)}`
     const expLabel = new CSS2DObject(expDiv)
-    // const expPos = new Vector3()
-    // expPos.lerpVectors(targetPoint, starPoint, i / segmentTotal + (0.5 / segmentTotal))
-    // expLabel.position.set(expPos.x, expPos.y, expPos.z)
+    const expPos = new Vector3()
+    expPos.lerpVectors(targetPoint, starPoint, 0.95)
+    expLabel.position.set(expPos.x, expPos.y, expPos.z)
 
-    const posIndexOffset = 6
-
-    // TODO - Label positions change when zoom changes
-    const edgeCircleVec = new Vector3(
-      geometry.attributes.position.array[(posIndexOffset * 3) + 0],
-      geometry.attributes.position.array[(posIndexOffset * 3) + 1],
-      geometry.attributes.position.array[(posIndexOffset * 3) + 2]
-    )
-    const aToBDistance = new Vector3(0, 0, 0).distanceTo(edgeCircleVec)
-    const adjustedFactor = radius / aToBDistance
-    const expLabelPos = new Vector3()
-    expLabelPos.lerpVectors(new Vector3(0, 0, 0), edgeCircleVec, adjustedFactor)
-
-    expLabel.position.x = expLabelPos.x
-    expLabel.position.y = expLabelPos.y
-    expLabel.position.z = expLabelPos.z
-    expLabel.position.lerp(new Vector3(0, 0, 0), 0.75)
     expLabel.visible = false
-    explanationCircle.add(expLabel)
+    const expLabelGroup = new Group()
+    const angleToRotate = (i * (360 / segmentTotal / 2)) + (360 / segmentTotal / 4)
+    // console.log('angleToRotate', i, angleToRotate)
+    expLabelGroup.setRotationFromAxisAngle(centreVec, MathUtils.degToRad(angleToRotate - angleFromCentre))
+
+    expLabelGroup.add(expLabel)
+    explanationCircle.add(expLabelGroup)
     explanationCircle.userData.expLabels.push(expLabel)
   }
   explanationCircle.visible = false
@@ -377,7 +365,8 @@ export const setupMelodyExplanation = (constellation) => {
   const notesCircleAngle = createPitchExplanationAngleCircle(targetPointCentre,
     new Vector3(furthestStarFromCentre.ax, furthestStarFromCentre.ay, furthestStarFromCentre.az),
     furthestStarFromCentre.angleFromCentre,
-    constellation.music.scale.chroma)
+    constellation.music.scale.chroma,
+    centreVec)
   explanationGroup.add(notesCircleAngle)
 
   const timingCircle = createTimingExplanationCircle(targetPointAlpha)
@@ -400,6 +389,7 @@ export const setupMelodyExplanation = (constellation) => {
     explanationObject.timingCircle.visible = true
     explanationObject.notesCircleAngle.visible = true
     explanationObject.notesCircleAngle.userData.setLabelsVisible(true)
+    // explanationObject.notesCircleAngle.setRotationFromAxisAngle(centreVec, MathUtils.degToRad(0 - furthestStarFromCentre.angleFromCentre))
     const angleTweenConfig = {radius: 0}
     explanationObject.timingCircleTween = new Tween(angleTweenConfig)
       .to({radius: furthestStarFromAlpha.distanceFromAlpha - (furthestStarFromAlpha.distanceFromAlpha * 0.04)}, time - 5)
