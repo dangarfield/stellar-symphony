@@ -619,11 +619,15 @@ const loadStars = () => {
   }
 }
 const loadConstellationLines = () => {
-  const lineMaterial = new LineMaterial({
-    color: 0x1363DF,
-    linewidth: 0.002
-  })
+  const minOpacity = 0.3
   for (const constellation of starData.constellations) {
+    const lineMaterial = new LineMaterial({
+      color: 0x1363DF,
+      linewidth: 0.002,
+      transparent: true
+      // opacity: minOpacity
+    })
+    const constellationItems = []
     for (const lines of constellation.lines) {
       if (lines.points) {
         const points = []
@@ -638,6 +642,7 @@ const loadConstellationLines = () => {
         line.computeLineDistances()
         line.scale.set(1, 1, 1)
         scene.add(line)
+        constellationItems.push(line)
       }
     }
 
@@ -649,6 +654,26 @@ const loadConstellationLines = () => {
     const conLabel = new CSS2DObject(conDiv)
     conLabel.position.set(constellation.centre.x, constellation.centre.y, constellation.centre.z)
     scene.add(conLabel)
+    // constellationItems.push(conLabel)
+    constellation.highlightConstellation = (highlight) => {
+      lineMaterial.opacity = highlight ? 1 : minOpacity
+      lineMaterial.transparent = !highlight
+      // console.log('highlightConstellation', constellation.constellationName, highlight, lineMaterial.opacity)
+      // if (lineMaterial.userData.isTweening) return
+      // if (highlight && lineMaterial.opacity === 1) return
+      // if (!highlight && lineMaterial.opacity === minOpacity) return
+
+      // lineMaterial.userData.isTweening = true
+      // new Tween(lineMaterial)
+      //   .to({opacity: highlight ? 1 : minOpacity}, 400)
+      //   .onComplete(() => {
+      //     delete lineMaterial.userData.isTweening
+      //   })
+      //   .onStop(() => {
+      //     delete lineMaterial.userData.isTweening
+      //   })
+      //   .start()
+    }
   }
 }
 const loadSphere = () => {

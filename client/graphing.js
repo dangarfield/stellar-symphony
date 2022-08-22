@@ -6,9 +6,16 @@ Chart.register(ScatterController, LinearScale, PointElement, LineController, Cat
 export const updateSelectedConstellation = async (starData, constellationId, moveMap) => {
   // console.log('updateSelectedConstellation', starData.selectedConstellation ,constellationId,starData.selectedConstellation !== constellationId)
   if (starData.selectedConstellation !== constellationId) {
+    for (const constellationData of starData.constellations) {
+      if (constellationData.constellation === constellationId) {
+        constellationData.highlightConstellation(true)
+      } else {
+        constellationData.highlightConstellation(false)
+      }
+    }
     starData.selectedConstellation = constellationId
     const constellationData = starData.constellations.find(c => c.constellation === constellationId)
-
+    // constellationData.highlightConstellation(true)
     // Move map
     if (moveMap) {
       focusMapOnConstellation(constellationData)
