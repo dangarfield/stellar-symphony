@@ -218,6 +218,12 @@
             border-color: rgba(0, 0, 0, 0.6) transparent transparent transparent;
         }
 
+        .ldBar-label:after {
+            content: " %";
+            /* change from % to USD */
+            /* font-size: 0.6em; */
+        }
+
         @media (max-width: 576px) {
             .constellation-select {
                 width: 100%;
@@ -260,7 +266,10 @@
     <div class="icon-holders">
         <div class="star-map"></div>
         <div class="loading position-absolute top-50 start-50 translate-middle">
-            <h3 class="loading-text">Loading...</h3>
+            <h3 class="loading-text text-center">Loading...</h3>
+            <div class="ld-bar text-center" style="width:100%;height:60px" data-stroke="data:ldbar/res,gradient(0,1,#FF00FF, #1363DF)" data-path="M10 20Q20 15 30 20Q40 25 50 20Q60 15 70 20Q80 25 90 20" data-value="0">
+            </div>
+
         </div>
         <div class="info-long container-fluid">
             <div class="row">

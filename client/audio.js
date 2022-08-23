@@ -1,6 +1,7 @@
 import {ScaleType, Scale, Note} from '@tonaljs/tonal'
 import {Sampler, Transport, Pattern, Part, start as ToneStart, Draw, Player, JCReverb} from 'tone'
-import { setupMelodyExplanation, stopMelodyExplanation } from './map.js'
+import {setupMelodyExplanation, stopMelodyExplanation} from './map.js'
+import {setLoadingText, hideLoadingText, setLoadingPercent} from './utils.js'
 
 const activeSamplers = []
 const removeAllSamplers = () => {
@@ -152,6 +153,8 @@ let piano = null
 
 const playToneClip = async (starData, toneData) => {
   // console.log('playToneClip', toneData)
+  setLoadingText('Loading instruments...')
+  setLoadingPercent(0)
   stopToneClips()
   document.querySelector('.info-short .tone-clip').style.display = 'none'
   document.querySelector('.info-short .tone-stop').style.display = 'inline'
@@ -159,6 +162,7 @@ const playToneClip = async (starData, toneData) => {
   if (toneData.type === 'scale') {
     if (piano === null) {
       piano = await loadPianoSampler()
+      setLoadingPercent(100)
     }
     const scaleNotes = Scale.get(toneData.scale.chroma).intervals.map(Note.transposeFrom('C')).map(v => (v) + '4')
     scaleNotes.push('C5')
@@ -169,6 +173,7 @@ const playToneClip = async (starData, toneData) => {
   } else if (toneData.type === 'chords' || toneData.type === 'melody') {
     if (piano === null) {
       piano = await loadPianoSampler()
+      setLoadingPercent(100)
     }
     const visualMelody = setupMelodyExplanation(toneData.constellation)
     // const notesToPlay = toneData.melody ? toneData.chords.concat(toneData.melody) : toneData.chords
@@ -216,12 +221,15 @@ const playToneClip = async (starData, toneData) => {
           triggeredAnimationAction(visualMelody, value, timeForAnimation)
         }, time)
       }, notesToPlay).start(0)
+      setLoadingPercent(100)
     } else {
-      for (const track of toneData.song) {
+      for (const [i, track] of toneData.song.entries()) {
         // console.log('about to loadSampler', starData.instruments.notes, track.instrument, track.notes, track)
         track.sampler = await loadSampler(starData.instruments.notes, track.instrument, track.notes, track.type.startsWith('Melody'))
         // const sampler = piano
-        console.log('track', track)
+        console.log('track', i, track)
+        setLoadingPercent(100 / toneData.song.length * i)
+
         new Part((time, value) => {
           // if (!value.ignore && !track.type.startsWith('Melody')) {
           if (!value.ignore) {
@@ -233,9 +241,10 @@ const playToneClip = async (starData, toneData) => {
         }, track.notes).start(0)
       }
     }
-
     Transport.bpm.value = toneData.bpm
   }
+  setLoadingPercent(100)
+  hideLoadingText()
   Transport.start('+0.05')
 }
 
