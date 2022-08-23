@@ -27,10 +27,8 @@ export const updateSelectedConstellation = async (starData, constellationId, mov
       constellationSelect.value = constellationId
     }
 
-    // Set info short
-    const infoShort = document.querySelector('.info-short')
-    infoShort.querySelector('.name').textContent = constellationData.constellationName
-    const toneClipEle = infoShort.querySelector('.tone-clip')
+    // Set play button
+    const toneClipEle = document.querySelector('.action-play.tone-clip')
 
     toneClipEle.setAttribute('data-type', 'song')
     toneClipEle.setAttribute('data-constellation', constellationData.constellation)
@@ -38,7 +36,6 @@ export const updateSelectedConstellation = async (starData, constellationId, mov
     if (constellationData.music.songPath) {
       toneClipEle.setAttribute('data-url', constellationData.music.songPath)
     }
-    infoShort.style.display = 'block'
 
     // Set info text
     const infoLong = document.querySelector('.info-long')
@@ -63,14 +60,6 @@ export const updateSelectedConstellation = async (starData, constellationId, mov
       })
     }
   }
-}
-const bindInfoShortToneClip = (starData) => {
-  document.querySelector('.info-short .tone-clip').addEventListener('click', function () {
-    getToneDataFromElementAndPlay(starData, this)
-  })
-  document.querySelector('.info-short .tone-stop').addEventListener('click', function () {
-    stopToneClips()
-  })
 }
 const getColor = (i) => {
   const Tableau20 = ['#4E79A7', '#A0CBE8', '#F28E2B', '#FFBE7D', '#59A14F', '#8CD17D', '#B6992D', '#F1CE63',
@@ -536,6 +525,9 @@ const hideAllOverlays = () => {
   hideInfoExplain()
 }
 const bindActionLinks = (starData) => {
+  document.querySelector('.action-play').addEventListener('click', function () {
+    this.classList.contains('active') ? stopToneClips() : getToneDataFromElementAndPlay(starData, this)
+  })
   document.querySelector('.action-info').addEventListener('click', function () {
     this.classList.contains('active') ? hideInfoLong() : showInfoLong()
   })
@@ -554,7 +546,6 @@ const bindActionLinks = (starData) => {
 }
 export const initConstellationData = (starData) => {
   addConstellationSelectOptions(starData)
-  bindInfoShortToneClip(starData)
   bindInfoClose()
   bindActionLinks(starData)
   processMandatoryConstellationData(starData)

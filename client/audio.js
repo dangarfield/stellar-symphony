@@ -32,6 +32,9 @@ export const stopToneClips = () => {
   stopMelodyExplanation()
   document.querySelector('.info-short .tone-clip').style.display = 'inline'
   document.querySelector('.info-short .tone-stop').style.display = 'none'
+  document.querySelector('.action-play').classList.remove('active', 'bi-stop-btn')
+  document.querySelector('.action-play').classList.add('bi-play-btn')
+  document.querySelector('.action-play .tooltip-text').textContent = 'Play'
 }
 
 const triggeredAnimationAction = (visualMelody, value, timeForAnimation, instrument) => {
@@ -158,6 +161,9 @@ const playToneClip = async (starData, toneData) => {
   stopToneClips()
   document.querySelector('.info-short .tone-clip').style.display = 'none'
   document.querySelector('.info-short .tone-stop').style.display = 'inline'
+  document.querySelector('.action-play').classList.remove('bi-play-btn')
+  document.querySelector('.action-play').classList.add('active', 'bi-stop-btn')
+  document.querySelector('.action-play .tooltip-text').textContent = `Stop ${toneData.constellation.constellationName}`
   ToneStart()
   if (toneData.type === 'scale') {
     if (piano === null) {
@@ -177,7 +183,7 @@ const playToneClip = async (starData, toneData) => {
     }
     const visualMelody = setupMelodyExplanation(toneData.constellation)
     // const notesToPlay = toneData.melody ? toneData.chords.concat(toneData.melody) : toneData.chords
-    const notesToPlay = toneData.melody
+    const notesToPlay = toneData.melody ? toneData.melody : toneData.chords
     const totalBars = toneData.type === 'melody' ? notesToPlay.find(n => n.totalBars).totalBars : 4
     const timeForAnimation = 1000 * Math.pow(toneData.bpm / 60, -1) * 4 * totalBars
     const part = new Part((time, value) => {

@@ -142,6 +142,10 @@
             color: white;
         }
 
+        .action-play.bi-stop-btn.active {
+            color: #1363DF;
+        }
+
         .info-long,
         .info-full {
             flex-direction: column;
@@ -220,8 +224,12 @@
 
         .ldBar-label:after {
             content: " %";
-            /* change from % to USD */
-            /* font-size: 0.6em; */
+        }
+
+        .loading {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 50px;
+            border-radius: 10px;
         }
 
         @media (max-width: 576px) {
@@ -231,7 +239,7 @@
 
             .info-long,
             .info-full {
-                top: 130px;
+                top: 90px;
                 max-height: calc(100vh - 300px);
             }
 
@@ -309,6 +317,7 @@
     <footer class="fixed-bottom">
         <nav class="w-100 text-center">
             <div class="navbar-text action-links">
+                <i class="bi bi-play-btn action-play tooltip-parent tone-clip"><span class="tooltip-text">Play</span></i>
                 <i class="bi bi-info-circle action-info tooltip-parent"><span class="tooltip-text">Constellation Info</span></i>
                 <i class="bi bi-bar-chart-line action-graph-all tooltip-parent"><span class="tooltip-text">All constellation analysis</span></i>
                 <i class="bi bi-graph-up action-graph-one tooltip-parent"><span class="tooltip-text">One constellation analysis</span></i>
