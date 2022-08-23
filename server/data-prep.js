@@ -514,7 +514,7 @@ const init = async () => {
 
   // console.log('rawStarData', groupedByConstellation.map(d => d.constellation), Object.keys(groupedByConstellation[0]))
   console.log('Writing star-data.json')
-  fs.writeJsonSync(`_static/data/star-data.json`, starData)
+  fs.writeJsonSync(`_static/data/star-data.png`, starData)
   console.log('FINISHED')
 }
 
