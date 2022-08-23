@@ -112,6 +112,27 @@ const toRomanNumeral = (i) => {
   }
   return i
 }
+const getNoteTypeColor = (notePos) => {
+  switch (notePos) {
+    // Rainbox
+    // case 0: default: return 0xF60000
+    // case 1: return 0xFF8C00
+    // case 2: return 0xFFEE00
+    // case 3: return 0x4DE94C
+    // case 4: return 0x3783FF
+    // case 5: return 0x4815AA
+    // case 6: return 0xEF4C9D
+
+    // Greyscale
+    case 0: default: return 0xFFFFFF
+    case 1: return 0x333333
+    case 2: return 0x888888
+    case 3: return 0x333333
+    case 4: return 0x888888
+    case 5: return 0x333333
+    case 6: return 0x888888
+  }
+}
 const createPitchExplanationDistanceCircle = (targetPoint, starPoint, angleFromCentre, scaleChroma) => {
   const scaleNotes = getScaleNotesFromChrome(scaleChroma)
   scaleNotes.push(scaleNotes[0])
@@ -127,10 +148,13 @@ const createPitchExplanationDistanceCircle = (targetPoint, starPoint, angleFromC
     const innerRadius = i * segmentRadius
     const outerRadius = (i + 1) * segmentRadius
     // const color = i % 2 === 0 ? 0xFF00FF : 0x1363DF
-    let color = i % 2 === 0 ? 0xFFFF00 : 0x0000FF
-    if (i === 0 || i === segmentTotal - 1) color = 0xFFFFFF
+    // let color = i % 2 === 0 ? 0xFFFF00 : 0x0000FF
+    // if (i === 0 || i === segmentTotal - 1) color = 0xFFFFFF
+
+    const color = getNoteTypeColor(i)
+
     const geometry = new RingGeometry(innerRadius, outerRadius, 32)
-    const material = new MeshBasicMaterial({ color: color, opacity: 0.15, transparent: true, side: DoubleSide })
+    const material = new MeshBasicMaterial({ color: color, opacity: 0.3, transparent: true, side: DoubleSide })
     const mesh = new Mesh(geometry, material)
     mesh.position.x = targetPoint.x
     mesh.position.y = targetPoint.y
@@ -175,19 +199,8 @@ const createPitchExplanationAngleCircle = (targetPoint, starPoint, angleFromCent
     // const color = i % 2 === 0 ? 0xFFFF00 : 0x0000FF
     const notePos = i % segmentTotal// === 0 ? 0 : segmentTotal - (i % segmentTotal)
     // console.log('circle', i, thetaStart, notePos)
-    let color
-    switch (notePos) {
-      case 0: color = 0xFFFFFF; break
-      case 1: color = 0xFFFF00; break
-      case 2: color = 0x0000FF; break
-      case 3: color = 0xFFFF00; break
-      case 4: color = 0x0000FF; break
-      case 5: color = 0xFFFF00; break
-      case 6: color = 0x0000FF; break
-
-      default: color = 0xFFFF00; break
-    }
-    const material = new MeshBasicMaterial({ color: color, opacity: 0.15, transparent: true, side: DoubleSide })
+    const color = getNoteTypeColor(notePos)
+    const material = new MeshBasicMaterial({ color: color, opacity: 0.3, transparent: true, side: DoubleSide })
     const mesh = new Mesh(geometry, material)
     mesh.position.x = targetPoint.x
     mesh.position.y = targetPoint.y
@@ -619,7 +632,7 @@ const loadStars = () => {
   }
 }
 const loadConstellationLines = () => {
-  const minOpacity = 0.3
+  const minOpacity = 0.5
   for (const constellation of starData.constellations) {
     const lineMaterial = new LineMaterial({
       color: 0x1363DF,

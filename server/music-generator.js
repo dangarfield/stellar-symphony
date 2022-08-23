@@ -912,45 +912,47 @@ export const debugNotes = (starData) => {
 }
 export const getInstrumentForTrack = () => {
   const chords = [
-    'The Deeps',
-    'The Lightkeeper',
     'Soft Piano',
-    'Earth Sign', // ?
-    'Thirds Organ',
-    'Vox Humana', // ?
-    'Plucks',
     'Capstan Upright',
+    'Fingered',
+    'Hannah Peels Music Box',
+    'Floe',
+    'Plucks',
+    'Circular Mmms',
+    'Vox Humana', // ?
+    'The Deeps',
+    'Nasty Tines',
+    'Thirds Organ',
+    'Space Pluck 2',
+    'Sustain Ahhs',
+    'Sustain Uhs',
+    'The Lightkeeper',
+    'Earth Sign'// ?
     // 'Magnetic Reader',
     // 'Spliced Upright',
-    'Space Pluck 2',
-    'Floe',
-    'Fingered',
-    'Sustain Ahhs',
     // 'Sustain Oohs',
-    'Sustain Uhs',
-    'Hannah Peels Music Box',
-    'Circular Mmms',
-    'Nasty Tines']
+  ]
 
   const chordsDrone = [
-    'The Deeps',
-    'The Lightkeeper',
     'Soft Piano',
-    'Earth Sign',
+    'Capstan Upright',
+    'The Deeps',
+    'Floe',
+    'Plucks',
+    'Circular Mmms',
+    'Sustain Oohs',
+    'Space Pluck 2',
+    'The Lightkeeper',
+    'Nasty Tines',
+    'Earth Sign'
     // 'Thirds Organ',
     // 'Vox Humana',
-    'Plucks',
-    'Capstan Upright',
     // 'Magnetic Reader',
     // 'Spliced Upright',
-    'Space Pluck 2',
-    'Floe',
     // 'Fingered',
     // 'Sustain Ahhs',
-    'Sustain Oohs',
     // 'Hannah Peels Music Box',
-    'Circular Mmms',
-    'Nasty Tines']
+  ]
 
   const melody = [
     'Soft Piano', // good
@@ -964,40 +966,42 @@ export const getInstrumentForTrack = () => {
     // 'Magnetic Reader', // ?
     'Spliced Upright',
     // 'Gieger', // ?
+    'Fingered', // good
     'Plucks',
+    'Nasty Tines', // good
+    'Mini',
+    'Piano Heaven',
     'Sustain Tuned',
     // 'Choir In The Rain', // ?
     // 'Sevastopol', // ?
     'Anthem',
-    'Organ',
-    'Fingered', // good
-    'Mini',
+    'Organ'
     // 'Warp Laments', // ?
     // 'Warp Souls', // ?
     // 'Chorus Pad',
-    'Nasty Tines', // good
-    'Piano Heaven']
+  ]
 
   const bass = [
+    'Gentle',
+    'Sevastopol',
+    'Lost In The Cavern',
+    'Nautilus Soft',
+    'Nasty Tines',
+    'Peer Guitar Ensemble',
+    'Choir In The Rain',
     'Sound The Alarm',
+    'Nightfrost',
+    'Sustain Uhs',
+    'Earth Sign',
+    'Phosphor',
     'Sumburgh Steel',
+    'Space Pluck 2',
     'The Lightkeeper',
     // 'Ancients',
-    'Brutalizer',
-    'Nightfrost',
-    'Phosphor',
-    'Earth Sign',
-    'Space Pluck 2',
+    'Brutalizer'
     // 'Drone',
-    'Gentle',
-    'Nautilus Soft',
-    'Choir In The Rain',
-    'Lost In The Cavern',
-    'Sevastopol',
-    'Peer Guitar Ensemble',
-    'Sustain Uhs',
     // 'Guitar Bowed Drone',
-    'Nasty Tines']
+  ]
 
   const highNotes = [
     'Long',
