@@ -143,8 +143,41 @@
         }
 
         .action-play.bi-stop-btn.active {
-            color: #1363DF;
+            background: linear-gradient(-45deg, #FF00FF, #FF00FF, #1363DF, #1363DF);
+            background-size: 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: animated_text 10s ease-in-out infinite;
+            -moz-animation: animated_text 10s ease-in-out infinite;
+            -webkit-animation: animated_text 10s ease-in-out infinite;
         }
+
+        .action-play.bi-stop-btn.active .tooltip-text {
+            background: rgba(0, 0, 0, 0.6);
+            background-size: 100%;
+            color: white;
+            -webkit-background-clip: none;
+            -webkit-text-fill-color: white;
+            animation: none;
+            -moz-animation: none;
+            -webkit-animation: none;
+        }
+
+
+        @keyframes animated_text {
+            0% {
+                background-position: 0px 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0px 50%;
+            }
+        }
+
 
         .info-long,
         .info-full {
