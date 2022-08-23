@@ -1,4 +1,3 @@
-import {stopToneClips} from './audio.js'
 import axios from 'axios'
 import LdBar from '@loadingio/loading-bar'
 
@@ -31,7 +30,7 @@ export const globalBindings = () => {
   document.body.addEventListener('keydown', function (e) {
     // console.log('e', e.code, e)
     if (e.code === 'Space' || e.code === 'Backspace' || e.code === 'Delete') {
-      stopToneClips()
+      document.querySelector('.action-play').click()
     }
   })
 }

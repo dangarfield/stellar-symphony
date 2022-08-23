@@ -251,6 +251,9 @@ const playToneClip = async (starData, toneData) => {
   }
   setLoadingPercent(100)
   hideLoadingText()
+
+  // TODO - Still need to figure out a way to call stopToneClips() after all notes have finished playing, or just everything?!
+
   Transport.start('+0.05')
 }
 
