@@ -10,7 +10,6 @@ import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRe
 import {updateSelectedConstellation, showInfoLong} from './graphing.js'
 import {Tween, update as tweenUpdate, Easing} from '@tweenjs/tween.js'
 import {getScaleNotesFromChrome} from './audio.js'
-// import * as Stats from 'stats.js'
 import Stats from 'three/examples/jsm/libs/stats.module.js'
 
 const starVertexShader = () => {
@@ -45,6 +44,7 @@ let camera
 let scene
 let renderer
 let labelRenderer
+const showStats = window.location.hostname === 'localhost'
 let stats
 
 const raycaster = new Raycaster()
@@ -547,10 +547,12 @@ const initScene = () => {
     updateFovFromDistance()
     // console.log('control change', controls.getDistance(), camera.fov)
   })
-  stats = new Stats()
-  stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
-  stats.dom.style.cssText = 'position:fixed;bottom:0;right:0;cursor:pointer;opacity:0.9;z-index:10000'
-  document.querySelector('.stats').appendChild(stats.dom)
+  if (showStats) {
+    stats = new Stats()
+    stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
+    stats.dom.style.cssText = 'position:fixed;bottom:0;right:0;cursor:pointer;opacity:0.9;z-index:10000'
+    document.querySelector('.stats').appendChild(stats.dom)
+  }
 
   window.addEventListener('resize', onWindowResize)
   document.addEventListener('pointermove', onPointerMove)
@@ -726,7 +728,7 @@ const onPointerMove = (event) => {
   pointer.y = -(event.clientY / window.innerHeight) * 2 + 1
 }
 const render = () => {
-  stats.begin()
+  if (showStats) stats.begin()
   resizeCanvasToDisplaySize()
   // controls.update()
   tweenUpdate()
@@ -756,7 +758,7 @@ const render = () => {
 
   renderer.render(scene, camera)
   labelRenderer.render(scene, camera)
-  stats.end()
+  if (showStats) stats.end()
   window.requestAnimationFrame(render)
 }
 export const setBgStarsVisibility = (visible) => {
