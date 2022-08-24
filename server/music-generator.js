@@ -711,7 +711,7 @@ export const generateSong = (constellationData) => {
     {structure: '0000011001100', type: 'Melody 2'},
     {structure: '0000311111113', type: 'Root Bass'},
     {structure: '0001311111113', type: 'High Notes'},
-    {structure: '0000000001113', type: 'Picking'}, // A general picking thing can sound pretty bad, scrap it for now
+    {structure: '0000000001113', type: 'Picking'},
     {structure: '0000000111113', type: 'Fast Arpeggio'},
     {structure: '1111300000000', type: 'Low Drone'},
     {structure: '0000123445678', type: 'Drums'}
@@ -955,27 +955,27 @@ export const getInstrumentForTrack = () => {
   ]
 
   const melody = [
-    'Soft Piano', // good
+    'Soft Piano',
+    'Felt Cassette',
+    'Spliced Upright',
+    'Fingered',
+    'Plucks',
+    'Nasty Tines',
+    'Mini',
+    'Piano Heaven',
+    'Sustain Tuned',
+    'Anthem',
+    'Organ'
     // 'Earth Sign',
     // 'Ghost Hand Bells', // ?
     // 'Trems Slow', // ?
     // 'Gentle', // ?
     // 'Nautilus', // ?
     // 'Nautilus Soft', // ?
-    'Felt Cassette', // good
     // 'Magnetic Reader', // ?
-    'Spliced Upright',
     // 'Gieger', // ?
-    'Fingered', // good
-    'Plucks',
-    'Nasty Tines', // good
-    'Mini',
-    'Piano Heaven',
-    'Sustain Tuned',
     // 'Choir In The Rain', // ?
     // 'Sevastopol', // ?
-    'Anthem',
-    'Organ'
     // 'Warp Laments', // ?
     // 'Warp Souls', // ?
     // 'Chorus Pad',
@@ -997,149 +997,139 @@ export const getInstrumentForTrack = () => {
     'Sumburgh Steel',
     'Space Pluck 2',
     'The Lightkeeper',
-    // 'Ancients',
     'Brutalizer'
+    // 'Ancients',
     // 'Drone',
     // 'Guitar Bowed Drone',
   ]
 
   const highNotes = [
     'Long',
-    'Cyclosa',
-    'Foehn',
-    // 'Hireth',
-    'Oseny',
-    'Petrichor',
-    // 'Saudade',
-    // 'Ghost Hand Bells', //?
     'Brass Loop',
+    'Cyclosa',
+    'Tape Piano',
+    'Breathy Mist',
+    'Sustain Guitar',
+    'Whale Song',
+    'Metallique Cries',
     'Vox Humana Crinkle',
     'Woods Hollow Crinkle',
+    'Ethereal Guitar',
     'Plucks',
-    'Resonance Chaos',
-    'Trems Slow',
-    // 'Nautilus Soft',
-    'Whale Song',
+    'Vocal Pad',
+    'Petrichor',
+    'Oseny',
+    'Warp Fracture',
     'Glass Cabinet',
-    // 'Sustain',
-    // 'Sustain Tuned',
-    'Decay',
+    'Sages Pad',
     'Swells',
-    // 'Choir In The Rain',//?
-    // 'Ghost At The Harbour',//?
+    'Trems Slow',
+    'Foehn',
+    'Decay',
+    'Anthem',
+    'Warp Laments',
     'Glacial Pad',
+    'Octave Echoes',
     'Lost In The Cavern',
     'Sevastopol',
-    'Anthem',
-    // 'Glass 2',
-    'Warp Fracture',
-    'Warp Laments',
-    'Ethereal Guitar',
-    'Sustain Guitar',
-    'Tape Piano',
-    'Sages Pad',
-    'Breathy Mist',
-    // 'Chorus Pad',
+    'Ribbon',
     'Guitar Bowed Drone',
-    'Vocal Pad',
     'Granules',
-    'Metallique Cries',
-    'Octave Echoes',
-    'Ribbon']
+    'Resonance Chaos'
+    // 'Hireth',
+    // 'Saudade',
+    // 'Ghost Hand Bells', //?
+    // 'Nautilus Soft',
+    // 'Sustain',
+    // 'Sustain Tuned',
+    // 'Choir In The Rain',//?
+    // 'Ghost At The Harbour',//?
+    // 'Glass 2',
+    // 'Chorus Pad',
+  ]
 
   const picking = [
-    'Short',
-    'Piano Heaven',
+    'Resonator Music Box',
     'Pipe Piano',
     'Vox Humana',
-    'Pizzicato Ensemble',
-    'Underwater Bass',
+    'Piano Heaven',
     'Plucks',
     'Floe',
-    'Resonator Music Box']
+    'Pizzicato Ensemble',
+    'Short',
+    'Underwater Bass'
+  ]
 
   const fastArpeggio = [
     'Sound The Alarm',
     'The Deeps',
-    // 'Gossip',
-    'Thirds Organ',
-    // 'Brass Loop',
     'Vox Humana',
+    'Magnetic Reader',
+    'Thirds Organ',
+    'Plucks',
+    'Piano Heaven',
+    'Tank Piano',
+    'Pizzicato Ensemble',
+    'Ensemble',
+    'Nasty Tines',
+    'Underwater Bass',
+    'Mobius Blips'
+    // 'Gossip',
+    // 'Brass Loop',
     // 'Vox Humana Crinkle',
     // 'Muted Plucks',
-    'Plucks',
-    'Underwater Bass',
-    'Magnetic Reader',
     // 'Glass Grand Soft',
     // 'Tremolo',
     // 'Sustain Oohs',
     // 'Resonator Music Box',
     // 'Sages Pad',
     // 'Chorus Pad',
-    'Nasty Tines',
-    'Mobius Blips',
-    'Ensemble',
     // 'Bumblebee',
     // 'Granular Piano',
-    'Piano Heaven',
-    'Tank Piano',
     // 'Tape Piano',
-    'Pizzicato Ensemble'
     // 'Synth Stab'
   ]
 
   const lowDrone = [
-    'Sumburgh Steel',
-    'The Lightkeeper',
-    'Ancients',
-    'Andromeda',
-    'Nascent',
-    'Nightfrost',
-    'Phosphor',
-    'Balm',
-    // 'Deep Dream',
-    'Earth Sign',
-    // 'Plaintive Wail',
-    'Thirds Organ',
-    'Transreal',
     'Whalesong',
-    '2 on the Platform',
-    'Break Emergency Glass',
-    'Hayward Crane',
+    'Metro',
     'Night Tube',
-    // 'Nautilus',
-    'Nautilus Soft',
-    // 'Rattle',
-    'Submerged',
     'Decay',
-    // 'Ghost At The Harbour',
     'Glacial Pad',
+    'Balm',
     'Lost In The Cavern',
+    'Hayward Crane',
+    'Break Emergency Glass',
+    '2 on the Platform',
+    'Fragile Air',
+    'Submerged',
+    'Nautilus Soft',
+    'Chorus Pad',
+    'Metallique Cries',
+    'Transreal',
+    'Nascent',
+    'Ribbon',
+    'Breathy Mist',
+    'Nightfrost',
+    'Thirds Organ',
+    'The Lightkeeper',
+    'Sumburgh Steel',
+    'Ancients',
+    'Earth Sign',
+    'Andromeda',
+    'Phosphor'
+    // 'Deep Dream',
+    // 'Plaintive Wail',
+    // 'Nautilus',
+    // 'Rattle',
+    // 'Ghost At The Harbour',
     // 'Helicopter',
     // 'Horn',
-    'Metro',
-    'Breathy Mist',
-    'Chorus Pad',
-    'Fragile Air',
     // 'Granules',
     // 'Metallique',
-    'Metallique Cries',
-    'Ribbon']
+  ]
   const drums = [
-    'ACT Algier Action',
-    'ACT Distress',
-    'ACT Forward Mission',
-    'ACT Mounting Danger',
-    'ACT Rimshot Dance',
-    'ACT Rolling Thunder',
-
-    'ACT Cyberlicious',
-    'ACT Morse Code',
-    'ACT Platic Box Ensemble',
-    'ACT Purring Alien',
-    'ACT Steady Rolling',
-    'ACT Taiko Army',
-
+    // Light
     'AIR A Bit Foggy',
     'AIR Bouncing Static',
     'AIR Dubbie Hats',
@@ -1149,58 +1139,58 @@ export const getInstrumentForTrack = () => {
 
     'ALN Clock Groove',
     'ALN Diving Danger',
-    'ALN Ear Piercer',
-    'ALN Earsick',
-    // 'ALN Ebb and Flow',// Doesn't sound great
-    'ALN Lost In Space Echo',
     'ALN Pipe Drumming',
-    'ALN Strange Mess',
     'ALN Whatdidhesayyyy',
 
-    'BAT Battery',
-    'BAT Carol of Drums',
-    'BAT Heart Pump',
-    'BRU Eleven Inch Nails',
+    // Glitch effects
+    'GLT Brrrbs',
+    'GLT I Found A Gameboy',
+    'GLT Step Filter Groove',
+
+    'ACT Plastic Box Ensemble',
+    'ACT Cyberlicious',
+    'ACT Purring Alien',
+    'ACT Morse Code',
+
+    'DRT Dirty Needle',
+
+    'CPY Space X Delay',
+    'CPY Hip Movement',
+    'CPY Thru Gates',
+    'CPY Stutter Groove',
+    'CPY Rhytmn Gator',
+    'CPY Chucka',
+    'CPY Gaterade',
+
+    // Noisy
+    'GRO Coming And Going',
+    'GRO Diving Bell',
+    'GRO Dubganger',
+    'GRO Relaxed Big Drums',
 
     'CIN Adrenaline Building',
     'CIN Attack From East',
     'CIN Pumped Hannibal',
     'CIN Right Behind You',
 
-    'COL Amboss Troops',
-    'COL Big Bottoms',
-    'COL Big Hurry',
-    'COL Death Of A King',
-    'COL Doppler Monster',
-
-    'CPY Chucka',
-    'CPY Gaterade',
-    'CPY Hip Movement',
-    'CPY Rhytmn Gator',
-    'CPY Space X Delay',
-    'CPY Stutter Groove',
-    'CPY Thru Gates',
-
-    'DRT Dirty Needle',
-    'GIA Attila',
-    'GIA The Siege',
-    'GIA Twin Hits',
-
-    'GLT Brrrbs',
-    'GLT I Found A Gameboy',
-    'GLT Step Filter Groove',
-
-    'GRO Coming And Going',
-    'GRO Diving Bell',
-    'GRO Dubganger',
-    'GRO Relaxed Big Drums',
+    'ALN Strange Mess',
+    'ALN Ear Piercer',
+    'ALN Earsick',
+    // 'ALN Ebb and Flow',// Doesn't sound great
+    'ALN Lost In Space Echo',
 
     'POW David And Goliath',
     'POW In A Strut',
     'POW Micro Brewery',
     'POW Ping Pong Armies',
-    'POW Procssor Progressor',
+    'POW Processor Progressor',
     'POW Washing Machine',
+
+    'BAT Heart Pump',
+    'BAT Battery',
+    'BAT Carol of Drums',
+
+    'BRU Eleven Inch Nails',
 
     'SUS Are You Nervous',
     'SUS Bam Bam',
@@ -1208,9 +1198,29 @@ export const getInstrumentForTrack = () => {
     'SUS Fried Transistors',
     'SUS Start Stop',
 
+    // Hard
     'THR Death By Gravity',
     'THR March Of The Drums',
-    'THR Valley Of The King'
+    'THR Valley Of The King',
+
+    'ACT Steady Rolling',
+    'ACT Taiko Army',
+    'ACT Algier Action',
+    'ACT Distress',
+    'ACT Forward Mission',
+    'ACT Mounting Danger',
+    'ACT Rimshot Dance',
+    'ACT Rolling Thunder',
+
+    'GIA Attila',
+    'GIA The Siege',
+    'GIA Twin Hits',
+
+    'COL Amboss Troops',
+    'COL Big Bottoms',
+    'COL Big Hurry',
+    'COL Death Of A King',
+    'COL Doppler Monster'
   ]
   return {
     'Chords': chords,
