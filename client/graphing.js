@@ -464,7 +464,7 @@ const populateGraphOneInfo = (starData) => {
   // TODO - Fix styling for col-3
 }
 const populateExplainInfo = (starData) => {
-  document.querySelector('.info-full .name').textContent = 'Explanation as to how it all works'
+  document.querySelector('.info-full .name').textContent = 'How it all works'
   document.querySelector('.info-full .info-body').innerHTML = `<p>TBC</p>`
 }
 export const showInfoLong = () => {
