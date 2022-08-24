@@ -147,13 +147,8 @@ const createPitchExplanationDistanceCircle = (targetPoint, starPoint, angleFromC
     // Shape
     const innerRadius = i * segmentRadius
     const outerRadius = (i + 1) * segmentRadius
-    // const color = i % 2 === 0 ? 0xFF00FF : 0x1363DF
-    // let color = i % 2 === 0 ? 0xFFFF00 : 0x0000FF
-    // if (i === 0 || i === segmentTotal - 1) color = 0xFFFFFF
-
     const color = getNoteTypeColor(i)
-
-    const geometry = new RingGeometry(innerRadius, outerRadius, 32)
+    const geometry = new RingGeometry(innerRadius, outerRadius, 32 + (5 * i))
     const material = new MeshBasicMaterial({ color: color, opacity: 0.3, transparent: true, side: DoubleSide })
     const mesh = new Mesh(geometry, material)
     mesh.position.x = targetPoint.x

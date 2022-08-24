@@ -129,8 +129,12 @@
         .action-links i {
             font-size: 40px;
             padding: 0 10px;
-            background-color: rgba(0, 0, 0, 0.6);
             color: #6c757d;
+        }
+
+        .action-links .action-bg {
+            background-color: rgba(0, 0, 0, 0.6);
+            display: inline-block;
         }
 
         .action-links i:hover {
@@ -255,8 +259,17 @@
             border-color: rgba(0, 0, 0, 0.6) transparent transparent transparent;
         }
 
+        .ldBar-label {
+            font-size: 1.25rem;
+        }
+
         .ldBar-label:after {
             content: " %";
+        }
+
+        .ldBar path.baseline,
+        .ldBar path.mainline {
+            stroke-linecap: round;
         }
 
         .loading {
@@ -350,12 +363,12 @@
     <footer class="fixed-bottom">
         <nav class="w-100 text-center">
             <div class="navbar-text action-links">
-                <i class="bi bi-play-btn action-play tooltip-parent tone-clip"><span class="tooltip-text">Play</span></i>
-                <i class="bi bi-info-circle action-info tooltip-parent"><span class="tooltip-text">Constellation Info</span></i>
-                <i class="bi bi-bar-chart-line action-graph-all tooltip-parent"><span class="tooltip-text">All constellation analysis</span></i>
-                <i class="bi bi-graph-up action-graph-one tooltip-parent"><span class="tooltip-text">One constellation analysis</span></i>
-                <i class="bi bi-chat-quote action-explain tooltip-parent"><span class="tooltip-text">Detailed explanation</span></i>
-                <i class="bi bi-stars action-all-stars tooltip-parent active"><span class="tooltip-text">Show / Hide stars for performance</span></i>
+                <span class="action-bg"><i class="bi bi-play-btn action-play tooltip-parent tone-clip"><span class="tooltip-text">Play</span></i></span>
+                <span class="action-bg"><i class="bi bi-info-circle action-info tooltip-parent"><span class="tooltip-text">Constellation Info</span></i></span>
+                <span class="action-bg"><i class="bi bi-bar-chart-line action-graph-all tooltip-parent"><span class="tooltip-text">All constellation analysis</span></i></span>
+                <span class="action-bg"><i class="bi bi-graph-up action-graph-one tooltip-parent"><span class="tooltip-text">One constellation analysis</span></i></span>
+                <span class="action-bg"><i class="bi bi-chat-quote action-explain tooltip-parent"><span class="tooltip-text">Detailed explanation</span></i></span>
+                <span class="action-bg"><i class="bi bi-stars action-all-stars tooltip-parent active"><span class="tooltip-text">Show / Hide stars for performance</span></i></span>
             </div>
         </nav>
     </footer>

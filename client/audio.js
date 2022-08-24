@@ -172,9 +172,10 @@ const playToneClip = async (starData, toneData) => {
     }
     const scaleNotes = Scale.get(toneData.scale.chroma).intervals.map(Note.transposeFrom('C')).map(v => (v) + '4')
     scaleNotes.push('C5')
-    new Pattern(function (time, note) {
+    const scalePattern = new Pattern(function (time, note) {
       piano.triggerAttackRelease(note, '4n', time)
     }, scaleNotes, 'up').start(0)
+    activeSamplers.push(scalePattern)
     Transport.bpm.value = 120
   } else if (toneData.type === 'chords' || toneData.type === 'melody') {
     if (piano === null) {
@@ -182,8 +183,10 @@ const playToneClip = async (starData, toneData) => {
       setLoadingPercent(100)
     }
     const visualMelody = setupMelodyExplanation(toneData.constellation)
-    // const notesToPlay = toneData.melody ? toneData.chords.concat(toneData.melody) : toneData.chords
-    const notesToPlay = toneData.melody ? toneData.melody : toneData.chords
+    const notesToPlay = toneData.melody ? toneData.chords.concat(toneData.melody) : toneData.chords
+    // const notesToPlay = toneData.melody ? toneData.melody : toneData.chords
+
+    console.log('totalBars', notesToPlay.find(n => n.totalBars).totalBars)
     const totalBars = toneData.type === 'melody' ? notesToPlay.find(n => n.totalBars).totalBars : 4
     const timeForAnimation = 1000 * Math.pow(toneData.bpm / 60, -1) * 4 * totalBars
     const part = new Part((time, value) => {
@@ -197,7 +200,7 @@ const playToneClip = async (starData, toneData) => {
 
     part.loop = true
     part.loopEnd = '4m'
-
+    activeSamplers.push(part)
     Transport.bpm.value = toneData.bpm
   } else if (toneData.type === 'song') {
     const visualMelody = setupMelodyExplanation(toneData.constellation)
@@ -206,7 +209,8 @@ const playToneClip = async (starData, toneData) => {
       notesToPlay = notesToPlay.concat(track.notes)
     }
     const totalBars = notesToPlay.find(n => n.totalBars).totalBars
-    const timeForAnimation = 1000 * Math.pow(toneData.bpm / 60, -1) * 4 * totalBars
+
+    const timeForAnimation = 1000 * Math.pow(toneData.bpm / 60, -1) * 4 * totalBars // This isn't right - Tucana
 
     if (toneData.url) {
       // console.log('has url', toneData.url)
@@ -219,14 +223,16 @@ const playToneClip = async (starData, toneData) => {
           resolve()
         }).toDestination()
         player.sync().start(0)
+        activeSamplers.push(player)
       })
       const playerLoadingPromiseResult = await playerLoadingPromise
-      console.log('Player  promise resolved', toneData.url, playerLoadingPromiseResult)
-      new Part((time, value) => {
+      console.log('Player promise resolved', toneData.url, playerLoadingPromiseResult)
+      const part = new Part((time, value) => {
         Draw.schedule(function () {
           triggeredAnimationAction(visualMelody, value, timeForAnimation)
         }, time)
       }, notesToPlay).start(0)
+      activeSamplers.push(part)
       setLoadingPercent(100)
     } else {
       for (const [i, track] of toneData.song.entries()) {
@@ -236,7 +242,7 @@ const playToneClip = async (starData, toneData) => {
         console.log('track', i, track)
         setLoadingPercent(100 / toneData.song.length * i)
 
-        new Part((time, value) => {
+        const part = new Part((time, value) => {
           // if (!value.ignore && !track.type.startsWith('Melody')) {
           if (!value.ignore) {
             track.sampler.triggerAttackRelease(value.note, value.duration, time)
@@ -245,15 +251,18 @@ const playToneClip = async (starData, toneData) => {
             triggeredAnimationAction(visualMelody, value, timeForAnimation, track.instrument)
           }, time)
         }, track.notes).start(0)
+        activeSamplers.push(part)
       }
     }
+    const endPart = new Part((time, value) => {
+      console.log('SCHEDULED END')
+      stopToneClips()
+    }, [{time: '52:2:0'}]).start(0)
+    activeSamplers.push(endPart)
     Transport.bpm.value = toneData.bpm
   }
   setLoadingPercent(100)
   hideLoadingText()
-
-  // TODO - Still need to figure out a way to call stopToneClips() after all notes have finished playing, or just everything?!
-
   Transport.start('+0.05')
 }
 
