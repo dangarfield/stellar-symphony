@@ -16,6 +16,7 @@
     "dependencies": {
         "@loadingio/loading-bar": "^0.1.1",
         "@rollup/plugin-commonjs": "^22.0.2",
+        "@splidejs/splide": "^4.0.7",
         "@tonaljs/tonal": "^4.6.5",
         "@tonejs/midi": "^2.0.28",
         "@tweenjs/tween.js": "^18.6.4",

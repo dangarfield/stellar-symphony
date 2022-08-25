@@ -512,7 +512,7 @@ export const focusMapOnConstellation = (constellation) => {
 const initScene = () => {
   const canvasWidth = document.querySelector('.star-map').clientWidth
   const canvasHeight = document.querySelector('.star-map').clientHeight // canvasWidth < 600 ? canvasWidth : Math.round(canvasWidth / 2)
-  console.log('canvas sizes', canvasWidth, canvasHeight)
+  // console.log('canvas sizes', canvasWidth, canvasHeight)
   scene = new Scene()
   scene.background = new Color(0x000000)
 
@@ -780,7 +780,7 @@ export const addStarMap = (passedStarData) => {
   updateFovFromDistance()
   setupMelodyExplanationGroup()
   const initialConstellation = starData.constellations.find(c => c.constellationName === 'Aquarius') || starData.constellations[0]
-  console.log('initialConstellation', initialConstellation)
+  // console.log('initialConstellation', initialConstellation)
   updateSelectedConstellation(starData, initialConstellation.constellation, true)
   showInfoLong()
   render()

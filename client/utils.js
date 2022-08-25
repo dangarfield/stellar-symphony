@@ -4,7 +4,7 @@ import LdBar from '@loadingio/loading-bar'
 const loadingBar = new LdBar('.ld-bar')
 
 export const setLoadingText = (text) => {
-  console.log('setLoadingText', text)
+  // console.log('setLoadingText', text)
   document.querySelector('.loading-text').innerHTML = text
   document.querySelector('.loading').style.display = 'block'
 }
