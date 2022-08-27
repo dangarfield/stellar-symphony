@@ -592,4 +592,17 @@ export const initConstellationData = (starData) => {
   bindActionLinks(starData)
   processMandatoryConstellationData(starData)
   preProcessGraphData(starData)
+
+  // const allIn = []
+  // for (const [track, instrus] of Object.entries(starData.instruments.tracks)) {
+  //   // console.log(`${track}: ${instrus}`)
+  //   for (const instru of instrus) {
+  //     if (instru.substring(0, 4) !== instru.substring(0, 4).toUpperCase() && !allIn.includes(instru)) {
+  //       allIn.push(instru)
+  //     }
+  //   }
+  // }
+  // allIn.sort()
+  // console.log('allIn')
+  // console.log(allIn)
 }
