@@ -539,7 +539,7 @@ const initScene = () => {
   controls = new OrbitControls(camera, renderer.domElement)
   // controls.rotateSpeed *= -1; // This isn't working, should ideally be opposite up and down, scroll in / out, not pan
   controls.minDistance = 0
-  controls.maxDistance = 1
+  controls.maxDistance = 0.99
   controls.zoomSpeed = 2
   // console.log('controls', controls)
   controls.addEventListener('change', function (change) {

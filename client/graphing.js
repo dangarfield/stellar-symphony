@@ -103,15 +103,15 @@ const generateConstellationMapDataHtml = (constellationData, instruments) => {
   return `
     <p>
       Song:
-      <i class="bi bi-play-circle tone-clip"
-        data-constellation="${constellationData.constellation}" data-type="song">
-        Basic notes
-      </i>
       ${constellationData.music.songPath ? `
-      - <i class="bi bi-play-circle tone-clip"
+      <i class="bi bi-play-circle tone-clip"
         data-constellation="${constellationData.constellation}" data-type="song" data-url="${constellationData.music.songPath}">
         Full band
-      </i>` : ''}
+      </i> - ` : ''}
+      <i class="bi bi-play-circle tone-clip"
+        data-constellation="${constellationData.constellation}" data-type="song">
+        Real time
+      </i>
     </p>
     </p>
 
