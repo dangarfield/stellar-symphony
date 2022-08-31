@@ -103,15 +103,16 @@ const generateConstellationMapDataHtml = (constellationData, instruments) => {
   return `
     <p>
       Song:
-      ${constellationData.music.songPath ? `
-      <i class="bi bi-play-circle tone-clip"
-        data-constellation="${constellationData.constellation}" data-type="song" data-url="${constellationData.music.songPath}">
-        Full band
-      </i> - ` : ''}
+
       <i class="bi bi-play-circle tone-clip"
         data-constellation="${constellationData.constellation}" data-type="song">
         Real time
       </i>
+      ${constellationData.music.songPath ? `
+      - <i class="bi bi-play-circle tone-clip"
+        data-constellation="${constellationData.constellation}" data-type="song" data-url="${constellationData.music.songPath}">
+        Recording
+      </i>` : ''}
     </p>
     </p>
 
@@ -317,7 +318,7 @@ const addConstellationSelectOptions = (starData) => {
   for (const constellation of starData.constellations) {
     const opt = document.createElement('option')
     opt.value = constellation.constellation
-    opt.text = constellation.constellationName + `${constellation.music.songPath ? ' (Full band)' : ''}`
+    opt.text = constellation.constellationName + `${constellation.music.songPath ? ' (Recording)' : ''}`
     constellationSelect.add(opt)
   }
 

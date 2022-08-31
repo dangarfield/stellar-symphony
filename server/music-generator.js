@@ -956,16 +956,24 @@ export const getInstrumentForTrack = () => {
 
   const melody = [
     'Soft Piano',
+    'Woods Hollow Crinkle',
     'Felt Cassette',
-    'Spliced Upright',
+    // 'Capstan Upright',
+    // 'Granualar Piano',
+    'Tank Piano',
+    // 'Spliced Upright',
     'Fingered',
     'Plucks',
+    'Floe',
+    // 'Ensemble',
+    // 'Tape Wurli',
     'Nasty Tines',
     'Mini',
-    'Piano Heaven',
+    // 'Piano Heaven',
     'Sustain Tuned',
-    'Anthem',
-    'Organ'
+    'Anthem'
+    // 'Organ'
+
     // 'Earth Sign',
     // 'Ghost Hand Bells', // ?
     // 'Trems Slow', // ?
