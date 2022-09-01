@@ -214,9 +214,11 @@ const playToneClip = async (starData, toneData) => {
 
     if (toneData.url) {
       // console.log('has url', toneData.url)
+      const ignoredNotes = JSON.parse(JSON.stringify(notesToPlay))
+
       const playerLoadingPromise = new Promise(resolve => {
-        for (const note of notesToPlay) {
-          note.ignore = true
+        for (const ignoredNote of ignoredNotes) {
+          ignoredNote.ignore = true
         }
         const player = new Player(toneData.url, function () {
           // console.log('Player loaded', toneData.url)
@@ -231,7 +233,7 @@ const playToneClip = async (starData, toneData) => {
         Draw.schedule(function () {
           triggeredAnimationAction(visualMelody, value, timeForAnimation)
         }, time)
-      }, notesToPlay).start(0)
+      }, ignoredNotes).start(0)
       activeSamplers.push(part)
       setLoadingPercent(100)
     } else {
