@@ -316,3 +316,5 @@ export const getToneDataFromElementAndPlay = (starData, ele) => {
   console.log('.tone-clip click', type, constellationId, constellation, toneData)
   playToneClip(starData, toneData)
 }
+
+// TODO - when recording is player, the real times do not

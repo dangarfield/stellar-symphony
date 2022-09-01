@@ -162,7 +162,7 @@ const createPitchExplanationDistanceCircle = (targetPoint, starPoint, angleFromC
     // Labels
     const expDiv = document.createElement('div')
     expDiv.className = 'label-note'
-    expDiv.textContent = `${toRomanNumeral(i + 1)} ${scaleNotes[i].substring(0, scaleNotes[i].length - 1)}`
+    expDiv.textContent = `${scaleNotes[i].substring(0, scaleNotes[i].length - 1)} (${toRomanNumeral(i + 1)})`
     const expLabel = new CSS2DObject(expDiv)
     const expPos = new Vector3()
     expPos.lerpVectors(targetPoint, starPoint, i / segmentTotal + (0.5 / segmentTotal))
@@ -210,7 +210,7 @@ const createPitchExplanationAngleCircle = (targetPoint, starPoint, angleFromCent
 
     const expDiv = document.createElement('div')
     expDiv.className = 'label-note'
-    expDiv.textContent = `${toRomanNumeral(notePos + 1)} ${scaleNotes[notePos].substring(0, scaleNotes[notePos].length - 1)}`
+    expDiv.textContent = `${scaleNotes[notePos].substring(0, scaleNotes[notePos].length - 1)} (${toRomanNumeral(notePos + 1)})`
     const expLabel = new CSS2DObject(expDiv)
     const expPos = new Vector3()
     expPos.lerpVectors(targetPoint, starPoint, 0.95)

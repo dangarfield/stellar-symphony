@@ -310,6 +310,10 @@
             color: black;
         }
 
+        .loading .blockquote-footer {
+            margin: 0;
+        }
+
         @media (max-width: 576px) {
             .explanation .nav-pills .nav-link {
                 padding: 4px;
@@ -333,6 +337,14 @@
             .action-links i {
                 font-size: 30px;
                 padding: 0 3px;
+            }
+
+            .loading.translate-middle {
+                transform: translate(-0%, -50%) !important;
+            }
+
+            .loading.start-50 {
+                left: 0% !important;
             }
         }
     </style>
@@ -361,6 +373,13 @@
     <div class="icon-holders">
         <div class="star-map"></div>
         <div class="loading position-absolute top-50 start-50 translate-middle">
+            <div class="quote" style="display: none;">
+                <blockquote class="blockquote text-center">
+                    <p class="mb-0">And sometimes instead of these innocent souls he only thinks of the girl who was named after the Moon</p>
+                    <footer class="blockquote-footer">Dan</footer>
+                </blockquote>
+                <hr />
+            </div>
             <h3 class="loading-text text-center">Loading...</h3>
             <div class="ld-bar text-center" style="width:100%;height:60px" data-stroke="data:ldbar/res,gradient(0,1,#FF00FF, #1363DF)" data-path="M10 20Q20 15 30 20Q40 25 50 20Q60 15 70 20Q80 25 90 20" data-value="0">
             </div>

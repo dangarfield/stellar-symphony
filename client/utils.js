@@ -3,8 +3,15 @@ import LdBar from '@loadingio/loading-bar'
 
 const loadingBar = new LdBar('.ld-bar')
 
-export const setLoadingText = (text) => {
-  // console.log('setLoadingText', text)
+export const ensureCorrectLoadingText = async () => {
+  if (window.location.hostname !== 'localhost') {
+    const timeZone = window.Intl.DateTimeFormat().resolvedOptions().timeZone
+    if (timeZone !== 'Europe/London') {
+      document.querySelector('.loading .quote').style.display = 'block'
+    }
+  }
+}
+export const setLoadingText = async (text) => {
   document.querySelector('.loading-text').innerHTML = text
   document.querySelector('.loading').style.display = 'block'
 }
