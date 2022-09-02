@@ -1,5 +1,5 @@
 import {ScaleType, Scale, Note} from '@tonaljs/tonal'
-import {Sampler, Transport, Pattern, Part, start as ToneStart, Draw, Player, JCReverb} from 'tone'
+import {Sampler, Transport, Pattern, Part, start as ToneStart, Draw, Player, JCReverb, ToneAudioBuffer, getContext as getAudioContext} from 'tone'
 import {setupMelodyExplanation, stopMelodyExplanation} from './map.js'
 import {setLoadingText, hideLoadingText, setLoadingPercent} from './utils.js'
 
@@ -215,20 +215,11 @@ const playToneClip = async (starData, toneData) => {
     if (toneData.url) {
       // console.log('has url', toneData.url)
       const ignoredNotes = JSON.parse(JSON.stringify(notesToPlay))
+      for (const ignoredNote of ignoredNotes) {
+        ignoredNote.ignore = true
+      }
+      await getPlayerWithLoadingProgress(toneData.url)
 
-      const playerLoadingPromise = new Promise(resolve => {
-        for (const ignoredNote of ignoredNotes) {
-          ignoredNote.ignore = true
-        }
-        const player = new Player(toneData.url, function () {
-          // console.log('Player loaded', toneData.url)
-          resolve()
-        }).toDestination()
-        player.sync().start(0)
-        activeSamplers.push(player)
-      })
-      const playerLoadingPromiseResult = await playerLoadingPromise
-      console.log('Player promise resolved', toneData.url, playerLoadingPromiseResult)
       const part = new Part((time, value) => {
         Draw.schedule(function () {
           triggeredAnimationAction(visualMelody, value, timeForAnimation)
@@ -285,6 +276,50 @@ export const getScaleNotesFromChrome = (chroma) => {
 // Melody 1 Timing = distance from alpha
 // Melody 1 Notes =  angle from centre
 
+const loadBuffer = async (url) => {
+  // test if the url contains multiple extensions
+  const matches = url.match(/\[([^\]\[]+\|.+)\]$/)
+  if (matches) {
+    const extensions = matches[1].split('|')
+    let extension = extensions[0]
+    for (const ext of extensions) {
+      if (ToneAudioBuffer.supportsType(ext)) {
+        extension = ext
+        break
+      }
+    }
+    url = url.replace(matches[0], extension)
+  }
+
+  // make sure there is a slash between the baseUrl and the url
+  const baseUrl = ToneAudioBuffer.baseUrl === '' || ToneAudioBuffer.baseUrl.endsWith('/') ? ToneAudioBuffer.baseUrl : ToneAudioBuffer.baseUrl + '/'
+  const response = await fetch(baseUrl + url)
+  if (!response.ok) {
+    throw new Error(`could not load url: ${url}`)
+  }
+  const arrayBuffer = await response.arrayBuffer()
+
+  const audioBuffer = await getAudioContext().decodeAudioData(arrayBuffer)
+
+  return audioBuffer
+}
+
+const getPlayerWithLoadingProgress = async (url) => {
+  let player
+  const playerLoadingPromise = new Promise(resolve => {
+    player = new Player(url, function () {
+      resolve()
+    })
+  })
+  await playerLoadingPromise
+  // player = await (new Player(url))
+  player.toDestination()
+  player.sync().start(0)
+  activeSamplers.push(player)
+
+  console.log('Player promise resolved', url)
+  return player
+}
 export const getToneDataFromElementAndPlay = (starData, ele) => {
   const type = ele.getAttribute('data-type')
   const constellationId = ele.getAttribute('data-constellation')
