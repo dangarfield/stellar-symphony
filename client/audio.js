@@ -1,3 +1,4 @@
+import axios from 'axios'
 import {ScaleType, Scale, Note} from '@tonaljs/tonal'
 import {Sampler, Transport, Pattern, Part, start as ToneStart, Draw, Player, JCReverb, ToneAudioBuffer, getContext as getAudioContext} from 'tone'
 import {setupMelodyExplanation, stopMelodyExplanation} from './map.js'
@@ -276,9 +277,9 @@ export const getScaleNotesFromChrome = (chroma) => {
 // Melody 1 Timing = distance from alpha
 // Melody 1 Notes =  angle from centre
 
-const loadBuffer = async (url) => {
+const loadBufferWithProgress = async (url) => {
   // test if the url contains multiple extensions
-  const matches = url.match(/\[([^\]\[]+\|.+)\]$/)
+  const matches = url.match(/\[([^]\[]+\|.+)\]$/)
   if (matches) {
     const extensions = matches[1].split('|')
     let extension = extensions[0]
@@ -293,25 +294,32 @@ const loadBuffer = async (url) => {
 
   // make sure there is a slash between the baseUrl and the url
   const baseUrl = ToneAudioBuffer.baseUrl === '' || ToneAudioBuffer.baseUrl.endsWith('/') ? ToneAudioBuffer.baseUrl : ToneAudioBuffer.baseUrl + '/'
-  const response = await fetch(baseUrl + url)
-  if (!response.ok) {
-    throw new Error(`could not load url: ${url}`)
-  }
-  const arrayBuffer = await response.arrayBuffer()
 
+  const response = await axios.get(baseUrl + url, {
+    responseType: 'arraybuffer',
+    onDownloadProgress: function (progressEvent) {
+      let percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+      // console.log('progress', progressEvent, percentCompleted)
+      if (percentCompleted === Infinity) percentCompleted = 100
+      setLoadingPercent(percentCompleted)
+    }
+  })
+  const arrayBuffer = response.data
   const audioBuffer = await getAudioContext().decodeAudioData(arrayBuffer)
-
   return audioBuffer
 }
 
 const getPlayerWithLoadingProgress = async (url) => {
-  let player
-  const playerLoadingPromise = new Promise(resolve => {
-    player = new Player(url, function () {
-      resolve()
-    })
-  })
-  await playerLoadingPromise
+  console.log('pre buf')
+  const buf = await loadBufferWithProgress(url)
+  console.log('post buf', buf)
+  let player = new Player(buf)
+  // const playerLoadingPromise = new Promise(resolve => {
+  //   player = new Player(buf, function () {
+  //     resolve()
+  //   })
+  // })
+  // await playerLoadingPromise
   // player = await (new Player(url))
   player.toDestination()
   player.sync().start(0)
