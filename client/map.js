@@ -7,7 +7,7 @@ import { Line2 } from 'three/examples/jsm/lines/Line2.js'
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js'
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js'
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js'
-import {updateSelectedConstellation, showInfoLong} from './graphing.js'
+import {updateSelectedConstellation, showDefaultInfoWindow} from './graphing.js'
 import {Tween, update as tweenUpdate, Easing} from '@tweenjs/tween.js'
 import {getScaleNotesFromChrome} from './audio.js'
 import Stats from 'three/examples/jsm/libs/stats.module.js'
@@ -108,7 +108,7 @@ const toRomanNumeral = (i) => {
   } else if (i === 7) {
     return 'VII'
   } else if (i === 8) {
-    return 'VIII'
+    return 'I'
   }
   return i
 }
@@ -782,6 +782,6 @@ export const addStarMap = (passedStarData) => {
   const initialConstellation = starData.constellations.find(c => c.constellationName === 'Aquarius') || starData.constellations[0]
   // console.log('initialConstellation', initialConstellation)
   updateSelectedConstellation(starData, initialConstellation.constellation, true)
-  showInfoLong()
+  showDefaultInfoWindow()
   render()
 }

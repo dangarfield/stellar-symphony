@@ -510,7 +510,15 @@ const populateExplainInfo = (starData) => {
   }
   // TODO - I probably should unbind navLink clicks and destroy the splide instance
 }
-export const showInfoLong = () => {
+export const showDefaultInfoWindow = () => {
+  if (window.localStorage.getItem('has-loaded')) {
+    showInfoLong()
+  } else {
+    showInfoExplain()
+    window.localStorage.setItem('has-loaded', true)
+  }
+}
+const showInfoLong = () => {
   hideAllOverlays()
   document.querySelector('.info-long').style.display = 'flex'
   document.querySelector('.action-info').classList.add('active')
