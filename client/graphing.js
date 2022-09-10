@@ -595,7 +595,6 @@ const bindActionLinks = (starData) => {
     this.classList.contains('active') ? hideInfoExplain() : showInfoExplain(starData)
   })
 }
-
 export const initConstellationData = (starData) => {
   addConstellationSelectOptions(starData)
   bindInfoClose()
