@@ -502,7 +502,7 @@ const populateExplainInfo = (starData) => {
     navLink.addEventListener('click', function () {
       const slideHeading = this.getAttribute('data-heading')
       const slideIndex = splide.Components.Slides.get().findIndex(s => s.slide.getAttribute('data-heading') === slideHeading)
-      console.log('slideHeading', slideHeading, slideIndex)
+      // console.log('slideHeading', slideHeading, slideIndex)
       if (slideIndex >= 0) {
         splide.go(slideIndex)
       }
