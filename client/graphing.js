@@ -91,9 +91,9 @@ const getInstrumentSelectHtml = (trackType, constellationData, tracks) => {
   const instrument = constellationData.music.songNotes.find(t => t.type === trackType).instrument
   return `
     <div class="mb-3 row">
-      <label class="col-sm-5 col-form-label">${trackType}</label>
+      <label class="col-sm-5 col-form-label form-select-sm">${trackType}</label>
       <div class="col-sm-7">
-        <select class="form-select info-long-instrument-select" data-type="${trackType}">
+        <select class="form-select form-select-sm info-long-instrument-select" data-type="${trackType}">
         ${tracks[trackType].map(i => `<option value="${i}"${i === instrument ? ' selected' : ''}>${i}</option>`)}
         </select>
       </div>
