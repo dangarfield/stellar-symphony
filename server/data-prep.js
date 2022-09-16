@@ -5,7 +5,7 @@ import * as THREE from 'three'
 import * as path from 'path'
 import fetch from 'node-fetch'
 import { getScale, getChords, getMelodyWithTimingByDistance, getMelodyWithTimingByAngle, chordsToToneNotes,
-  generateSong, debugNotes, getInstruments, applyInstrumentsToMusic } from './music-generator.js'
+  generateSong, debugNotes, getInstruments, applyInstrumentsToMusic, isFavourite } from './music-generator.js'
 
 const downloadDataFile = async (url, path) => {
   const res = await fetch(url)
@@ -473,6 +473,9 @@ const calculateAndAddAveragesToConstellations = (starData) => {
 
     if (fs.existsSync(path.join('_static', 'audio', `${constellationData.constellationName}.mp3`))) {
       constellationData.music.songPath = `audio/${constellationData.constellationName}.mp3`
+    }
+    if (isFavourite(constellationData.constellationName)) {
+      constellationData.music.isFavourite = true
     }
     // console.log('music', constellationData.music)
     // }

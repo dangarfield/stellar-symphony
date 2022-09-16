@@ -5,6 +5,38 @@ import {setupMelodyExplanation, stopMelodyExplanation} from './map.js'
 import {setLoadingText, hideLoadingText, setLoadingPercent} from './utils.js'
 
 const activeSamplers = []
+let continuousPlay = false
+let rotationList = []
+
+const playNextRotation = async () => {
+  stopToneClips()
+  const nextConstellation = rotationList.shift()
+  if (rotationList.length === 0) {
+    populateRotationList()
+  }
+  console.log('playRotate', nextConstellation)
+  document.querySelector('.constellation-select').value = nextConstellation
+  document.querySelector('.constellation-select').dispatchEvent(new window.Event('change'))
+  setTimeout(function () {
+    document.querySelector('.action-play').click()
+  }, 1010)
+}
+const populateRotationList = () => {
+  rotationList = [...document.querySelectorAll('.constellation-select option')].filter(o => o.textContent.includes('Favourite')).map(o => o.value)
+  console.log('populateRotationList', rotationList)
+}
+export const playRotate = () => {
+  document.querySelector('.action-play-rotate').classList.add('active')
+  continuousPlay = true
+  if (rotationList.length === 0) {
+    populateRotationList()
+  }
+  playNextRotation()
+}
+export const stopRotate = () => {
+  document.querySelector('.action-play-rotate').classList.remove('active')
+  continuousPlay = false
+}
 const removeAllSamplers = () => {
   // console.log('removeAllSamplers', activeSamplers)
   while (activeSamplers.length > 0) {
@@ -251,6 +283,9 @@ const playToneClip = async (starData, toneData) => {
     const endPart = new Part((time, value) => {
       console.log('SCHEDULED END')
       stopToneClips()
+      if (continuousPlay) {
+        playNextRotation()
+      }
     }, [{time: '52:2:0'}]).start(0)
     activeSamplers.push(endPart)
     Transport.bpm.value = toneData.bpm

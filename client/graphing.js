@@ -1,4 +1,4 @@
-import {getScaleText, getToneDataFromElementAndPlay, stopToneClips, loadSampler} from './audio.js'
+import {getScaleText, getToneDataFromElementAndPlay, stopToneClips, loadSampler, playRotate, stopRotate} from './audio.js'
 import {focusMapOnConstellation, setBgStarsVisibility} from './map.js'
 import {Chart, ScatterController, LinearScale, PointElement, LineController, CategoryScale, LineElement, Legend} from 'chart.js'
 import Splide from '@splidejs/splide'
@@ -318,7 +318,9 @@ const addConstellationSelectOptions = (starData) => {
   for (const constellation of starData.constellations) {
     const opt = document.createElement('option')
     opt.value = constellation.constellation
-    opt.text = constellation.constellationName + `${constellation.music.songPath ? ' (Recording)' : ''}`
+    opt.text = constellation.constellationName
+    if (constellation.music.songPath) { opt.text += ' (Recording)' }
+    if (constellation.music.isFavourite) { opt.text += ' (Favourite)' }
     constellationSelect.add(opt)
   }
 
@@ -593,6 +595,9 @@ const bindActionLinks = (starData) => {
   })
   document.querySelector('.action-explain').addEventListener('click', function () {
     this.classList.contains('active') ? hideInfoExplain() : showInfoExplain(starData)
+  })
+  document.querySelector('.action-play-rotate').addEventListener('click', function () {
+    this.classList.contains('active') ? stopRotate() : playRotate()
   })
 }
 export const initConstellationData = (starData) => {

@@ -1293,3 +1293,8 @@ export const applyInstrumentsToMusic = (starData) => {
     // console.log('instruMappings', instruMappings)
   }
 }
+const favourites = ['Andromeda', 'Aquarius', 'Aquila', 'Ara', 'Caelum', 'Camelopardalis', 'Cancer', 'Canes Venatici', 'Canis Major',
+  'Centaurus', 'Cepheus', 'Chamaeleon']
+export const isFavourite = (constellationName) => {
+  return favourites.includes(constellationName)
+}
