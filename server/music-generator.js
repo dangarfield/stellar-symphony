@@ -1294,7 +1294,8 @@ export const applyInstrumentsToMusic = (starData) => {
   }
 }
 const favourites = ['Andromeda', 'Aquarius', 'Aquila', 'Ara', 'Caelum', 'Camelopardalis', 'Cancer', 'Canes Venatici', 'Canis Major',
-  'Centaurus', 'Cepheus', 'Chamaeleon']
+  'Centaurus', 'Cepheus', 'Chamaeleon', 'Columba', 'Coma Berenices', 'Corona Australis', 'Corona Borealis', 'Corvus', 'Crater', 'Cygnus',
+  'Delphinus', 'Draco', 'Equuleus', 'Eridanus']
 export const isFavourite = (constellationName) => {
   return favourites.includes(constellationName)
 }

@@ -2,13 +2,27 @@ import axios from 'axios'
 import {ScaleType, Scale, Note} from '@tonaljs/tonal'
 import {Sampler, Transport, Pattern, Part, start as ToneStart, Draw, Player, JCReverb, ToneAudioBuffer, getContext as getAudioContext} from 'tone'
 import {setupMelodyExplanation, stopMelodyExplanation} from './map.js'
-import {setLoadingText, hideLoadingText, setLoadingPercent} from './utils.js'
+import {setLoadingText, hideLoadingText, setLoadingPercent, shuffle} from './utils.js'
 
 const activeSamplers = []
 let continuousPlay = false
 let rotationList = []
 
-const playNextRotation = async () => {
+export const playNext = async (dontPlay) => {
+  stopToneClips()
+  const all = [...document.querySelectorAll('.constellation-select option')].map(o => o.value).filter(o => o !== '')
+  const currentIndex = all.findIndex(o => o === document.querySelector('.constellation-select').value)
+  const nextConstellation = currentIndex < all.length - 1 ? all[currentIndex + 1] : all[0]
+  console.log('playNext', all, currentIndex, nextConstellation)
+  document.querySelector('.constellation-select').value = nextConstellation
+  document.querySelector('.constellation-select').dispatchEvent(new window.Event('change'))
+  if (!dontPlay) {
+    setTimeout(function () {
+      document.querySelector('.action-play').click()
+    }, 1010)
+  }
+}
+export const playNextRotation = async (dontPlay) => {
   stopToneClips()
   const nextConstellation = rotationList.shift()
   if (rotationList.length === 0) {
@@ -17,12 +31,15 @@ const playNextRotation = async () => {
   console.log('playRotate', nextConstellation)
   document.querySelector('.constellation-select').value = nextConstellation
   document.querySelector('.constellation-select').dispatchEvent(new window.Event('change'))
-  setTimeout(function () {
-    document.querySelector('.action-play').click()
-  }, 1010)
+  if (!dontPlay) {
+    setTimeout(function () {
+      document.querySelector('.action-play').click()
+    }, 1010)
+  }
 }
 const populateRotationList = () => {
   rotationList = [...document.querySelectorAll('.constellation-select option')].filter(o => o.textContent.includes('Favourite')).map(o => o.value)
+  shuffle(rotationList)
   console.log('populateRotationList', rotationList)
 }
 export const playRotate = () => {
