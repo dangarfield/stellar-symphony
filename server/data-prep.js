@@ -109,16 +109,15 @@ const getStarData = async () => {
 const getConstellationShipData = () => {
   let data = fs.readFileSync('data/constellationship.fab', 'utf-8')
   data = data.split('\n')
-  //   data = data.split(/\s+/)
   data = data.map(d => {
-    const dSplit = d.split(' ')// d.split[/\t+/]
-    const lines = _.chunk(dSplit.slice(3), 2).map(l => { return { starIds: l } })
+    const dSplit = d.split(' ').filter(d => d !== '')
+    const lines = _.chunk(dSplit.slice(2), 2).map(l => { return { starIds: l } })
     return {
       constellation: dSplit[0],
       lines
     }
   })
-  //   console.log('data', data, data.length)
+  // console.log('data', data)
   return data
 }
 const getConstellationNamesData = () => {
