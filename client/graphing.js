@@ -367,8 +367,8 @@ const populateGraphAllInfo = (starData) => {
   <div class="col-12 bg-light"><canvas class="all-mag"></canvas></div>
   <div class="col-12 bg-light"><canvas class="all-rv"></canvas></div>
   <div class="col-12 bg-light"><canvas class="all-lum"></canvas></div>
-  <div class="col-12 bg-light"><canvas class="all-ci"></canvas></div>
-  <div class="col-12 bg-light"><canvas class="all-hr"></canvas></div>`
+  <div class="col-12 bg-light"><canvas class="all-ci"></canvas></div>`
+  // <div class="col-12 bg-light"><canvas class="all-hr"></canvas></div>`
   activeGraphs.push(drawLineAllDiffsChart(starData, 'absmag'))
   activeGraphs.push(drawLineAllDiffsChart(starData, 'mag'))
   activeGraphs.push(drawLineAllDiffsChart(starData, 'rv'))
@@ -402,41 +402,57 @@ const populateGraphOneInfo = (starData) => {
   const constellationData = starData.constellations[i]
   document.querySelector('.info-full .name').textContent = `Analysis of ${constellationData.constellationName}`
   document.querySelector('.info-full .info-body').innerHTML = `
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-absmag"></canvas></div>
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-mag"></canvas></div>
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-rv"></canvas></div>
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-lum"></canvas></div>
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-ci"></canvas></div>
-  <div class="col-md-3 bg-light"></div>
-  <div class="col-md-3 bg-light"></div>
-  <div class="col-md-3 bg-light"></div>
 
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-absmag-main"></canvas></div>
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-mag-main"></canvas></div>
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-rv-main"></canvas></div>
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-lum-main"></canvas></div>
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-ci-main"></canvas></div>
-  <div class="col-md-3 bg-light"></div>
-  <div class="col-md-3 bg-light"></div>
-  <div class="col-md-3 bg-light"></div>
+  <div class="col-12 bg-light"><canvas class="all-absmag"></canvas></div>
+  <div class="col-12 bg-light"><canvas class="all-mag"></canvas></div>
+  <div class="col-12 bg-light"><canvas class="all-rv"></canvas></div>
+  <div class="col-12 bg-light"><canvas class="all-lum"></canvas></div>
+  <div class="col-12 bg-light"><canvas class="all-ci"></canvas></div>
 
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-absmag-ave"></canvas></div>
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-mag-ave"></canvas></div>
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-rv-ave"></canvas></div>
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-lum-ave"></canvas></div>
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-ci-ave"></canvas></div>
-  <div class="col-md-3 bg-light"></div>
-  <div class="col-md-3 bg-light"></div>
-  <div class="col-md-3 bg-light"></div>
+  <div class="row holder">
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-absmag"></canvas></div>
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-mag"></canvas></div>
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-rv"></canvas></div>
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-lum"></canvas></div>
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-ci"></canvas></div>
+    <div class="col-md-3 bg-light"></div>
+    <div class="col-md-3 bg-light"></div>
+    <div class="col-md-3 bg-light"></div>
 
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-absmag-ave-main"></canvas></div>
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-mag-ave-main"></canvas></div>
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-rv-ave-main"></canvas></div>
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-lum-ave-main"></canvas></div>
-  <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-ci-ave-main"></canvas></div>
-  <div class="col-md-3 bg-light"></div>
-  <div class="col-md-3 bg-light"></div>
-  <div class="col-md-3 bg-light"></div>`
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-absmag-main"></canvas></div>
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-mag-main"></canvas></div>
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-rv-main"></canvas></div>
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-lum-main"></canvas></div>
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-ci-main"></canvas></div>
+    <div class="col-md-3 bg-light"></div>
+    <div class="col-md-3 bg-light"></div>
+    <div class="col-md-3 bg-light"></div>
+
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-absmag-ave"></canvas></div>
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-mag-ave"></canvas></div>
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-rv-ave"></canvas></div>
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-lum-ave"></canvas></div>
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-ci-ave"></canvas></div>
+    <div class="col-md-3 bg-light"></div>
+    <div class="col-md-3 bg-light"></div>
+    <div class="col-md-3 bg-light"></div>
+
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-absmag-ave-main"></canvas></div>
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-mag-ave-main"></canvas></div>
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-rv-ave-main"></canvas></div>
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-lum-ave-main"></canvas></div>
+    <div class="col-md-3 bg-light"><canvas class="${constellationData.constellation}-ci-ave-main"></canvas></div>
+    <div class="col-md-3 bg-light"></div>
+    <div class="col-md-3 bg-light"></div>
+    <div class="col-md-3 bg-light"></div>
+  </div>`
+
+  // All constellation data
+  activeGraphs.push(drawLineAllDiffsChart(starData, 'absmag'))
+  activeGraphs.push(drawLineAllDiffsChart(starData, 'mag'))
+  activeGraphs.push(drawLineAllDiffsChart(starData, 'rv'))
+  activeGraphs.push(drawLineAllDiffsChart(starData, 'lum'))
+  activeGraphs.push(drawLineAllDiffsChart(starData, 'ci'))
 
   // Sorted all stars
   activeGraphs.push(drawScatterConstellationDiffChart(constellationData, 'absmag', i))
