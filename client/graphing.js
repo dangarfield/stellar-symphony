@@ -545,11 +545,11 @@ const hideInfoLong = () => {
   document.querySelector('.info-long').style.display = 'none'
   document.querySelector('.action-info').classList.remove('active')
 }
-const showAllStars = () => {
+export const showAllStars = () => {
   setBgStarsVisibility(true)
   document.querySelector('.action-all-stars').classList.add('active')
 }
-const hideAllStars = () => {
+export const hideAllStars = () => {
   setBgStarsVisibility(false)
   document.querySelector('.action-all-stars').classList.remove('active')
 }

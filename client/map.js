@@ -7,7 +7,7 @@ import { Line2 } from 'three/examples/jsm/lines/Line2.js'
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js'
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js'
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js'
-import {updateSelectedConstellation, showDefaultInfoWindow} from './graphing.js'
+import {updateSelectedConstellation, showDefaultInfoWindow, showAllStars, hideAllStars} from './graphing.js'
 import {Tween, update as tweenUpdate, Easing} from '@tweenjs/tween.js'
 import {getScaleNotesFromChrome} from './audio.js'
 import Stats from 'three/examples/jsm/libs/stats.module.js'
@@ -485,6 +485,7 @@ export const setupMelodyExplanation = (constellation) => {
 const updateFovFromDistance = () => {
   camera.fov = 25 + (controls.getDistance() * 30)
   camera.updateProjectionMatrix()
+  controls.getDistance() < 0.8 ? showAllStars() : hideAllStars()
 }
 
 export const focusMapOnConstellation = (constellation) => {
