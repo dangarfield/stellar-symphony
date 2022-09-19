@@ -6,6 +6,7 @@ import * as path from 'path'
 import fetch from 'node-fetch'
 import { getScale, getChords, getMelodyWithTimingByDistance, getMelodyWithTimingByAngle, chordsToToneNotes,
   generateSong, debugNotes, getInstruments, applyInstrumentsToMusic, isFavourite } from './music-generator.js'
+import drawdown from './drawdown.js'
 
 const downloadDataFile = async (url, path) => {
   const res = await fetch(url)
@@ -500,6 +501,9 @@ const reduceStarDataSize = (starData) => {
     }
   }
 }
+const convertReadme = (starData) => {
+  starData.readme = drawdown(fs.readFileSync('./README.md'))
+}
 const init = async () => {
   await downloadDataFiles()
   const rawData = await getRawData()
@@ -513,7 +517,7 @@ const init = async () => {
   calculateAndAddAveragesToConstellations(starData)
   reduceStarDataSize(starData)
   debugNotes(starData)
-
+  convertReadme(starData)
   // console.log('rawStarData', groupedByConstellation.map(d => d.constellation), Object.keys(groupedByConstellation[0]))
   console.log('Writing star-data.json')
   fs.writeJsonSync(`_static/data/star-data.png`, starData)

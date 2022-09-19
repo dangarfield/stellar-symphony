@@ -1,7 +1,6 @@
 import {getScaleText, getToneDataFromElementAndPlay, stopToneClips, loadSampler, playRotate, stopRotate, playNextRotation, playNext} from './audio.js'
 import {focusMapOnConstellation, setBgStarsVisibility} from './map.js'
 import {Chart, ScatterController, LinearScale, PointElement, LineController, CategoryScale, LineElement, Legend} from 'chart.js'
-import Splide from '@splidejs/splide'
 
 Chart.register(ScatterController, LinearScale, PointElement, LineController, CategoryScale, LineElement, Legend)
 
@@ -486,47 +485,7 @@ const populateGraphOneInfo = (starData) => {
 }
 const populateExplainInfo = (starData) => {
   document.querySelector('.info-full .name').textContent = 'How it all works'
-  document.querySelector('.info-full .info-body').innerHTML = document.querySelector('#explanation').innerHTML
-  const navLinks = document.querySelectorAll('.explanation .nav-link')
-
-  const splide = new Splide('.splide', {
-    pagination: false,
-    paginationKeyboard: true,
-    keyboard: true,
-    role: 'group'
-  })
-  const bar = splide.root.querySelector('.explanation-progress-bar')
-
-  splide.on('mounted move', function (newIndex) {
-    console.log('mounted move', newIndex, splide)
-    const end = splide.Components.Controller.getEnd() + 1
-    bar.style.width = String(100 * (splide.index + 1) / end) + '%'
-    if (newIndex !== undefined) {
-      const slideHeading = splide.Components.Slides.getAt(newIndex).slide.getAttribute('data-heading')
-      for (let i = 0; i < navLinks.length; i++) {
-        const navLink = navLinks[i]
-        if (navLink.getAttribute('data-heading') === slideHeading) {
-          navLink.classList.add('active')
-        } else {
-          navLink.classList.remove('active')
-        }
-      }
-    }
-  })
-  splide.mount()
-
-  for (let i = 0; i < navLinks.length; i++) {
-    const navLink = navLinks[i]
-    navLink.addEventListener('click', function () {
-      const slideHeading = this.getAttribute('data-heading')
-      const slideIndex = splide.Components.Slides.get().findIndex(s => s.slide.getAttribute('data-heading') === slideHeading)
-      // console.log('slideHeading', slideHeading, slideIndex)
-      if (slideIndex >= 0) {
-        splide.go(slideIndex)
-      }
-    })
-  }
-  // TODO - I probably should unbind navLink clicks and destroy the splide instance
+  document.querySelector('.info-full .info-body').innerHTML = `<div class="readme">${starData.readme}</div>`
 }
 export const showDefaultInfoWindow = () => {
   if (window.localStorage.getItem('has-loaded')) {
