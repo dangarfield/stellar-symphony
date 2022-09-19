@@ -4,7 +4,7 @@
 
 Listen here: [https://stellar-symphony.netlify.app](https://stellar-symphony.netlify.app)
 
-![Stellar Symphony](https://i.ibb.co/Nsg2W43/stellar-symphony.gif "Stellar Symphony")
+![Stellar Symphony](https://i.ibb.co/VBzp3NV/ezgif-com-gif-maker-2.gif "Stellar Symphony")
 
 
 ## Why?
