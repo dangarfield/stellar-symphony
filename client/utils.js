@@ -35,9 +35,15 @@ export const filterConstellationsFromUrl = (starData) => {
 }
 export const globalBindings = () => {
   document.body.addEventListener('keydown', function (e) {
-    // console.log('e', e.code, e)
+    console.log('e', e.code, e)
     if (e.code === 'Space' || e.code === 'Backspace' || e.code === 'Delete') {
       document.querySelector('.action-play').click()
+    }
+    if (e.code === 'KeyA') {
+      document.querySelector('.action-play-rotate').click()
+    }
+    if (e.code === 'KeyN') {
+      document.querySelector('.action-next').click()
     }
   })
 }

@@ -2,7 +2,10 @@
 
 > Procedurally generated music based on data from 120000 stars
 
-Deployed to [https://stellar-symphony.netlify.app](https://stellar-symphony.netlify.app)
+Listen here: [https://stellar-symphony.netlify.app](https://stellar-symphony.netlify.app)
+
+![Stellar Symphony](https://i.ibb.co/Nsg2W43/stellar-symphony.gif "Stellar Symphony")
+
 
 ## Why?
 
