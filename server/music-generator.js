@@ -1296,7 +1296,9 @@ export const applyInstrumentsToMusic = (starData) => {
 const favourites = ['Andromeda', 'Aquarius', 'Aquila', 'Ara', 'Caelum', 'Camelopardalis', 'Cancer', 'Canes Venatici', 'Canis Major',
   'Centaurus', 'Cepheus', 'Chamaeleon', 'Columba', 'Coma Berenices', 'Corona Australis', 'Corona Borealis', 'Corvus', 'Crater', 'Cygnus',
   'Delphinus', 'Draco', 'Equuleus', 'Eridanus', 'Hercules', 'Horologium', 'Hydrus', 'Indus', 'Lacerta', 'Leo', 'Leo Minor', 'Lepus',
-  'Lupus', 'Lynx', 'Lyra', 'Mensa', 'Microscopium', 'Monoceros', 'Musca']
+  'Lupus', 'Lynx', 'Lyra', 'Mensa', 'Microscopium', 'Monoceros', 'Musca', 'Norma', 'Octans', 'Ophiuchus', 'Pavo', 'Pegasus', 'Perseus',
+  'Phoenix', 'Pisces', 'Piscis Austrinus', 'Sagitta', 'Sagittarius', 'Scorpius', 'Sculptor', 'Scutum', 'Serpens', 'Sextans', 'Taurus',
+  'Telescopium', 'Triangulum', 'Triangulum Australe', 'Ursa Major', 'Ursa Minor', 'Vela', 'Volans']
 export const isFavourite = (constellationName) => {
   return favourites.includes(constellationName)
 }
