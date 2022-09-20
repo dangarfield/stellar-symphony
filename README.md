@@ -32,7 +32,7 @@ Funnily enough, it starts to look like an musical EQ curve. We can also take the
 This is ultimately how I've created the rules the crate the music, by identifying differences between the constellations and making them into
 rules to apply to create scales, chords, melodies and instruments for these pieces. All without my involvement out without me writing any music.
 
-Data sources - tbc
+Data sources - Combination of the following catalogues - [HYG-Database](http://www.astronexus.com/hyg), Hipparcos, Yale Bright Stars Catalogue, Gliese catalog, Gaia DR2, [Stellarium Web](https://stellarium-web.org)
 
 ## Scale
 
@@ -98,6 +98,10 @@ to the soft sounds and the most frequently luminous to the harder sounds.
 
 All constellations have been recording properly in music software using the exact same samples: **Play full band**, however, you can change them
 and play use the **Play with real time Instruments** to play with sampled instruments directly in the browser.
+
+Credits
+- All drums come from [ujam - Symphonic Elements](https://www.ujam.com/symphonic-elements/drums/)
+- All other instruments come from [Spitfire Audio - Labs](https://labs.spitfireaudio.com/)
 
 ## Tempo
 

@@ -97,7 +97,7 @@ export default function markdown (src) {
     stash[--si] = p4
       ? p2
         ? '<img src="' + p4 + '" alt="' + p3 + '"/>'
-        : '<a href="' + p4 + '">' + unesc(highlight(p3)) + '</a>'
+        : '<a href="' + p4 + '" target="_blank">' + unesc(highlight(p3)) + '</a>'
       : p6
     return si + '\uf8ff'
   })
