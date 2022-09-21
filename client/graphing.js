@@ -348,6 +348,7 @@ const bindInfoClose = () => {
     hideInfoExplain()
   })
 }
+
 const activeGraphs = []
 const destroyAllGraphs = () => {
   const graphsToBeRemoved = []
