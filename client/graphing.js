@@ -318,7 +318,6 @@ const addConstellationSelectOptions = (starData) => {
     const opt = document.createElement('option')
     opt.value = constellation.constellation
     opt.text = constellation.constellationName
-    // if (constellation.music.songPath) { opt.text += ' (Recording)' }
     if (constellation.music.isFavourite) { opt.text += ' (Favourite)' }
     constellationSelect.add(opt)
   }
