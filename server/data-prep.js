@@ -477,8 +477,6 @@ const calculateAndAddAveragesToConstellations = (starData) => {
     if (isFavourite(constellationData.constellationName)) {
       constellationData.music.isFavourite = true
     }
-    // console.log('music', constellationData.music)
-    // }
   }
   starData.hrAllListData = hrAllListData
   starData.ranges.absmag.constellationDiffListData = absmagConstellationDiffListData
