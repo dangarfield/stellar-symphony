@@ -1,6 +1,5 @@
 Good sounds
 
-
   Low Drone       - C2          3m *** Low C2 3m
 
   Root Bass       - C3 B3       1m
