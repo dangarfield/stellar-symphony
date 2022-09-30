@@ -34,6 +34,7 @@ rules to apply to create scales, chords, melodies and instruments for these piec
 
 Data sources - Combination of the following catalogues - [HYG-Database](http://www.astronexus.com/hyg), Hipparcos, Yale Bright Stars Catalogue, Gliese catalog, Gaia DR2, [Stellarium Web](https://stellarium-web.org)
 
+
 ## Scale
 
 We can plot the differences of absolute magnitude from the whole average star data.
@@ -55,6 +56,7 @@ some are sad or moody (minor), or some are just plain strange (using scales that
 
 This is the frequency of scales and how many are used in all constellations.
 
+
 ## Chords
 
 Most pop music is made from chords, and these chords are normally made from a root note as part of a triad.
@@ -68,6 +70,7 @@ each conversion to produce the scale, why not use the relative magnitude to choo
 Let's choose a range of 4 buckets to compare, grouping them off how they differ with the least different using the first triad C, and the most different using B.
 Additionally, we can add some extra notes that add a little dramatic flavour if they are negative (add9, add11, add13).
 Remember, these aren't always major chords, they use the scale that we have already selected.
+
 
 ## Melody
 
@@ -88,6 +91,7 @@ and the note is made from the distance of the star to the centre of the constell
 We can see that some 'square' constellations appear to have consistent timing and also very similar notes.
 This level of regularity or irregularity translates into audio differences.
 
+
 ## Instruments
 
 I have cheated a little here. I was originally wanting to create soundscapes based on the actual frequencies off the known stars,
@@ -103,16 +107,19 @@ Credits
 - All drums come from [ujam - Symphonic Elements](https://www.ujam.com/symphonic-elements/drums/)
 - All other instruments come from [Spitfire Audio - Labs](https://labs.spitfireaudio.com/)
 
+
 ## Tempo
 
 I was going to add tempo based on the average revolution speel of the stars, however, there is relatively little date known in the hyg
 data sets for this, and also in order for me to be able to use real time instrument changes, the recorded notes (and drum samples)
 were much easier to record at one single tempo, so all are at 80 bpm.
 
+
 ## Structure
 
 Plotting the relative magnitude differences, we can see that there is a little shopping structure emerging.
 I chose to use 9 to 15 to start sparsely, the gradually build up the instruments, have a small lull towards the end, the final crescendo.
+
 
 ## Star map
 
