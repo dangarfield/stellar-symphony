@@ -377,7 +377,7 @@ const getPlayerWithLoadingProgress = async (url) => {
   player.sync().start(0)
   activeSamplers.push(player)
 
-  console.log('Player promise resolved', url)
+  // console.log('Player promise resolved', url)
   return player
 }
 export const getToneDataFromElementAndPlay = (starData, ele) => {
