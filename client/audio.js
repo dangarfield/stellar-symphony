@@ -366,13 +366,6 @@ const getPlayerWithLoadingProgress = async (url) => {
   const buf = await loadBufferWithProgress(url)
   console.log('post buf', buf)
   let player = new Player(buf)
-  // const playerLoadingPromise = new Promise(resolve => {
-  //   player = new Player(buf, function () {
-  //     resolve()
-  //   })
-  // })
-  // await playerLoadingPromise
-  // player = await (new Player(url))
   player.toDestination()
   player.sync().start(0)
   activeSamplers.push(player)
