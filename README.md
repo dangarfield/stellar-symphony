@@ -13,6 +13,7 @@ What do the stars sound like? Can we construct songs music purely referencing a 
 
 I'm Dan and this is what I've been working at achieving.
 
+
 ## Data
 We know surprisingly little about the stars around, but we do have publicly available data for about 120000 stars in our galaxy.
 Each of these stars are plotted in the star map with the differences in visible magnitude (how bright they are us) shown by bigger, brighter dots.
