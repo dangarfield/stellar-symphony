@@ -21,6 +21,7 @@ Each of these stars are plotted in the star map with the differences in visible 
 Imagine comparing the brightness of each star. That's pretty hard because there are so many and the brightness are are all pretty different.
 One way would be to imagine the brightest star and the dullest star, now imagine creating a number of buckets or groups that you could put
 the stars in, eg, a brightness of 1.5 might fit into the bucket 1 to 2.
+
 In this experiment, I've created 24 buckets for each of the different pieces of indignation we have of the stars:
 
 - Absolute magnitude (how bright the star really is)
