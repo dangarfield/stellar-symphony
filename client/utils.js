@@ -56,7 +56,6 @@ export const downloadStarData = (url) => {
         if (percentCompleted === Infinity) percentCompleted = 100
         setLoadingPercent(percentCompleted)
       }
-
     }).then(function (response) {
       // console.log('response', response)
       resolve(response.data)
