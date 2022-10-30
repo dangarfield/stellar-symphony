@@ -4,24 +4,24 @@
  */
 
 export default function markdown (src) {
-  var rxLt = /</g
-  var rxGt = />/g
-  var rxSpace = /\t|\r|\uf8ff/g
-  var rxEscape = /\\([\\|`*_{}[\]()#+\-~])/g
-  var rxHr = /^([*\-=_] *){3,}$/gm
-  var rxBlockquote = /\n *&gt; *([^]*?)(?=(\n|$){2})/g
-  var rxList = /\n( *)(?:[*\-+]|((\d+)|([a-z])|[A-Z])[.)]) +([^]*?)(?=(\n|$){2})/g
-  var rxListjoin = /<\/(ol|ul)>\n\n<\1>/g
-  var rxHighlight = /(^|[^A-Za-z\d\\])(([*_])|(~)|(\^)|(--)|(\+\+)|`)(\2?)([^<]*?)\2\8(?!\2)(?=\W|_|$)/g
-  var rxCode = /\n((```|~~~).*\n?([^]*?)\n?\2|(( {4}.*?\n)+))/g
-  var rxLink = /((!?)\[(.*?)\]\((.*?)( ".*")?\)|\\([\\`*_{}[\]()#+\-.!~]))/g
-  var rxTable = /\n(( *\|.*?\| *\n)+)/g
-  var rxThead = /^.*\n( *\|( *:?-+:?-+:? *\|)* *\n|)/
-  var rxRow = /.*\n/g
-  var rxCell = /\||(.*?[^\\])\|/g
-  var rxHeading = /(?=^|>|\n)([>\s]*?)(#{1,6}) (.*?)( #*)? *(?=\n|$)/g
-  var rxPara = /(?=^|>|\n)\s*\n+([^<]+?)\n+\s*(?=\n|<|$)/g
-  var rxStash = /-\d+\uf8ff/g
+  const rxLt = /</g
+  const rxGt = />/g
+  const rxSpace = /\t|\r|\uf8ff/g
+  const rxEscape = /\\([\\|`*_{}[\]()#+\-~])/g
+  const rxHr = /^([*\-=_] *){3,}$/gm
+  const rxBlockquote = /\n *&gt; *([^]*?)(?=(\n|$){2})/g
+  const rxList = /\n( *)(?:[*\-+]|((\d+)|([a-z])|[A-Z])[.)]) +([^]*?)(?=(\n|$){2})/g
+  const rxListjoin = /<\/(ol|ul)>\n\n<\1>/g
+  const rxHighlight = /(^|[^A-Za-z\d\\])(([*_])|(~)|(\^)|(--)|(\+\+)|`)(\2?)([^<]*?)\2\8(?!\2)(?=\W|_|$)/g
+  const rxCode = /\n((```|~~~).*\n?([^]*?)\n?\2|(( {4}.*?\n)+))/g
+  const rxLink = /((!?)\[(.*?)\]\((.*?)( ".*")?\)|\\([\\`*_{}[\]()#+\-.!~]))/g
+  const rxTable = /\n(( *\|.*?\| *\n)+)/g
+  const rxThead = /^.*\n( *\|( *:?-+:?-+:? *\|)* *\n|)/
+  const rxRow = /.*\n/g
+  const rxCell = /\||(.*?[^\\])\|/g
+  const rxHeading = /(?=^|>|\n)([>\s]*?)(#{1,6}) (.*?)( #*)? *(?=\n|$)/g
+  const rxPara = /(?=^|>|\n)\s*\n+([^<]+?)\n+\s*(?=\n|<|$)/g
+  const rxStash = /-\d+\uf8ff/g
 
   function replace (rex, fn) {
     src = src.replace(rex, fn)
@@ -39,7 +39,7 @@ export default function markdown (src) {
 
   function list (src) {
     return src.replace(rxList, function (all, ind, ol, num, low, content) {
-      var entry = element('li', highlight(content.split(
+      const entry = element('li', highlight(content.split(
         RegExp('\n ?' + ind + '(?:(?:\\d+|[a-zA-Z])[.)]|[*\\-+]) +', 'g')).map(list).join('</li><li>')))
 
       return '\n' + (ol
@@ -53,11 +53,16 @@ export default function markdown (src) {
   function highlight (src) {
     return src.replace(rxHighlight, function (all, _, p1, emp, sub, sup, small, big, p2, content) {
       return _ + element(
-        emp ? (p2 ? 'strong' : 'em')
-          : sub ? (p2 ? 's' : 'sub')
-            : sup ? 'sup'
-              : small ? 'small'
-                : big ? 'big'
+        emp
+          ? (p2 ? 'strong' : 'em')
+          : sub
+            ? (p2 ? 's' : 'sub')
+            : sup
+              ? 'sup'
+              : small
+                ? 'small'
+                : big
+                  ? 'big'
                   : 'code',
         highlight(content))
     })
@@ -67,8 +72,8 @@ export default function markdown (src) {
     return str.replace(rxEscape, '$1')
   }
 
-  var stash = []
-  var si = 0
+  const stash = []
+  let si = 0
 
   src = '\n' + src + '\n'
 
@@ -104,12 +109,14 @@ export default function markdown (src) {
 
   // table
   replace(rxTable, function (all, table) {
-    var sep = table.match(rxThead)[1]
+    const sep = table.match(rxThead)[1]
     return '\n' + element('table',
       table.replace(rxRow, function (row, ri) {
-        return row === sep ? '' : element('tr', row.replace(rxCell, function (all, cell, ci) {
-          return ci ? element(sep && !ri ? 'th' : 'td', unesc(highlight(cell || ''))) : ''
-        }))
+        return row === sep
+          ? ''
+          : element('tr', row.replace(rxCell, function (all, cell, ci) {
+            return ci ? element(sep && !ri ? 'th' : 'td', unesc(highlight(cell || ''))) : ''
+          }))
       })
     )
   })

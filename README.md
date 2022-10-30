@@ -1,17 +1,21 @@
 # Stellar Symphony
 
-> Procedurally generated music based on data from 120000 stars
+> Procedurally generated music and visualisation based on data from 120,000 stars
 
 Listen here: [https://stellar-symphony.netlify.app](https://stellar-symphony.netlify.app)
+
+Code and comments here: [https://github.com/dangarfield/stellar-symphony](https://github.com/dangarfield/stellar-symphony)
 
 ![Stellar Symphony](https://i.ibb.co/VBzp3NV/ezgif-com-gif-maker-2.gif "Stellar Symphony")
 
 
 ## Why?
 
-What do the stars sound like? Can we construct songs music purely referencing a single set of rules that we can apply to all star data that we have to create some patterns and music from them?
+> What do the stars sound like? Can we construct songs music purely referencing a single set of rules that we can apply to all star data that we have to create some patterns and music from them?
 
-I'm Dan and this is what I've been working at achieving.
+All music here is generated using star data. The same rules are applied to all 120,000 stars in 88 constellations and it creates different chords, scales, melodies and instruments.
+
+I'm Dan and this is what I've been working at achieving!
 
 
 ## Data

@@ -4,8 +4,10 @@ import _ from 'lodash'
 import * as THREE from 'three'
 import * as path from 'path'
 import fetch from 'node-fetch'
-import { getScale, getChords, getMelodyWithTimingByDistance, getMelodyWithTimingByAngle, chordsToToneNotes,
-  generateSong, debugNotes, getInstruments, applyInstrumentsToMusic, isFavourite } from './music-generator.js'
+import {
+  getScale, getChords, getMelodyWithTimingByDistance, getMelodyWithTimingByAngle, chordsToToneNotes,
+  generateSong, debugNotes, getInstruments, applyInstrumentsToMusic, isFavourite
+} from './music-generator.js'
 import drawdown from './drawdown.js'
 
 const downloadDataFile = async (url, path) => {
@@ -45,7 +47,7 @@ const getRawData = async () => {
   const rawStarData = await getStarData()
   const constellationShip = getConstellationShipData()
   const constellationNames = getConstellationNamesData()
-  return {rawStarData, constellationShip, constellationNames}
+  return { rawStarData, constellationShip, constellationNames }
 }
 const getStarData = async () => {
 //   const dataStepResult = loadDataStep('getStarData')
@@ -82,7 +84,7 @@ const getStarData = async () => {
         data.dec = parseFloat(data.dec)
         data.decrad = parseFloat(data.decrad)
 
-        const {x, y, z} = getXYZFromRaDec(1, data.decrad, data.rarad)
+        const { x, y, z } = getXYZFromRaDec(1, data.decrad, data.rarad)
         data.ax = x
         data.ay = y
         data.az = z
@@ -131,7 +133,7 @@ const getConstellationNamesData = () => {
     if (dSplit.length < 2) {
       return {}
     }
-    return {constellation: dSplit[0], constellationName: dSplit[1].replaceAll('"', '')}
+    return { constellation: dSplit[0], constellationName: dSplit[1].replaceAll('"', '') }
   }).filter(d => d.constellation)
   // console.log('data', data, data.length)
   return data
@@ -159,7 +161,7 @@ const groupByConstellation = (rawData) => {
     .groupBy('con')
     .map((v, k) => (
       _.defaults(
-        {constellation: k, stars: v},
+        { constellation: k, stars: v },
         rawData.constellationShip.find(c => c.constellation === k),
         rawData.constellationNames.find(c => c.constellation === k)
       ))
@@ -220,7 +222,7 @@ const groupByConstellation = (rawData) => {
         const starB = v.starsMain.find(s => s.hip === line.starIds[1]) || rawData.rawStarData.find(s => s.hip === line.starIds[1])
         if (starA && starB) {
           line.distance = Math.sqrt(Math.pow(starB.ax - starA.ax, 2) + Math.pow(starB.ay - starA.ay, 2) + Math.pow(starB.az - starA.az, 2))
-          line.points = [{x: starA.ax, y: starA.ay, z: starA.az}, {x: starB.ax, y: starB.ay, z: starB.az}]
+          line.points = [{ x: starA.ax, y: starA.ay, z: starA.az }, { x: starB.ax, y: starB.ay, z: starB.az }]
         }
       }
 
@@ -240,7 +242,7 @@ const getXYZFromRaDec = (R, dec, ra) => {
   }
 }
 const getRange = (min, max, totalSteps) => {
-  let range = _.range(min, max, (max - min) / (totalSteps))
+  const range = _.range(min, max, (max - min) / (totalSteps))
   range.push(max)
   range.shift()
   return range
@@ -328,11 +330,11 @@ const getConstellationAverages = (groupedByConstellation) => {
   }
 }
 const calculateAndAddAveragesToConstellations = (starData) => {
-  const absmagConstellationDiffListData = [{constellation: 'ALL', data: starData.ranges.absmag.averages}]
-  const magConstellationDiffListData = [{constellation: 'ALL', data: starData.ranges.mag.averages}]
-  const rvConstellationDiffListData = [{constellation: 'ALL', data: starData.ranges.rv.averages}]
-  const lumConstellationDiffListData = [{constellation: 'ALL', data: starData.ranges.lum.averages}]
-  const ciConstellationDiffListData = [{constellation: 'ALL', data: starData.ranges.ci.averages}]
+  const absmagConstellationDiffListData = [{ constellation: 'ALL', data: starData.ranges.absmag.averages }]
+  const magConstellationDiffListData = [{ constellation: 'ALL', data: starData.ranges.mag.averages }]
+  const rvConstellationDiffListData = [{ constellation: 'ALL', data: starData.ranges.rv.averages }]
+  const lumConstellationDiffListData = [{ constellation: 'ALL', data: starData.ranges.lum.averages }]
+  const ciConstellationDiffListData = [{ constellation: 'ALL', data: starData.ranges.ci.averages }]
   const hrAllListData = []
 
   for (const [i, constellationData] of starData.constellations.entries()) {
@@ -428,12 +430,12 @@ const calculateAndAddAveragesToConstellations = (starData) => {
     constellationData.ranges.lum.diffs = constellationData.ranges.lum.averages.map((v, i) => v - starData.ranges.lum.averages[i])
     constellationData.ranges.ci.diffs = constellationData.ranges.ci.averages.map((v, i) => v - starData.ranges.ci.averages[i])
 
-    hrAllListData.push({constellation: constellationData.constellation, data: constellationData.diffs.hrList})
-    absmagConstellationDiffListData.push({constellation: constellationData.constellation, data: constellationData.ranges.absmag.diffs})
-    magConstellationDiffListData.push({constellation: constellationData.constellation, data: constellationData.ranges.mag.diffs})
-    rvConstellationDiffListData.push({constellation: constellationData.constellation, data: constellationData.ranges.rv.diffs})
-    lumConstellationDiffListData.push({constellation: constellationData.constellation, data: constellationData.ranges.lum.diffs})
-    ciConstellationDiffListData.push({constellation: constellationData.constellation, data: constellationData.ranges.ci.diffs})
+    hrAllListData.push({ constellation: constellationData.constellation, data: constellationData.diffs.hrList })
+    absmagConstellationDiffListData.push({ constellation: constellationData.constellation, data: constellationData.ranges.absmag.diffs })
+    magConstellationDiffListData.push({ constellation: constellationData.constellation, data: constellationData.ranges.mag.diffs })
+    rvConstellationDiffListData.push({ constellation: constellationData.constellation, data: constellationData.ranges.rv.diffs })
+    lumConstellationDiffListData.push({ constellation: constellationData.constellation, data: constellationData.ranges.lum.diffs })
+    ciConstellationDiffListData.push({ constellation: constellationData.constellation, data: constellationData.ranges.ci.diffs })
 
     // General Music Config
     const bpm = 80
@@ -490,7 +492,7 @@ const reduceStarDataSize = (starData) => {
   const allowedKeys = ['absmag', 'mag', 'hip', 'ax', 'ay', 'az', 'alpha', 'distanceFromAlpha', 'distanceFromCentre', 'angleFromCentre', 'angleFromAlpha']
   for (const constellation of starData.constellations) {
     for (const star of constellation.stars) {
-      delete star['id']
+      delete star.id
       for (const [key] of Object.entries(star)) {
         if (!allowedKeys.includes(key)) {
           delete star[key]
@@ -511,14 +513,14 @@ const init = async () => {
   const groupedByConstellation = groupByConstellation(rawData)
   const averages = getConstellationAverages(groupedByConstellation)
   setMinMaxAndRangesForConstellations(groupedByConstellation, ranges)
-  const starData = {constellations: groupedByConstellation, ranges, averages, instruments}
+  const starData = { constellations: groupedByConstellation, ranges, averages, instruments }
   calculateAndAddAveragesToConstellations(starData)
   reduceStarDataSize(starData)
   debugNotes(starData)
   convertReadme(starData)
   // console.log('rawStarData', groupedByConstellation.map(d => d.constellation), Object.keys(groupedByConstellation[0]))
   console.log('Writing star-data.json')
-  fs.writeJsonSync(`_static/data/star-data.png`, starData)
+  fs.writeJsonSync('_static/data/star-data.png', starData)
   console.log('FINISHED')
 }
 

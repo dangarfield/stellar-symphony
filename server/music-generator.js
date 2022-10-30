@@ -1,48 +1,48 @@
 import { ScaleType, Note, Interval } from '@tonaljs/tonal'
 import Midi from '@tonejs/midi'
 import fs from 'fs-extra'
-import {join} from 'path'
+import { join } from 'path'
 
 import _ from 'lodash'
 
 const sortingOrder = [
   // Don't actually use boosts, keep them here until I decided to get rid of it
-  {name: 'major', boost: 2},
-  {name: 'lydian', boost: 2},
-  {name: 'mixolydian', boost: 2},
-  {name: 'phrygian', boost: 2},
-  {name: 'dorian', boost: 2},
-  {name: 'locrian', boost: 2},
-  {name: 'aeolian', boost: 2},
+  { name: 'major', boost: 2 },
+  { name: 'lydian', boost: 2 },
+  { name: 'mixolydian', boost: 2 },
+  { name: 'phrygian', boost: 2 },
+  { name: 'dorian', boost: 2 },
+  { name: 'locrian', boost: 2 },
+  { name: 'aeolian', boost: 2 },
 
-  {name: 'lydian dominant', boost: 1},
-  {name: 'lydian augmented', boost: 1},
-  {name: 'lydian minor', boost: 1},
-  {name: 'lydian #9', boost: 1},
-  {name: 'phrygian dominant', boost: 1},
-  {name: 'dorian b2', boost: 1},
-  {name: 'mixolydian b6', boost: 1},
-  {name: 'major augmented', boost: 1},
+  { name: 'lydian dominant', boost: 1 },
+  { name: 'lydian augmented', boost: 1 },
+  { name: 'lydian minor', boost: 1 },
+  { name: 'lydian #9', boost: 1 },
+  { name: 'phrygian dominant', boost: 1 },
+  { name: 'dorian b2', boost: 1 },
+  { name: 'mixolydian b6', boost: 1 },
+  { name: 'major augmented', boost: 1 },
 
-  {name: 'flamenco', boost: 0},
-  {name: 'neopolitan major', boost: 0},
-  {name: 'harmonic major', boost: 0},
-  {name: 'locrian major', boost: 0},
-  {name: 'leading whole tone', boost: 0},
+  { name: 'flamenco', boost: 0 },
+  { name: 'neopolitan major', boost: 0 },
+  { name: 'harmonic major', boost: 0 },
+  { name: 'locrian major', boost: 0 },
+  { name: 'leading whole tone', boost: 0 },
   // {name: 'double harmonic lydian', boost: 0},
-  {name: 'harmonic minor', boost: 0},
-  {name: 'altered', boost: 0},
-  {name: 'locrian #2', boost: 0},
-  {name: 'melodic minor', boost: 0},
+  { name: 'harmonic minor', boost: 0 },
+  { name: 'altered', boost: 0 },
+  { name: 'locrian #2', boost: 0 },
+  { name: 'melodic minor', boost: 0 },
   // {name: 'ultralocrian', boost: 0},
   // {name: 'locrian 6', boost: 0},
-  {name: 'augmented heptatonic', boost: 0},
-  {name: 'dorian #4', boost: 0},
-  {name: 'lydian diminished', boost: 0},
-  {name: 'balinese', boost: 0},
-  {name: 'double harmonic major', boost: 0},
-  {name: 'hungarian minor', boost: 0},
-  {name: 'hungarian major', boost: 0}
+  { name: 'augmented heptatonic', boost: 0 },
+  { name: 'dorian #4', boost: 0 },
+  { name: 'lydian diminished', boost: 0 },
+  { name: 'balinese', boost: 0 },
+  { name: 'double harmonic major', boost: 0 },
+  { name: 'hungarian minor', boost: 0 },
+  { name: 'hungarian major', boost: 0 }
   // {name: 'oriental', boost: 0}
   // {name: 'todi raga', boost: 0},
   // {name: 'persian', boost: 0},
@@ -143,7 +143,7 @@ export const getChords = (bucketValues, bucketPositions, max, scale) => {
     const value = bucketValues[bucketPosition]
     const interval = 1 + adjustBucketValue(value, max, maxIntervals - 1)
     // console.log('chords value', bucketPosition, value, interval)
-    let decorationValue = parseInt(value.toFixed(5).replace(/\D/g, ''))
+    const decorationValue = parseInt(value.toFixed(5).replace(/\D/g, ''))
     let decoration = false
     if (decorationValue % 6 === 0) {
       decoration = 13
@@ -175,8 +175,8 @@ const adjustBucketValue = (value, max, total) => {
 const getTriad = (scale, interval, decoration) => {
   const scaleChromaArray = scale.chroma.split('')
   const tripleOctave = [...scaleChromaArray].concat(scaleChromaArray, scaleChromaArray).map((v, i) => ({
-    v: v,
-    i: i
+    v,
+    i
   }))
   const tripleOctaveFiltered = tripleOctave.filter(v => v.v === '1')
   // console.log('tripleOctave', tripleOctave, tripleOctaveFiltered)
@@ -228,8 +228,8 @@ export const getMelodyWithTimingByDistance = (stars, scale, distanceAttribute, a
     const noteCount = Math.round(s[distanceAttribute] / timeFactor)
     const note = scaleNotes[Math.floor((s[angleAttribute] % 180) / (180 / 7))]
     return {
-      noteCount: noteCount,
-      note: note, // scaleNotes[i % scaleNotes.length],
+      noteCount,
+      note, // scaleNotes[i % scaleNotes.length],
       time: `${Math.floor(noteCount / 8)}:${Math.floor(noteCount / 2) % 4}:${noteCount % 2 === 1 ? 2 : 0}`,
       duration: '4n', // Todo lengths
       starHip: s.hip
@@ -263,8 +263,8 @@ export const getMelodyWithTimingByAngle = (stars, scale, distanceAttribute, angl
 
     // console.log('star', s.bayer, s.proper, '-', s[angleAttribute], noteCount, '-', scaleNotes, s[distanceAttribute], s[distanceAttribute]/maxDistance, (s[distanceAttribute]/maxDistance) '(scaleNotes.length-1), note)
     return {
-      noteCount: noteCount,
-      note: note, // scaleNotes[i % scaleNotes.length],
+      noteCount,
+      note, // scaleNotes[i % scaleNotes.length],
       time: `${Math.floor(noteCount / 8)}:${Math.floor(noteCount / 2) % 4}:${noteCount % 2 === 1 ? 2 : 0}`,
       duration: '4n', // Todo lengths
       starHip: s.hip
@@ -277,7 +277,7 @@ export const getMelodyWithTimingByAngle = (stars, scale, distanceAttribute, angl
     duration: '4n',
     ignore: true,
     melodyTimingByAngle: true,
-    totalBars: totalBars
+    totalBars
   }
   melody.unshift(hiddenFirstNote)
   return melody
@@ -327,7 +327,7 @@ const noteToMidi = (lengthBarSec, lengthBeatSec, lengthSubDSec, chordNotesFlat) 
     }
     // const duration = durationCount 'durationOneLength // TODO - This isn't right, test 1n,2n,4n,8n,1m,2m
 
-    let timeSeconds = (bars * lengthBarSec) + (beats * lengthBeatSec) + (subdivisions * lengthSubDSec)
+    const timeSeconds = (bars * lengthBarSec) + (beats * lengthBeatSec) + (subdivisions * lengthSubDSec)
 
     const midiNote = {
       // bars,
@@ -340,7 +340,7 @@ const noteToMidi = (lengthBarSec, lengthBeatSec, lengthSubDSec, chordNotesFlat) 
       // pitch: n.note.slice(0, -1),
       // octave: parseInt(n.note.slice(-1)),
       velocity: 1,
-      duration: duration
+      duration
     }
     // console.log('converting note', n, midiNote)
     return midiNote
@@ -358,7 +358,7 @@ const convertNotesToMidi = (bpm, timeSig, name, tracks) => { // chordNotes, melo
   const midi = new Midi.Midi()
   midi.header.name = name
   midi.header.setTempo(bpm)
-  midi.header.timeSignatures.push({ticks: 0, timeSignature: beatsInMeasure, measures: beatsLength})
+  midi.header.timeSignatures.push({ ticks: 0, timeSignature: beatsInMeasure, measures: beatsLength })
 
   // console.log('bars/beat/subd', lengthBarSec, lengthBeatSec, lengthSubDSec)
 
@@ -384,7 +384,7 @@ export const chordsToToneNotes = (chords, barOffset, variant) => {
   for (let i = 0; i < chords.length; i++) {
     const chord = chords[i]
     const notesInChord = chord.notes.slice(0, 3).map(n => Note.transpose(n, '-8P'))
-    let decorationNote = chord.notes.length > 3 ? Note.transpose(Note.transpose(chord.notes[3], '-8P'), '-8P') : false
+    const decorationNote = chord.notes.length > 3 ? Note.transpose(Note.transpose(chord.notes[3], '-8P'), '-8P') : false
     if (variant === 2 && i === 3) {
       chordNotes.push({
         time: `${i + barOffset}:0`,
@@ -705,16 +705,16 @@ export const generateSong = (constellationData) => {
   const timeSig = constellationData.music.timeSig
 
   const tracks = [
-    {structure: '0000011111113', type: 'Chords'},
-    {structure: '0111300000000', type: 'Chords Drone'},
-    {structure: '0011300110013', type: 'Melody 1'},
-    {structure: '0000011001100', type: 'Melody 2'},
-    {structure: '0000311111113', type: 'Root Bass'},
-    {structure: '0001311111113', type: 'High Notes'},
-    {structure: '0000000001113', type: 'Picking'},
-    {structure: '0000000111113', type: 'Fast Arpeggio'},
-    {structure: '1111300000000', type: 'Low Drone'},
-    {structure: '0000123445678', type: 'Drums'}
+    { structure: '0000011111113', type: 'Chords' },
+    { structure: '0111300000000', type: 'Chords Drone' },
+    { structure: '0011300110013', type: 'Melody 1' },
+    { structure: '0000011001100', type: 'Melody 2' },
+    { structure: '0000311111113', type: 'Root Bass' },
+    { structure: '0001311111113', type: 'High Notes' },
+    { structure: '0000000001113', type: 'Picking' },
+    { structure: '0000000111113', type: 'Fast Arpeggio' },
+    { structure: '1111300000000', type: 'Low Drone' },
+    { structure: '0000123445678', type: 'Drums' }
   ]
   for (const track of tracks) {
     track.notes = []
@@ -785,7 +785,7 @@ const printNotesForIntrumentsSummary = (starData) => {
       // console.log('track', track)
       let type = types.find(t => t.type === track.type)
       if (!type) {
-        type = {type: track.type, notes: [], durations: []}
+        type = { type: track.type, notes: [], durations: [] }
         types.push(type)
       }
       // if (typeof (track.notes.note) === 'array') {
@@ -842,7 +842,7 @@ const printNotesForIntrumentsSummary = (starData) => {
             notes.push(Note.fromMidi(m))
           }
         }
-        return {o: o, l: l, all: l > 1, root: l === 1, notes: notes}
+        return { o, l, all: l > 1, root: l === 1, notes }
       })
       .reduce(function (a, b) {
         a = a.concat(b.notes)
@@ -853,7 +853,7 @@ const printNotesForIntrumentsSummary = (starData) => {
       //   return {time: `${bar}:0`, note: n, duration: type.duration, bar}
       // })
       .map((n, i) => {
-        return {type: n, notes: [{time: `0:0`, note: n, duration: type.duration}]}
+        return { type: n, notes: [{ time: '0:0', note: n, duration: type.duration }] }
       })
     // console.log('type', type)
     const bpm = 80
@@ -891,7 +891,7 @@ const createAllMidiNotesFile = () => {
       return a
     }, [])
     .map((n, i) => {
-      return {type: n, notes: [{time: `0:0`, note: n, duration: '3m'}]}
+      return { type: n, notes: [{ time: '0:0', note: n, duration: '3m' }] }
     })
   // console.log('noteValues', noteValues)
   // for (const noteValue of noteValues) {
@@ -899,7 +899,7 @@ const createAllMidiNotesFile = () => {
   // }
   const bpm = 80
   const timeSig = [4, 4]
-  const byteArray = convertNotesToMidi(bpm, timeSig, `_all-notes`, noteValues)
+  const byteArray = convertNotesToMidi(bpm, timeSig, '_all-notes', noteValues)
   // console.log('generateSong', byteArray)
   const midiDir = 'midi'
   const filePath = `${midiDir}/_all-notes.mid`
@@ -1236,16 +1236,17 @@ export const getInstrumentForTrack = () => {
     'COL Doppler Monster'
   ]
   return {
-    'Chords': chords,
+    Chords: chords,
     'Chords Drone': chordsDrone,
     'Melody 1': melody,
     'Melody 2': melody,
     'Root Bass': bass,
     'High Notes': highNotes,
-    'Picking': picking,
+    Picking: picking,
     'Fast Arpeggio': fastArpeggio,
     'Low Drone': lowDrone,
-    'Drums': drums }
+    Drums: drums
+  }
 }
 export const getInstruments = () => {
   const soundsDir = join('_static', 'sounds')
@@ -1255,28 +1256,28 @@ export const getInstruments = () => {
     const notes = fs.readdirSync(join(soundsDir, name))
       .filter(f => f.endsWith('.mp3'))
       .map(f => f.replace(`${name} - `, '').replace('.mp3', ''))
-    return { name: name, notes }
+    return { name, notes }
   })
   // for (const instrument of instruments) {
   //   console.log('instrument', instrument)
   // }
-  return {notes: instruments, tracks: getInstrumentForTrack()}
+  return { notes: instruments, tracks: getInstrumentForTrack() }
 }
 export const applyInstrumentsToMusic = (starData) => {
   const instrumentTypes = getInstrumentForTrack()
   const constellations = starData.constellations.map(c => c)
 
   const trackTypeToAttributeList = [
-    {track: 'Chords', bucket: 0},
-    {track: 'Chords Drone', bucket: 1},
-    {track: 'Melody 1', bucket: 2},
-    {track: 'Melody 2', bucket: 3},
-    {track: 'Root Bass', bucket: 4},
-    {track: 'High Notes', bucket: 5},
-    {track: 'Picking', bucket: 6},
-    {track: 'Fast Arpeggio', bucket: 7},
-    {track: 'Low Drone', bucket: 8},
-    {track: 'Drums', bucket: 9}
+    { track: 'Chords', bucket: 0 },
+    { track: 'Chords Drone', bucket: 1 },
+    { track: 'Melody 1', bucket: 2 },
+    { track: 'Melody 2', bucket: 3 },
+    { track: 'Root Bass', bucket: 4 },
+    { track: 'High Notes', bucket: 5 },
+    { track: 'Picking', bucket: 6 },
+    { track: 'Fast Arpeggio', bucket: 7 },
+    { track: 'Low Drone', bucket: 8 },
+    { track: 'Drums', bucket: 9 }
   ]
   for (const trackTypeToAttribute of trackTypeToAttributeList) {
     // console.log('')
@@ -1284,7 +1285,7 @@ export const applyInstrumentsToMusic = (starData) => {
 
     const instruMappings = constellations.map((c, i) => {
       const instrument = instrumentTypes[trackTypeToAttribute.track][Math.floor(i / (constellations.length / instrumentTypes[trackTypeToAttribute.track].length))]
-      return {constellationName: c.constellationName, trackType: trackTypeToAttribute.track, instrument}
+      return { constellationName: c.constellationName, trackType: trackTypeToAttribute.track, instrument }
     })
     for (const instruMapping of instruMappings) {
       const track = starData.constellations.find(c => c.constellationName === instruMapping.constellationName).music.songNotes.find(t => t.type === instruMapping.trackType)
