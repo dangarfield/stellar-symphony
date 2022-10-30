@@ -159,7 +159,8 @@
             -webkit-animation: animated_text 10s ease-in-out infinite;
         }
 
-        .action-play.bi-stop-btn.active .tooltip-text {
+        .action-play.bi-stop-btn.active .tooltip-text,
+        .action-play.bi-stop-btn.active .tooltip-clickme {
             background: rgba(0, 0, 0, 0.6);
             background-size: 100%;
             color: white;
@@ -184,6 +185,11 @@
             100% {
                 background-position: 0px 50%;
             }
+        }
+        @keyframes flickerAnimation {
+            0%   { opacity:1; }
+            50%  { opacity:0; }
+            100% { opacity:1; }
         }
 
 
@@ -243,7 +249,8 @@
             display: inline-block;
         }
 
-        .tooltip-parent .tooltip-text {
+        .tooltip-parent .tooltip-text,
+        .tooltip-parent .tooltip-clickme {
             visibility: hidden;
             width: 110px;
             background-color: rgba(0, 0, 0, 0.6);
@@ -261,11 +268,24 @@
             font-style: normal;
         }
 
-        .tooltip-parent:hover .tooltip-text {
+        .tooltip-parent .tooltip-clickme {
+            visibility: visible;
+            color: #fff;
+            padding: 0;
+            bottom: 80%;
+            animation: flickerAnimation 1s infinite;
+        }
+        .tooltip-parent .tooltip-clickme i {
+            color: #fff;
+        }
+
+        .tooltip-parent:hover .tooltip-text,
+        .tooltip-parent:hover .tooltip-clickme {
             visibility: visible;
         }
 
-        .tooltip-parent:hover .tooltip-text::after {
+        .tooltip-parent:hover .tooltip-text::after,
+        .tooltip-parent:hover .tooltip-clickme {
             content: "";
             position: absolute;
             top: 100%;
@@ -459,7 +479,7 @@
         <nav class="w-100 text-center">
             <div class="navbar-text action-links">
                 <span class="action-bg"><i class="bi bi-play-btn action-play tooltip-parent tone-clip"><span class="tooltip-text">Play</span></i></span>
-                <span class="action-bg"><i class="bi bi-repeat action-play-rotate tooltip-parent"><span class="tooltip-text">Auto Play</span></i></span>
+                <span class="action-bg"><i class="bi bi-repeat action-play-rotate tooltip-parent"><span class="tooltip-text">Auto Play</span><span class="tooltip-clickme">CLICK TO PLAY!<br/><i class="bi bi-arrow-down"></i></span></i></span>
                 <span class="action-bg"><i class="bi bi-skip-forward action-next tooltip-parent"><span class="tooltip-text">Next</span></i></span>
                 <span class="action-bg"><i class="bi bi-info-circle action-info tooltip-parent"><span class="tooltip-text">Music Info</span></i></span>
                 <span class="action-bg d-none"><i class="bi bi-bar-chart-line action-graph-all tooltip-parent"><span class="tooltip-text">All constellation analysis</span></i></span>

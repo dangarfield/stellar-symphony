@@ -490,6 +490,7 @@ const populateExplainInfo = (starData) => {
 export const showDefaultInfoWindow = (starData) => {
   if (window.localStorage.getItem('has-loaded')) {
     showInfoLong()
+    removeClickMe()
   } else {
     showInfoExplain(starData)
     window.localStorage.setItem('has-loaded', true)
@@ -552,8 +553,14 @@ const hideAllOverlays = () => {
   hideInfoGraphOne()
   hideInfoExplain()
 }
+const removeClickMe = () => {
+  const clickMeEle = document.querySelector('.tooltip-clickme')
+  // console.log('removeClickMe', clickMeEle)
+  if(clickMeEle) clickMeEle.remove()
+}
 const bindActionLinks = (starData) => {
   document.querySelector('.action-play').addEventListener('click', function () {
+    removeClickMe()
     this.classList.contains('active') ? stopToneClips() : getToneDataFromElementAndPlay(starData, this)
   })
   document.querySelector('.action-info').addEventListener('click', function () {
@@ -572,6 +579,7 @@ const bindActionLinks = (starData) => {
     this.classList.contains('active') ? hideInfoExplain() : showInfoExplain(starData)
   })
   document.querySelector('.action-play-rotate').addEventListener('click', function () {
+    removeClickMe()
     this.classList.contains('active') ? stopRotate() : playRotate()
   })
   document.querySelector('.action-next').addEventListener('click', function () {
