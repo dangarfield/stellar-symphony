@@ -1,9 +1,9 @@
 import axios from 'axios'
-import {ScaleType, Scale, Note} from '@tonaljs/tonal'
-import {Sampler, Transport, Pattern, Part, start as ToneStart, Draw, Player, JCReverb, ToneAudioBuffer, getContext as getAudioContext} from 'tone'
-import {setupMelodyExplanation, stopMelodyExplanation} from './map.js'
-import {setLoadingText, hideLoadingText, setLoadingPercent, shuffle} from './utils.js'
-import {Tween} from '@tweenjs/tween.js'
+import { ScaleType, Scale, Note } from '@tonaljs/tonal'
+import { Sampler, Transport, Pattern, Part, start as ToneStart, Draw, Player, JCReverb, ToneAudioBuffer, getContext as getAudioContext } from 'tone'
+import { setupMelodyExplanation, stopMelodyExplanation } from './map.js'
+import { setLoadingText, hideLoadingText, setLoadingPercent, shuffle } from './utils.js'
+import { Tween, remove as removeTween } from '@tweenjs/tween.js'
 
 const activeSamplers = []
 let continuousPlay = false
@@ -74,13 +74,25 @@ Transport.on('stop', function () {
   stopToneClips()
 })
 
+const stopProgressTween = () => {
+  if (progressTween) {
+    progressTween.stop()
+    removeTween(progressTween)
+    progressTween = null
+  }
+}
+const startProgressTween = () => {
+  if (progressTween) {
+    progressTween.start()
+  }
+}
 export const stopToneClips = () => {
   console.log('stopToneClips')
   if (Transport.state === 'started') {
     Transport.stop()
     Transport.cancel(0)
   }
-  if(progressTween) progressTween.stop()
+  stopProgressTween()
   removeAllSamplers()
   stopMelodyExplanation()
   document.querySelector('.info-short .tone-clip').style.display = 'inline'
@@ -90,8 +102,8 @@ export const stopToneClips = () => {
   document.querySelector('.action-play .tooltip-text').textContent = 'Play'
 }
 
-const triggeredAnimationAction = (visualMelody, value, timeForAnimation, instrument) => {
-  console.log('Draw', value, instrument)
+const triggeredAnimationAction = (visualMelody, value, timeForAnimation) => {
+  console.log('Draw', value, timeForAnimation)
   if (value.melodyTimingByAngle) {
     visualMelody.animateLine(timeForAnimation)
   }
@@ -218,18 +230,20 @@ const playToneClip = async (starData, toneData) => {
   document.querySelector('.action-play').classList.add('active', 'bi-stop-btn')
   document.querySelector('.action-play .tooltip-text').textContent = `Stop ${toneData.constellation.constellationName}`
   ToneStart()
-  const songProgress = {progress: 0}
-  songProgressEle = document.querySelector('.song-progress')
+  const songProgress = { progress: 0 }
+  const songProgressEle = document.querySelector('.song-progress')
+  console.log('songProgressEle', songProgressEle)
   progressTween = new Tween(songProgress)
-      .to({progress: 100}, 168000)
-      .onUpdate(() => {
-        songProgressEle.style.width = `${songProgress.progress}%`
-      })
-      .onComplete(() => {songProgressEle.style.width = '0%'})
-      .onStop(() => {songProgressEle.style.width = '0%'})
-      .start() // TODO - Move to when first note is played
+    .to({ progress: 100 }, 52.5 * 3 * 1000)
+    .onUpdate(() => {
+      songProgressEle.style.width = `${songProgress.progress}%`
+    })
+    .onComplete(() => { songProgressEle.style.width = '0%' })
+    .onStop(() => { songProgressEle.style.width = '0%' })
+  // .start() // TODO - Move to when first note is played
 
   if (toneData.type === 'scale') {
+    stopProgressTween()
     if (piano === null) {
       piano = await loadPianoSampler()
       setLoadingPercent(100)
@@ -242,6 +256,7 @@ const playToneClip = async (starData, toneData) => {
     activeSamplers.push(scalePattern)
     Transport.bpm.value = 120
   } else if (toneData.type === 'chords' || toneData.type === 'melody') {
+    stopProgressTween()
     if (piano === null) {
       piano = await loadPianoSampler()
       setLoadingPercent(100)
@@ -305,7 +320,7 @@ const playToneClip = async (starData, toneData) => {
             track.sampler.triggerAttackRelease(value.note, value.duration, time)
           }
           Draw.schedule(function () {
-            triggeredAnimationAction(visualMelody, value, timeForAnimation, track.instrument)
+            triggeredAnimationAction(visualMelody, value, timeForAnimation)
           }, time)
         }, track.notes).start(0)
         activeSamplers.push(part)
@@ -317,8 +332,15 @@ const playToneClip = async (starData, toneData) => {
       if (continuousPlay) {
         playNextRotation()
       }
-    }, [{time: '52:2:0'}]).start(0)
+    }, [{ time: '52:2:0' }]).start(0)
     activeSamplers.push(endPart)
+
+    const startPart = new Part((time, value) => {
+      console.log('SCHEDULED START')
+      startProgressTween()
+    }, [{ time: '0:0:0' }]).start(0)
+    activeSamplers.push(startPart)
+
     Transport.bpm.value = toneData.bpm
   }
   setLoadingPercent(100)
@@ -379,7 +401,7 @@ const getPlayerWithLoadingProgress = async (url) => {
   console.log('pre buf')
   const buf = await loadBufferWithProgress(url)
   console.log('post buf', buf)
-  let player = new Player(buf)
+  const player = new Player(buf)
   player.toDestination()
   player.sync().start(0)
   activeSamplers.push(player)
@@ -392,7 +414,7 @@ export const getToneDataFromElementAndPlay = (starData, ele) => {
   const constellationId = ele.getAttribute('data-constellation')
   const constellation = starData.constellations.find(c => c.constellation === constellationId)
   const url = ele.getAttribute('data-url')
-  let toneData = {bpm: constellation.music.bpm, timeSig: constellation.music.timeSig, constellation, url: url}
+  const toneData = { bpm: constellation.music.bpm, timeSig: constellation.music.timeSig, constellation, url }
   switch (type) {
     case 'scale':
       toneData.type = 'scale'

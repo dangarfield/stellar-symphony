@@ -48,7 +48,7 @@ export const globalBindings = () => {
   })
 }
 export const downloadStarData = (url) => {
-  return new Promise(async resolve => {
+  return new Promise(resolve => {
     axios.get(url, {
       onDownloadProgress: function (progressEvent) {
         let percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)

@@ -45,6 +45,7 @@
         "@rollup/plugin-json": "^4.1.0",
         "@rollup/plugin-node-resolve": "^13.3.0",
         "rollup-plugin-livereload": "^2.0.5",
-        "rollup-plugin-serve": "^2.0.1"
+        "rollup-plugin-serve": "^2.0.1",
+        "standard": "^17.0.0"
     }
 }

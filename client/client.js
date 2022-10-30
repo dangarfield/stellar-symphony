@@ -1,6 +1,6 @@
-import {ensureCorrectLoadingText, setLoadingText, hideLoadingText, filterConstellationsFromUrl, globalBindings, downloadStarData} from './utils.js'
-import {initConstellationData} from './graphing.js'
-import {addStarMap} from './map.js'
+import { ensureCorrectLoadingText, setLoadingText, hideLoadingText, filterConstellationsFromUrl, globalBindings, downloadStarData } from './utils.js'
+import { initConstellationData } from './graphing.js'
+import { addStarMap } from './map.js'
 
 const init = async () => {
   try {

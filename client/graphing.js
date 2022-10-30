@@ -1,6 +1,6 @@
-import {getScaleText, getToneDataFromElementAndPlay, stopToneClips, loadSampler, playRotate, stopRotate, playNextRotation, playNext} from './audio.js'
-import {focusMapOnConstellation, setBgStarsVisibility} from './map.js'
-import {Chart, ScatterController, LinearScale, PointElement, LineController, CategoryScale, LineElement, Legend} from 'chart.js'
+import { getScaleText, getToneDataFromElementAndPlay, stopToneClips, loadSampler, playRotate, stopRotate, playNextRotation, playNext } from './audio.js'
+import { focusMapOnConstellation, setBgStarsVisibility } from './map.js'
+import { Chart, ScatterController, LinearScale, PointElement, LineController, CategoryScale, LineElement, Legend } from 'chart.js'
 
 Chart.register(ScatterController, LinearScale, PointElement, LineController, CategoryScale, LineElement, Legend)
 
@@ -107,11 +107,13 @@ const generateConstellationMapDataHtml = (constellationData, instruments) => {
         data-constellation="${constellationData.constellation}" data-type="song">
         Real time
       </i>
-      ${constellationData.music.songPath ? `
+      ${constellationData.music.songPath
+? `
       - <i class="bi bi-play-circle tone-clip"
         data-constellation="${constellationData.constellation}" data-type="song" data-url="${constellationData.music.songPath}">
         Recording
-      </i>` : ''}
+      </i>`
+: ''}
     </p>
     </p>
 
@@ -219,7 +221,7 @@ const graphData = {}
 const preProcessGraphData = (starData) => {
   // console.log('preProcessGraphData: START')
   graphData.dataAbsmagAll = {
-    label: `ALL - absmag - average`,
+    label: 'ALL - absmag - average',
     backgroundColor: getColor(19),
     borderColor: getColor(19),
     data: starData.ranges.absmag.averages,
@@ -227,7 +229,7 @@ const preProcessGraphData = (starData) => {
     hidden: true
   }
   graphData.dataMagAll = {
-    label: `ALL - mag - average`,
+    label: 'ALL - mag - average',
     backgroundColor: getColor(19),
     borderColor: getColor(19),
     data: starData.ranges.mag.averages,
@@ -235,7 +237,7 @@ const preProcessGraphData = (starData) => {
     hidden: true
   }
   graphData.dataRVAll = {
-    label: `ALL - rv - average`,
+    label: 'ALL - rv - average',
     backgroundColor: getColor(19),
     borderColor: getColor(19),
     data: starData.ranges.rv.averages,
@@ -243,7 +245,7 @@ const preProcessGraphData = (starData) => {
     hidden: true
   }
   graphData.dataLumAll = {
-    label: `ALL - lum - average`,
+    label: 'ALL - lum - average',
     backgroundColor: getColor(19),
     borderColor: getColor(19),
     data: starData.ranges.lum.averages,
@@ -251,7 +253,7 @@ const preProcessGraphData = (starData) => {
     hidden: true
   }
   graphData.dataCiAll = {
-    label: `ALL - ci - average`,
+    label: 'ALL - ci - average',
     backgroundColor: getColor(19),
     borderColor: getColor(19),
     data: starData.ranges.ci.averages,
@@ -556,7 +558,7 @@ const hideAllOverlays = () => {
 const removeClickMe = () => {
   const clickMeEle = document.querySelector('.tooltip-clickme')
   // console.log('removeClickMe', clickMeEle)
-  if(clickMeEle) clickMeEle.remove()
+  if (clickMeEle) clickMeEle.remove()
 }
 const bindActionLinks = (starData) => {
   document.querySelector('.action-play').addEventListener('click', function () {

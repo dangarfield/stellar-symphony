@@ -1,15 +1,17 @@
-import {Vector3, Scene, Color, PerspectiveCamera, WebGLRenderer, TextureLoader,
+import {
+  Vector3, Scene, Color, PerspectiveCamera, WebGLRenderer, TextureLoader,
   BufferGeometry, Points, ShaderMaterial, AdditiveBlending, Float32BufferAttribute,
   Mesh, SphereGeometry, MeshPhongMaterial, DoubleSide, Raycaster, Vector2, Line3, MathUtils, Group,
-  EllipseCurve, LineBasicMaterial, LineLoop, Object3D, EdgesGeometry, LineSegments, RingGeometry, CircleGeometry, MeshBasicMaterial} from 'three'
+  EllipseCurve, LineBasicMaterial, LineLoop, Object3D, EdgesGeometry, LineSegments, RingGeometry, CircleGeometry, MeshBasicMaterial
+} from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Line2 } from 'three/examples/jsm/lines/Line2.js'
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js'
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js'
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js'
-import {updateSelectedConstellation, showDefaultInfoWindow, showAllStars, hideAllStars} from './graphing.js'
-import {Tween, update as tweenUpdate, Easing} from '@tweenjs/tween.js'
-import {getScaleNotesFromChrome} from './audio.js'
+import { updateSelectedConstellation, showDefaultInfoWindow, showAllStars, hideAllStars } from './graphing.js'
+import { Tween, update as tweenUpdate, Easing } from '@tweenjs/tween.js'
+import { getScaleNotesFromChrome } from './audio.js'
 import Stats from 'three/examples/jsm/libs/stats.module.js'
 
 const starVertexShader = () => {
@@ -124,13 +126,14 @@ const getNoteTypeColor = (notePos) => {
     // case 6: return 0xEF4C9D
 
     // Greyscale
-    case 0: default: return 0xFFFFFF
+    case 0: return 0xFFFFFF
     case 1: return 0x333333
     case 2: return 0x888888
     case 3: return 0x333333
     case 4: return 0x888888
     case 5: return 0x333333
     case 6: return 0x888888
+    default: return 0xFFFFFF
   }
 }
 const createPitchExplanationDistanceCircle = (targetPoint, starPoint, angleFromCentre, scaleChroma) => {
@@ -149,7 +152,7 @@ const createPitchExplanationDistanceCircle = (targetPoint, starPoint, angleFromC
     const outerRadius = (i + 1) * segmentRadius
     const color = getNoteTypeColor(i)
     const geometry = new RingGeometry(innerRadius, outerRadius, 32 + (5 * i))
-    const material = new MeshBasicMaterial({ color: color, opacity: 0.3, transparent: true, side: DoubleSide })
+    const material = new MeshBasicMaterial({ color, opacity: 0.3, transparent: true, side: DoubleSide })
     const mesh = new Mesh(geometry, material)
     mesh.position.x = targetPoint.x
     mesh.position.y = targetPoint.y
@@ -195,7 +198,7 @@ const createPitchExplanationAngleCircle = (targetPoint, starPoint, angleFromCent
     const notePos = i % segmentTotal// === 0 ? 0 : segmentTotal - (i % segmentTotal)
     // console.log('circle', i, thetaStart, notePos)
     const color = getNoteTypeColor(notePos)
-    const material = new MeshBasicMaterial({ color: color, opacity: 0.3, transparent: true, side: DoubleSide })
+    const material = new MeshBasicMaterial({ color, opacity: 0.3, transparent: true, side: DoubleSide })
     const mesh = new Mesh(geometry, material)
     mesh.position.x = targetPoint.x
     mesh.position.y = targetPoint.y
@@ -310,9 +313,9 @@ const setupMelodyExplanationGroup = () => {
   scene.add(explanationGroup)
 }
 const clearMelodyExplanationGroup = () => {
-  var obj, i
+  let obj, i
   for (i = scene.children.length - 1; i >= 0; i--) {
-    obj = scene.children[ i ]
+    obj = scene.children[i]
     if (obj.is_ob) {
       removeAndDisposeProperly(obj)
     }
@@ -398,9 +401,9 @@ export const setupMelodyExplanation = (constellation) => {
     explanationObject.notesCircleAngle.visible = true
     explanationObject.notesCircleAngle.userData.setLabelsVisible(true)
     // explanationObject.notesCircleAngle.setRotationFromAxisAngle(centreVec, MathUtils.degToRad(0 - furthestStarFromCentre.angleFromCentre))
-    const angleTweenConfig = {radius: 0}
+    const angleTweenConfig = { radius: 0 }
     explanationObject.timingCircleTween = new Tween(angleTweenConfig)
-      .to({radius: furthestStarFromAlpha.distanceFromAlpha - (furthestStarFromAlpha.distanceFromAlpha * 0.04)}, time - 5)
+      .to({ radius: furthestStarFromAlpha.distanceFromAlpha - (furthestStarFromAlpha.distanceFromAlpha * 0.04) }, time - 5)
       .easing(function (value) { // Distances are not linear, add a small weighting of quadratic easing to roughly approximate
         const q = 1
         const l = 7
@@ -431,9 +434,9 @@ export const setupMelodyExplanation = (constellation) => {
     explanationObject.notesCircleDistance.visible = true
     explanationObject.notesCircleDistance.userData.setLabelsVisible(true)
     explanationObject.notesCircleDistance.setRotationFromAxisAngle(centreVec, MathUtils.degToRad(0 - furthestStarFromCentre.angleFromCentre))
-    const angleTweenConfig = {angle: 0}
+    const angleTweenConfig = { angle: 0 }
     explanationObject.timingLineTween = new Tween(angleTweenConfig)
-      .to({angle: 360}, time - 1)
+      .to({ angle: 360 }, time - 1)
       .onUpdate(() => {
         explanationObject.timingLine.setRotationFromAxisAngle(centreVec, MathUtils.degToRad(angleTweenConfig.angle - furthestStarFromCentre.angleFromCentre))
         explanationObject.timingLine.visible = true
@@ -458,8 +461,8 @@ export const setupMelodyExplanation = (constellation) => {
     // console.log('animateStar', starHip, starIndex)
     // explanationObject.points.geometry.attributes.size.array[starIndex] = 0.1
     // explanationObject.points.geometry.attributes.size.needsUpdate = true
-    const sizeConfig = {size: 0}
-    explanationObject.starTween = new Tween(sizeConfig).to({size: 0.1}, 200)
+    const sizeConfig = { size: 0 }
+    explanationObject.starTween = new Tween(sizeConfig).to({ size: 0.1 }, 200)
       .onUpdate(() => {
         explanationObject.points.geometry.attributes.size.array[starIndex] = sizeConfig.size
         explanationObject.points.geometry.attributes.size.needsUpdate = true
@@ -467,7 +470,7 @@ export const setupMelodyExplanation = (constellation) => {
       .onComplete(() => {
         // explanationObject.timingLine.visible = false
       })
-    const tweenB = new Tween(sizeConfig).to({size: 0}, 2000)
+    const tweenB = new Tween(sizeConfig).to({ size: 0 }, 2000)
       .onUpdate(() => {
         explanationObject.points.geometry.attributes.size.array[starIndex] = sizeConfig.size
         explanationObject.points.geometry.attributes.size.needsUpdate = true
@@ -490,9 +493,9 @@ const updateFovFromDistance = () => {
 
 export const focusMapOnConstellation = (constellation) => {
   controls.enabled = false
-  const oldCamPos = {x: camera.position.x, y: camera.position.y, z: camera.position.z}
+  const oldCamPos = { x: camera.position.x, y: camera.position.y, z: camera.position.z }
   const newCamVec = new Vector3(constellation.centre.x, constellation.centre.y, constellation.centre.z).lerp(new Vector3(0, 0, 0), 1.3)
-  const newCamPos = {x: newCamVec.x, y: newCamVec.y, z: newCamVec.z}
+  const newCamPos = { x: newCamVec.x, y: newCamVec.y, z: newCamVec.z }
 
   new Tween(oldCamPos)
     .to(newCamPos, 1000)
@@ -618,7 +621,7 @@ const loadStars = () => {
       pointsArray.push(constellation.centre.x, constellation.centre.y, constellation.centre.z)
       sizesArray.push(0.03)
       colorsArray.push(1, 0, 0, 1)
-      centrePoints.push({c: constellation.constellation, v: new Vector3(constellation.centre.x, constellation.centre.y, constellation.centre.z)})
+      centrePoints.push({ c: constellation.constellation, v: new Vector3(constellation.centre.x, constellation.centre.y, constellation.centre.z) })
     }
     // console.log('sizeArray', sizesArray)
     bufGeom.setAttribute('position', new Float32BufferAttribute(pointsArray, 3))
