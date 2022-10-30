@@ -3,10 +3,12 @@ import {ScaleType, Scale, Note} from '@tonaljs/tonal'
 import {Sampler, Transport, Pattern, Part, start as ToneStart, Draw, Player, JCReverb, ToneAudioBuffer, getContext as getAudioContext} from 'tone'
 import {setupMelodyExplanation, stopMelodyExplanation} from './map.js'
 import {setLoadingText, hideLoadingText, setLoadingPercent, shuffle} from './utils.js'
+import {Tween} from '@tweenjs/tween.js'
 
 const activeSamplers = []
 let continuousPlay = false
 let rotationList = []
+let progressTween
 
 export const playNext = async (dontPlay) => {
   stopToneClips()
@@ -78,6 +80,7 @@ export const stopToneClips = () => {
     Transport.stop()
     Transport.cancel(0)
   }
+  if(progressTween) progressTween.stop()
   removeAllSamplers()
   stopMelodyExplanation()
   document.querySelector('.info-short .tone-clip').style.display = 'inline'
@@ -215,6 +218,17 @@ const playToneClip = async (starData, toneData) => {
   document.querySelector('.action-play').classList.add('active', 'bi-stop-btn')
   document.querySelector('.action-play .tooltip-text').textContent = `Stop ${toneData.constellation.constellationName}`
   ToneStart()
+  const songProgress = {progress: 0}
+  songProgressEle = document.querySelector('.song-progress')
+  progressTween = new Tween(songProgress)
+      .to({progress: 100}, 168000)
+      .onUpdate(() => {
+        songProgressEle.style.width = `${songProgress.progress}%`
+      })
+      .onComplete(() => {songProgressEle.style.width = '0%'})
+      .onStop(() => {songProgressEle.style.width = '0%'})
+      .start() // TODO - Move to when first note is played
+
   if (toneData.type === 'scale') {
     if (piano === null) {
       piano = await loadPianoSampler()

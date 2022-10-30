@@ -369,8 +369,16 @@
             margin: 0 auto;
         }
 
-
-
+        .song-progress {
+            width: 0%;
+            height: 6px;
+            margin-top: -6px;
+            background: linear-gradient(-45deg, #FF00FF, #FF00FF, #1363DF, #1363DF);
+            background-size: 300%;
+            animation: animated_text 10s ease-in-out infinite;
+            -moz-animation: animated_text 10s ease-in-out infinite;
+            -webkit-animation: animated_text 10s ease-in-out infinite;
+        }
         @media (max-width: 576px) {
             .explanation .nav-pills .nav-link {
                 padding: 4px;
@@ -488,6 +496,9 @@
                 <span class="action-bg d-none"><i class="bi bi-stars action-all-stars tooltip-parent active"><span class="tooltip-text">Show / Hide stars for performance</span></i></span>
             </div>
         </nav>
+        <div class="w-100 song-progress-holder">
+            <div class="song-progress"></div>
+        </div>
     </footer>
 
     <template id="explanation">
