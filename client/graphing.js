@@ -487,11 +487,11 @@ const populateExplainInfo = (starData) => {
   document.querySelector('.info-full .name').textContent = 'How it all works'
   document.querySelector('.info-full .info-body').innerHTML = `<div class="readme">${starData.readme}</div>`
 }
-export const showDefaultInfoWindow = () => {
+export const showDefaultInfoWindow = (starData) => {
   if (window.localStorage.getItem('has-loaded')) {
     showInfoLong()
   } else {
-    showInfoExplain()
+    showInfoExplain(starData)
     window.localStorage.setItem('has-loaded', true)
   }
 }

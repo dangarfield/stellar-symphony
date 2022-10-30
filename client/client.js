@@ -19,6 +19,7 @@ const init = async () => {
     hideLoadingText()
   } catch (error) {
     window.alert(`Error: ${error.message}`)
+    console.error('error', error)
   }
 }
 

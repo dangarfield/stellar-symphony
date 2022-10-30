@@ -783,6 +783,6 @@ export const addStarMap = (passedStarData) => {
   const initialConstellation = starData.constellations.find(c => c.constellationName === 'Aquarius') || starData.constellations[0]
   // console.log('initialConstellation', initialConstellation)
   updateSelectedConstellation(starData, initialConstellation.constellation, true)
-  showDefaultInfoWindow()
+  showDefaultInfoWindow(starData)
   render()
 }
