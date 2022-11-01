@@ -32,7 +32,7 @@ In this experiment, I've created 24 buckets for each of the different pieces of 
 - Relative magnitude (how bright the star appears from earth)
 - Luminosity (the colour, closely representing the temperature of the star)
 - etc
-
+ 
 Once we have these buckets, we can start to group them for each constellation of stars. Some constellations may have more bright stars, or hotter stars.
 Funnily enough, it starts to look like an musical EQ curve. We can also take the average of all stars and compare the constellations to those averages.
 This is ultimately how I've created the rules the crate the music, by identifying differences between the constellations and making them into
