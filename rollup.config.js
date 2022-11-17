@@ -13,10 +13,10 @@ export default {
     format: 'cjs'
   },
   plugins: [
-    nodeResolve({browser: true}),
+    nodeResolve({ browser: true }),
     json(),
-    !production && serve({open: true, contentBase: '_static', port: 3000}),
-    !production && livereload({watch: '_static'}),
+    !production && serve({ open: true, contentBase: '_static', port: 3000 }),
+    !production && livereload({ watch: '_static' }),
     commonjs()
   ]
 }
