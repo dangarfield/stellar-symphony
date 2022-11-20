@@ -42,7 +42,7 @@ export const playNextRotation = async (dontPlay) => {
 const populateRotationList = () => {
   rotationList = [...document.querySelectorAll('.constellation-select option')].filter(o => o.textContent.includes('Favourite')).map(o => o.value)
   shuffle(rotationList)
-  console.log('populateRotationList', rotationList)
+  // console.log('populateRotationList', rotationList)
 }
 export const playRotate = () => {
   document.querySelector('.action-play-rotate').classList.add('active')
